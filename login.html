@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gym Login</title>
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -20,6 +19,7 @@
             font-family: 'Poppins', sans-serif;
         }
 
+        /* Using a local placeholder image that you should replace with a real gym image */
         .login-background {
             background-image: url('https://placehold.co/1200x800/222222/ffffff?text=GYM+BACKGROUND'); 
             background-size: cover;
@@ -94,36 +94,36 @@
         .text-link:hover {
             color: #fff;
         }
+
+        /* Style for the link to the signup page */
+        .signup-link {
+            color: var(--primary-purple); /* Highlighted color */
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="bg-gray-900">
 
-    <!-- Top Left Title -->
     <div class="absolute top-0 left-0 p-4 z-20 text-white font-semibold">Log In</div>
 
-    <!-- Main Background Container -->
     <div class="login-background">
         <div class="overlay"></div>
 
-        <!-- Login Card -->
         <div class="login-card">
             <h1 class="text-4xl font-bold mb-8 text-white">Sign-in</h1>
             
             <form onsubmit="handleLogin(event)" class="space-y-6">
 
-                <!-- Email Field -->
                 <div>
                     <label for="email" class="block text-left text-sm font-medium text-white mb-1">Email<span class="text-red-500">*</span></label>
                     <input type="email" id="email" class="custom-input" placeholder="Enter your email" required>
                 </div>
 
-                <!-- Password Field -->
                 <div>
                     <label for="password" class="block text-left text-sm font-medium text-white mb-1">Password<span class="text-red-500">*</span></label>
                     <input type="password" id="password" class="custom-input" placeholder="Enter your password" required>
                 </div>
                 
-                <!-- Remember Me & Forgot Password -->
                 <div class="flex justify-between items-center text-sm">
                     <div class="flex items-center">
                         <input id="remember-me" type="checkbox" class="h-4 w-4 bg-gray-700 border-gray-500 rounded text-purple-600 focus:ring-purple-500">
@@ -134,56 +134,60 @@
                     <a href="#" class="text-link hover:underline">Forgot Password?</a>
                 </div>
 
-                <!-- Login Button -->
                 <button type="submit" class="login-button w-full mt-8">
                     Login
                 </button>
-
             </form>
+
+            <div class="mt-6 text-sm text-gray-400">
+                Don't have an account? 
+                <a href="signup.html" class="signup-link hover:underline">
+                    Create an account
+                </a>
+            </div>
         </div>
     </div>
     
-    <!-- Message Box -->
     <div id="message-box" class="fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-xl hidden transition-all duration-300 transform translate-y-full"></div>
 
-    <script>
-        function showMessage(message, isError = false) {
-            const msgBox = document.getElementById('message-box');
-            msgBox.textContent = message;
-            msgBox.className = 'fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-xl transition-all duration-300 transform';
-            msgBox.classList.add(isError ? 'bg-red-600' : 'bg-green-600', 'translate-y-0', 'block');
+   <script>
+    // ... (Your showMessage function remains here) ...
 
-            setTimeout(() => {
-                msgBox.classList.add('translate-y-full');
-                msgBox.classList.remove('translate-y-0');
-            }, 3000);
-            setTimeout(() => {
-                msgBox.classList.add('hidden');
-            }, 3500);
+    function handleLogin(event) {
+        event.preventDefault(); 
+        
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (email.length < 5 || password.length < 4) {
+            showMessage("Please enter a valid email and password.", true);
+            return;
         }
 
-        // Updated handleLogin function
-        function handleLogin(event) {
-            event.preventDefault(); 
-            
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
+        // --- SIMULATED LOGIN FOR WORKABLE LINKING ---
+        // Successful Login Condition:
+        if (email === "admin@test.com" && password === "1234") { 
+            const userData = {
+                name: "Alex Johnson",
+                email: email,
+                role: "Senior Manager",
+                id: "SM-7790"
+            };
 
-            console.log(`Attempting login for: ${email}`);
+            // CRUCIAL: Save User Data to Local Storage
+            localStorage.setItem('loggedInUser', JSON.stringify(userData));
 
-            if (email.length < 5 || password.length < 4) {
-                showMessage("Please enter a valid email and password.", true);
-                return;
-            }
-
-            // Simulated success message
             showMessage("Login successful! Redirecting to admin page...");
 
-            // Redirect after short delay
+            // Redirect to admin.html
             setTimeout(() => {
-                window.location.href = "admin.html";
+                window.location.href = "admin.html"; 
             }, 1500);
+
+        } else {
+            showMessage("Login failed: Invalid email or password.", true);
         }
-    </script>
+    }
+</script>
 </body>
 </html>

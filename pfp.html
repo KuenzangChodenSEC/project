@@ -135,7 +135,7 @@
             color: #fff;
         }
         
-        /* CORRECTED: Sidebar link dividers to match admin.html layout */
+        /* Sidebar link dividers to match admin.html layout */
         .nav-links-container a:nth-child(4) { 
             border-top: 1px solid var(--color-dark-sidebar); 
             padding-top: 15px; 
@@ -526,7 +526,7 @@
                         <span>Join Date:</span><span>DD/MM/YYYY</span>
                     </div>
 
-                    <button class="register-button">Register New Admin</button>
+                    <button class="register-button" onclick="window.location.href='registration.html';">Register New Admin</button>
                 </div>
 
                 <div class="forms-section">
@@ -593,20 +593,24 @@
             e.preventDefault();
             showMessage('Profile updated successfully!');
             
-            // Example update to sidebar for visual consistency
+            // Update values on the page and sidebar after successful submission
             const newName = document.getElementById('fullName').value;
             const newEmail = document.getElementById('adminEmail').value;
             document.getElementById('sidebar-admin-name').textContent = newName;
             document.getElementById('sidebar-admin-email').textContent = newEmail;
             document.getElementById('display-name').textContent = newName;
             document.getElementById('display-email').textContent = newEmail;
+            
+            // Note: In a real application, you would send this data to a server here.
         });
 
         document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            const currentPass = document.getElementById('currentPassword').value;
             const newPass = document.getElementById('newPassword').value;
             const confirmPass = document.getElementById('confirmPassword').value;
-
+            
+            // Basic client-side validation
             if (newPass !== confirmPass) {
                 showMessage('Error: New passwords do not match.', true);
                 return;
@@ -615,13 +619,21 @@
                 showMessage('Error: Password must be at least 6 characters.', true);
                 return;
             }
+            if (currentPass === newPass) {
+                showMessage('Error: New password cannot be the same as current password.', true);
+                return;
+            }
 
+            // Note: In a real application, you would validate the current password against the server here.
+            
             showMessage('Password changed successfully!');
             this.reset(); // Clear the form fields
         });
 
         document.querySelector('.btn-cancel').addEventListener('click', function() {
-            document.getElementById('updateProfileForm').reset();
+            // Revert profile inputs to displayed values
+            document.getElementById('fullName').value = document.getElementById('display-name').textContent;
+            document.getElementById('adminEmail').value = document.getElementById('display-email').textContent;
         });
 
         document.querySelector('.btn-clear').addEventListener('click', function() {
