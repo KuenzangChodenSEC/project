@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Inventory</title>
+    <!-- Using Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-dark-bg: #1a1a1a;
+            --color-dark-sidebar: #222;
+            --color-light-bg: #f5f5f5;
+            --color-card-bg: #fff;
+            --color-accent: #6f5f90; 
+            --color-text-light: #aaa;
+            --color-text-dark: #333;
+            --color-active: #40384a; 
+            --color-border: #e0e0e0;
+            --color-table-bg: #40384a; /* Dark background for Table card */
+            --color-table-header: #8a819b;
+            --color-table-row: #f0f0f0;
+            --color-edit-button: #6f5f90;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--color-light-bg);
+            color: var(--color-text-dark);
+            overflow: hidden; 
+        }
+
+        /* ----------------------- */
+        /* 1. Sidebar (Reused Styles) */
+        /* ----------------------- */
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--color-dark-bg);
+            color: var(--color-text-light);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-header {
+            padding: 0 20px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .admin-profile-sidebar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0 30px;
+            border-bottom: 1px solid var(--color-dark-sidebar);
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #333; 
+            border: 2px solid #fff;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .avatar-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            color: #fff;
+        }
+
+        .admin-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .admin-email {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--color-text-light);
+        }
+
+        .nav-links-container {
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-light);
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            margin-right: 15px;
+            font-size: 16px;
+        }
+
+        .nav-link:hover {
+            background-color: var(--color-dark-sidebar);
+            color: #fff;
+        }
+
+        .nav-link.active {
+            background-color: var(--color-active);
+            color: #fff;
+        }
+        
+        .nav-link.active i {
+            color: #fff;
+        }
+        
+        .nav-links-container > a:nth-child(2) { border-top: 1px solid var(--color-dark-sidebar); padding-top: 15px; }
+        .nav-links-container > a:last-child { border-bottom: 1px solid var(--color-dark-sidebar); padding-bottom: 15px; margin-bottom: 20px; }
+
+
+        .logout-section {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--color-dark-sidebar);
+        }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-light);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .logout-link i {
+            margin-right: 10px;
+        }
+
+        .logout-link:hover {
+            color: var(--color-accent);
+        }
+
+        .bottom-logo {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            background-color: #333; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        /* ----------------------- */
+        /* 2. Main Content (Inventory) */
+        /* ----------------------- */
+        
+        .main-content {
+            margin-left: 250px; 
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto; 
+            background-color: var(--color-light-bg); 
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .inventory-container {
+            max-width: 900px;
+            background-color: var(--color-light-bg);
+            padding: 0;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            position: relative; /* For the fixed button */
+            min-height: calc(100vh - 80px); /* Adjust height for scrolling content */
+        }
+
+        .page-header {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--color-text-dark);
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-text-dark);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--color-accent);
+            display: inline-block;
+        }
+
+        /* --- Table Card Styles --- */
+        .equipment-list-card {
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background-color: var(--color-table-bg);
+            color: var(--color-table-row);
+        }
+
+        .list-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .show-entries {
+            display: flex;
+            align-items: center;
+        }
+        .show-entries label {
+            color: var(--color-table-header);
+            font-size: 13px;
+            margin-right: 10px;
+        }
+
+        .show-entries select {
+            background-color: #333;
+            border: 1px solid var(--color-table-header);
+            padding: 5px;
+            border-radius: 4px;
+            color: var(--color-table-row);
+            font-size: 13px;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+
+        .search-box label {
+            color: var(--color-table-header);
+            font-size: 13px;
+            margin-right: 10px;
+        }
+
+        .search-box input {
+            padding: 8px 40px 8px 15px; /* Padding for icon */
+            border-radius: 6px;
+            border: 1px solid var(--color-table-header);
+            background-color: #333;
+            color: var(--color-table-row);
+            font-size: 14px;
+            width: 250px;
+        }
+
+        .search-box i {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            color: var(--color-table-header);
+        }
+
+        .equipment-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .equipment-table thead th {
+            color: var(--color-table-header);
+            font-weight: 600;
+            font-size: 13px;
+            text-align: left;
+            padding: 10px 15px;
+            border-bottom: 1px solid #555;
+        }
+        
+        .equipment-table tbody tr {
+            border-bottom: 1px solid #3d3d3d;
+            transition: background-color 0.2s;
+        }
+
+        .equipment-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .equipment-table td {
+            padding: 15px;
+            font-size: 14px;
+        }
+
+        .sort-icon {
+            margin-left: 5px;
+            color: var(--color-table-header);
+        }
+
+        .status-active {
+            color: #5cb85c; /* Green */
+            font-weight: 500;
+        }
+        .status-inactive {
+            color: #d9534f; /* Red */
+            font-weight: 500;
+        }
+
+        .action-buttons button {
+            background-color: var(--color-edit-button);
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .action-buttons button:hover {
+            background-color: #564c70;
+        }
+
+        /* Add Equipment Button (Floating) */
+        #add-equipment-btn {
+            position: absolute;
+            bottom: 0px; 
+            right: 0px; 
+            background-color: var(--color-accent);
+            color: #fff;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        #add-equipment-btn:hover {
+            background-color: #564c70;
+        }
+
+        /* Message/Modal styles */
+        #messageBox {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transition: opacity 0.5s, transform 0.5s;
+            opacity: 0;
+            transform: translateY(-20px);
+            font-weight: 500;
+        }
+        #messageBox.error {
+            background-color: #f44336;
+        }
+        #messageBox.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar { width: 70px; }
+            .main-content { margin-left: 70px; }
+            .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span, .bottom-logo { display: none; }
+            .admin-profile-sidebar { border-bottom: none; padding-bottom: 0; }
+            .avatar { margin-bottom: 20px; }
+            .nav-link { justify-content: center; padding: 15px 0; }
+            .nav-link i { margin-right: 0; }
+            .logout-section { justify-content: center; }
+            .logout-link i { margin-right: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content { padding: 20px; }
+            .list-controls { flex-direction: column; gap: 15px; align-items: flex-start; }
+            .equipment-table th, .equipment-table td { padding: 10px; font-size: 12px; }
+            .search-box input { width: 100%; }
+            #add-equipment-btn {
+                right: 20px;
+                bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Message Box for feedback -->
+    <div id="messageBox"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="dashboard-header">Equipment</div>
+        
+        <div class="admin-profile-sidebar">
+            <div class="avatar">
+                <div class="avatar-inner"><i class="fas fa-user"></i></div>
+            </div>
+            <div class="admin-name" id="sidebar-admin-name">Administrator Name</div>
+            <div class="admin-email" id="sidebar-admin-email">admin@example.com</div>
+        </div>
+
+        <div class="nav-links-container">
+            <a class="nav-link" href="#">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-user-circle"></i>
+                <span>Admin Profile</span>
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-registered"></i>
+                <span>Registration</span>
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Plan</span>
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-credit-card"></i>
+                <span>View Payment</span>
+            </a>
+            <a class="nav-link active">
+                <i class="fas fa-box-open"></i>
+                <span>Inventory</span>
+            </a>
+            <a class="nav-link">
+                <i class="fas fa-users"></i>
+                <span>View Members</span>
+            </a>
+        </div>
+
+        <div class="logout-section">
+            <a class="logout-link" id="logout-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+            <div class="bottom-logo">CG</div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1 class="page-header">Equipment</h1>
+        <div class="inventory-container">
+            
+            <div class="section-title">View Equipment</div>
+            
+            <!-- Equipment List Card -->
+            <div class="equipment-list-card">
+                
+                <div class="list-controls">
+                    <div class="show-entries">
+                        <label for="show-entries">Show Entities</label>
+                        <select id="show-entries">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                    <div class="search-box">
+                        <label for="search-input">Search</label>
+                        <input type="text" id="search-input" placeholder="">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="equipment-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40%;">Equipment Name <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 20%;">Total No. <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 20%;">Status <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 15%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipment-table-body">
+                            <!-- Equipment rows will be inserted here by JavaScript -->
+                            <tr><td colspan="4" style="text-align: center;">Loading equipment...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Floating Button -->
+            <button id="add-equipment-btn" onclick="simulateAddEquipment()">Add Equipment</button>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Global Firebase and Config ---
+        let db;
+        let auth;
+        let userId = '';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        setLogLevel('Debug');
+
+        // --- UI Element References ---
+        const equipmentTableBody = document.getElementById('equipment-table-body');
+        const searchInput = document.getElementById('search-input');
+
+        let currentEquipment = []; 
+
+        // --- Utility Function for Feedback ---
+        function showMessage(message, isError = false) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = isError ? 'error' : '';
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
+        
+        // --- Firestore References ---
+        // Path: /artifacts/{appId}/public/data/equipment
+        function getEquipmentCollectionRef() {
+            return collection(db, 'artifacts', appId, 'public', 'data', 'equipment');
+        }
+
+        // --- Data Rendering and Filtering ---
+
+        function renderEquipment(equipment, searchTerm = '') {
+            equipmentTableBody.innerHTML = '';
+            
+            const lowerSearchTerm = searchTerm.toLowerCase().trim();
+            
+            const filteredEquipment = equipment.filter(item => 
+                item.name.toLowerCase().includes(lowerSearchTerm) ||
+                item.totalNo.toString().includes(lowerSearchTerm) ||
+                item.status.toLowerCase().includes(lowerSearchTerm)
+            );
+
+            if (filteredEquipment.length === 0) {
+                const row = `<tr><td colspan="4" style="text-align: center; color: var(--color-table-header);">No equipment found matching search criteria.</td></tr>`;
+                equipmentTableBody.innerHTML = row;
+                return;
+            }
+            
+            filteredEquipment.forEach(item => {
+                const statusClass = item.status === 'Active' ? 'status-active' : 'status-inactive';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.totalNo}</td>
+                    <td class="${statusClass}">${item.status}</td>
+                    <td class="action-buttons">
+                        <button onclick="handleEditEquipment('${item.id}', '${item.name}')">Edit</button>
+                    </td>
+                `;
+                equipmentTableBody.appendChild(row);
+            });
+        }
+        
+        // --- Global Handlers ---
+        
+        window.handleEditEquipment = function(equipmentId, equipmentName) {
+            // In a full application, this would open a modal pre-filled with the equipment data
+            console.log("Editing Equipment ID:", equipmentId, "Name:", equipmentName);
+            showMessage(`Editing ${equipmentName} (Simulated)`);
+        }
+
+        window.simulateAddEquipment = function() {
+            // In a full application, this would open an 'Add Equipment' form/modal
+            console.log("Simulating 'Add Equipment' button click.");
+            showMessage("Opening 'Add Equipment' form (Simulated)");
+        }
+        
+        // --- Event Handlers ---
+        
+        function handleSearch() {
+            renderEquipment(currentEquipment, searchInput.value);
+        }
+
+        // --- Firebase Listener Setup ---
+
+        function setupEquipmentListener() {
+            if (!db) {
+                console.error("Firestore not initialized.");
+                return;
+            }
+            
+            // Listen to the equipment collection 
+            onSnapshot(getEquipmentCollectionRef(), (querySnapshot) => {
+                const equipment = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    equipment.push({ 
+                        id: doc.id, 
+                        ...data,
+                        // Ensure required fields exist, use defaults if necessary for stability
+                        name: data.name || 'Untitled Equipment',
+                        totalNo: data.totalNo || 0,
+                        status: data.status || 'Active'
+                    });
+                });
+                
+                currentEquipment = equipment;
+                renderEquipment(currentEquipment, searchInput.value);
+
+                if (equipment.length === 0) {
+                    equipmentTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No equipment found in the database. Add one now!</td></tr>';
+                }
+            }, (error) => {
+                console.error("Error listening to equipment data:", error);
+                showMessage("Failed to load equipment data.", true);
+            });
+        }
+        
+        // --- Firebase Initialization ---
+        async function initFirebaseAndAuth() {
+            if (Object.keys(firebaseConfig).length === 0) {
+                console.error("Firebase config is missing.");
+                equipmentTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">FIREBASE CONFIG MISSING. Cannot load data.</td></tr>';
+                return;
+            }
+            
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        document.getElementById('sidebar-admin-name').textContent = 'Admin ' + userId.substring(0, 5);
+                        document.getElementById('sidebar-admin-email').textContent = user.email || 'authenticated@user.com';
+                        setupEquipmentListener();
+                    } else {
+                        console.log("Not authenticated. Using anonymous/default data.");
+                        userId = crypto.randomUUID();
+                        document.getElementById('sidebar-admin-name').textContent = 'Guest Admin';
+                        setupEquipmentListener(); 
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase initialization or authentication failed:", error);
+                showMessage("System Error: Failed to connect to database.", true);
+            }
+        }
+
+        // --- Setup Event Listeners ---
+        searchInput.addEventListener('input', handleSearch);
+        
+        window.onload = initFirebaseAndAuth;
+
+    </script>
+</body>
+</html>

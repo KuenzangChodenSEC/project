@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dashboard</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for aesthetic purposes */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #5b21b6; /* Indigo-700 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1b4b; /* Indigo-900 */
+        }
+        /* Mobile: Sidebar should be hidden by default and appear on button click */
+        #sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        #sidebar.open {
+            transform: translateX(0);
+        }
+        @media (min-width: 768px) {
+            #sidebar {
+                transform: translateX(0);
+            }
+        }
+        /* Style for the main content area */
+        .content-card {
+            min-height: 50vh;
+        }
+    </style>
+    <!-- Load Lucide Icons for aesthetic icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-100 font-sans antialiased">
+
+    <!-- Mobile Menu Button -->
+    <div class="md:hidden p-4 bg-indigo-800 shadow-lg flex justify-between items-center">
+        <span class="text-xl font-bold text-white">App Name</span>
+        <button id="menu-button" class="text-white p-2 rounded-lg hover:bg-indigo-700 transition duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        </button>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 bg-indigo-900 text-white flex-shrink-0 z-20 fixed md:relative md:translate-x-0 h-full overflow-y-auto">
+            <div class="p-6">
+                <h1 class="text-3xl font-extrabold text-indigo-300">My App</h1>
+                <p class="text-xs text-indigo-400 mt-1">Productivity Suite</p>
+            </div>
+            
+            <nav class="p-4 space-y-2">
+                <!-- Navigation Links -->
+                <a href="#" data-page="dashboard" class="nav-link flex items-center space-x-3 p-3 text-white rounded-lg transition-colors duration-200 hover:bg-indigo-600">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" data-page="projects" class="nav-link flex items-center space-x-3 p-3 text-white rounded-lg transition-colors duration-200 hover:bg-indigo-600">
+                    <i data-lucide="folder-git-2" class="w-5 h-5"></i>
+                    <span>Projects</span>
+                </a>
+                <a href="#" data-page="tasks" class="nav-link flex items-center space-x-3 p-3 text-white rounded-lg transition-colors duration-200 hover:bg-indigo-600">
+                    <i data-lucide="check-square" class="w-5 h-5"></i>
+                    <span>Tasks</span>
+                </a>
+                <a href="#" data-page="reports" class="nav-link flex items-center space-x-3 p-3 text-white rounded-lg transition-colors duration-200 hover:bg-indigo-600">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                    <span>Reports</span>
+                </a>
+                <a href="#" data-page="settings" class="nav-link flex items-center space-x-3 p-3 text-white rounded-lg transition-colors duration-200 hover:bg-indigo-600">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="p-4 mt-auto">
+                <a href="#" data-page="logout" class="nav-link flex items-center space-x-3 p-3 text-indigo-300 rounded-lg transition-colors duration-200 hover:bg-indigo-800">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8">
+            <!-- Header/Breadcrumbs (optional, kept simple for content) -->
+            <header class="mb-6">
+                <h2 id="page-title" class="text-3xl font-semibold text-gray-800">Dashboard</h2>
+                <p class="text-sm text-gray-500">Overview of your productivity.</p>
+            </header>
+
+            <!-- Content Display Area -->
+            <section id="content-area" class="space-y-6">
+                <!-- Content will be injected here -->
+            </section>
+        </main>
+        
+        <!-- Overlay for Mobile Menu -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black opacity-50 z-10 hidden md:hidden"></div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // --- Core Content Definitions ---
+        const pageContent = {
+            'dashboard': {
+                title: 'Dashboard',
+                html: `
+                    <div class="content-card bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-xl font-bold mb-4 text-indigo-600">Welcome Back!</h3>
+                        <p class="text-gray-700">This is your main dashboard. Track your key metrics and recent activity here.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                            <div class="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                                <p class="text-sm font-medium text-gray-500">Total Projects</p>
+                                <p class="text-2xl font-extrabold text-indigo-800">42</p>
+                            </div>
+                            <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                                <p class="text-sm font-medium text-gray-500">Open Tasks</p>
+                                <p class="text-2xl font-extrabold text-green-800">18</p>
+                            </div>
+                            <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                                <p class="text-sm font-medium text-gray-500">Upcoming Deadlines</p>
+                                <p class="text-2xl font-extrabold text-yellow-800">3</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            'projects': {
+                title: 'Projects',
+                html: `
+                    <div class="content-card bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-xl font-bold mb-4 text-indigo-600">Manage Active Projects</h3>
+                        <p class="text-gray-700">List of projects you are currently managing. This section is under development.</p>
+                        <ul class="mt-4 space-y-2">
+                            <li class="p-3 bg-gray-50 rounded-md">Project Phoenix - Status: On Track</li>
+                            <li class="p-3 bg-gray-50 rounded-md">Marketing Campaign Q4 - Status: Blocked</li>
+                        </ul>
+                    </div>
+                `
+            },
+            'tasks': {
+                title: 'Tasks',
+                html: `
+                    <div class="content-card bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-xl font-bold mb-4 text-indigo-600">Your Task List</h3>
+                        <p class="text-gray-700">A detailed view of all pending tasks across your projects. Focus on your priorities.</p>
+                    </div>
+                `
+            },
+            'reports': {
+                title: 'Reports',
+                html: `
+                    <div class="content-card bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-xl font-bold mb-4 text-indigo-600">Performance Reports</h3>
+                        <p class="text-gray-700">Generate and view performance reports for projects and team members.</p>
+                        <div class="mt-4"><button class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-200">Generate Monthly Report</button></div>
+                    </div>
+                `
+            },
+            'settings': {
+                title: 'Settings',
+                html: `
+                    <div class="content-card bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-xl font-bold mb-4 text-indigo-600">Application Settings</h3>
+                        <p class="text-gray-700">Manage user profile, preferences, and notifications here.</p>
+                    </div>
+                `
+            },
+            'logout': {
+                title: 'Logout',
+                html: `
+                    <div class="content-card bg-white p-6 rounded-xl shadow-lg text-center">
+                        <h3 class="text-xl font-bold mb-4 text-red-600">Logging Out...</h3>
+                        <p class="text-gray-700">Thank you for using My App. You are now being securely signed out.</p>
+                    </div>
+                `
+            }
+        };
+
+        // --- Navigation and Active State Logic ---
+
+        const contentArea = document.getElementById('content-area');
+        const pageTitle = document.getElementById('page-title');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const ACTIVE_CLASS = 'bg-indigo-700'; // The class for the highlighted, active state
+
+        /**
+         * Updates the main content area and highlights the active link.
+         * @param {string} pageId - The data-page attribute value.
+         */
+        function showPage(pageId) {
+            // 1. Update Content
+            const content = pageContent[pageId];
+            if (content) {
+                pageTitle.textContent = content.title;
+                contentArea.innerHTML = content.html;
+            } else {
+                pageTitle.textContent = 'Error';
+                contentArea.innerHTML = '<div class="text-red-500">Page not found.</div>';
+            }
+
+            // 2. Manage Active Link State (The requested highlight functionality)
+            navLinks.forEach(link => {
+                // Remove active class from all links
+                link.classList.remove(ACTIVE_CLASS);
+                
+                // Check if this is the link for the current page
+                if (link.getAttribute('data-page') === pageId) {
+                    // Add active class to the current link
+                    link.classList.add(ACTIVE_CLASS);
+                }
+            });
+        }
+
+        // --- Event Listeners and Initialization ---
+
+        // Attach click listener to all navigation links
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault(); // Stop default link behavior
+                const pageId = e.currentTarget.getAttribute('data-page');
+                if (pageId) {
+                    showPage(pageId);
+                    // Close sidebar on mobile after selection
+                    if (window.innerWidth < 768) {
+                        toggleSidebar();
+                    }
+                }
+            });
+        });
+
+        // Initialize on page load (default to dashboard)
+        window.onload = () => {
+            showPage('dashboard');
+        };
+
+        // --- Mobile Sidebar Toggling ---
+        const sidebar = document.getElementById('sidebar');
+        const menuButton = document.getElementById('menu-button');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('hidden');
+        }
+
+        menuButton.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar); // Close when clicking overlay
+    </script>
+</body>
+</html>

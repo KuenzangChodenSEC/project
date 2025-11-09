@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Payment</title>
+    <!-- Using Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-dark-bg: #1a1a1a;
+            --color-dark-sidebar: #222;
+            --color-light-bg: #f5f5f5;
+            --color-card-bg: #fff;
+            --color-accent: #6f5f90; 
+            --color-text-light: #aaa;
+            --color-text-dark: #333;
+            --color-active: #40384a; 
+            --color-border: #e0e0e0;
+            --color-table-bg: #40384a; /* Dark background for Table card */
+            --color-table-header: #8a819b;
+            --color-table-row: #f0f0f0;
+            --color-paid-button: #5cb85c; /* Green for Paid */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--color-light-bg);
+            color: var(--color-text-dark);
+            overflow: hidden; 
+        }
+
+        /* ----------------------- */
+        /* 1. Sidebar (Reused Styles) */
+        /* ----------------------- */
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--color-dark-bg);
+            color: var(--color-text-light);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-header {
+            padding: 0 20px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .admin-profile-sidebar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0 30px;
+            border-bottom: 1px solid var(--color-dark-sidebar);
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #333; 
+            border: 2px solid #fff;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .avatar-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            color: #fff;
+        }
+
+        .admin-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .admin-email {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--color-text-light);
+        }
+
+        .nav-links-container {
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-light);
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            margin-right: 15px;
+            font-size: 16px;
+        }
+
+        .nav-link:hover {
+            background-color: var(--color-dark-sidebar);
+            color: #fff;
+        }
+
+        .nav-link.active {
+            background-color: var(--color-active);
+            color: #fff;
+        }
+        
+        .nav-link.active i {
+            color: #fff;
+        }
+        
+        .nav-links-container > a:nth-child(2) { border-top: 1px solid var(--color-dark-sidebar); padding-top: 15px; }
+        .nav-links-container > a:last-child { border-bottom: 1px solid var(--color-dark-sidebar); padding-bottom: 15px; margin-bottom: 20px; }
+
+
+        .logout-section {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--color-dark-sidebar);
+        }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-light);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .logout-link i {
+            margin-right: 10px;
+        }
+
+        .logout-link:hover {
+            color: var(--color-accent);
+        }
+
+        .bottom-logo {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            background-color: #333; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        /* ----------------------- */
+        /* 2. Main Content (Payment View) */
+        /* ----------------------- */
+        
+        .main-content {
+            margin-left: 250px; 
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto; 
+            background-color: var(--color-light-bg); 
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .payment-container {
+            max-width: 900px;
+            background-color: var(--color-light-bg);
+            padding: 0;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .page-header {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--color-text-dark);
+            margin-bottom: 20px;
+        }
+
+        /* --- Table Card Styles --- */
+        .plan-card {
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .payment-list-card {
+            background-color: var(--color-table-bg);
+            color: var(--color-table-row);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--color-accent);
+            display: inline-block;
+            color: #fff; /* Title inside dark card */
+        }
+
+
+        .list-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .show-entries label, .show-entries select {
+            color: var(--color-table-header);
+            font-size: 13px;
+        }
+
+        .show-entries select {
+            background-color: transparent;
+            border: 1px solid var(--color-table-header);
+            padding: 5px;
+            border-radius: 4px;
+            color: var(--color-table-row);
+        }
+        
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 8px 40px 8px 15px; /* Padding for icon */
+            border-radius: 6px;
+            border: 1px solid var(--color-table-header);
+            background-color: #333;
+            color: var(--color-form-text);
+            font-size: 14px;
+            width: 250px;
+        }
+
+        .search-box i {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            color: var(--color-table-header);
+        }
+
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .payment-table thead th {
+            color: var(--color-table-header);
+            font-weight: 600;
+            font-size: 13px;
+            text-align: left;
+            padding: 10px 15px;
+            border-bottom: 1px solid #555;
+        }
+        
+        .payment-table tbody tr {
+            border-bottom: 1px solid #3d3d3d;
+            transition: background-color 0.2s;
+        }
+
+        .payment-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .payment-table td {
+            padding: 15px;
+            font-size: 14px;
+        }
+
+        .sort-icon {
+            margin-left: 5px;
+            color: var(--color-table-header);
+        }
+
+        .action-button {
+            background-color: var(--color-paid-button);
+            color: #fff;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .action-button.unpaid {
+            background-color: #d9534f; /* Red for Unpaid/Pending */
+        }
+        
+        .action-button:hover {
+            opacity: 0.9;
+        }
+
+
+        /* Message/Modal styles */
+        #messageBox {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transition: opacity 0.5s, transform 0.5s;
+            opacity: 0;
+            transform: translateY(-20px);
+            font-weight: 500;
+        }
+        #messageBox.error {
+            background-color: #f44336;
+        }
+        #messageBox.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar { width: 70px; }
+            .main-content { margin-left: 70px; }
+            .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span, .bottom-logo { display: none; }
+            .admin-profile-sidebar { border-bottom: none; padding-bottom: 0; }
+            .avatar { margin-bottom: 20px; }
+            .nav-link { justify-content: center; padding: 15px 0; }
+            .nav-link i { margin-right: 0; }
+            .logout-section { justify-content: center; }
+            .logout-link i { margin-right: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content { padding: 20px; }
+            .list-controls { flex-direction: column; gap: 15px; align-items: flex-start; }
+            .payment-table th, .payment-table td { padding: 10px; font-size: 12px; }
+            .search-box input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Message Box for feedback -->
+    <div id="messageBox"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="dashboard-header">Payment</div>
+        
+        <div class="admin-profile-sidebar">
+            <div class="avatar">
+                <div class="avatar-inner"><i class="fas fa-user"></i></div>
+            </div>
+            <div class="admin-name" id="sidebar-admin-name">Administrator Name</div>
+            <div class="admin-email" id="sidebar-admin-email">admin@example.com</div>
+        </div>
+
+        <div class="nav-links-container">
+            <a class="nav-link" href="#">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-user-circle"></i>
+                <span>Admin Profile</span>
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-registered"></i>
+                <span>Registration</span>
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Plan</span>
+            </a>
+            <a class="nav-link active">
+                <i class="fas fa-credit-card"></i>
+                <span>View Payment</span>
+            </a>
+            <a class="nav-link">
+                <i class="fas fa-box-open"></i>
+                <span>Inventory</span>
+            </a>
+            <a class="nav-link">
+                <i class="fas fa-users"></i>
+                <span>View Members</span>
+            </a>
+        </div>
+
+        <div class="logout-section">
+            <a class="logout-link" id="logout-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+            <div class="bottom-logo">CG</div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1 class="page-header">View Payment</h1>
+        <div class="payment-container">
+            
+            <!-- Payment List Card -->
+            <div class="plan-card payment-list-card">
+                <div class="card-title">Gym Members</div>
+                
+                <div class="list-controls">
+                    <div class="show-entries">
+                        <label for="show-entries">Show Entities</label>
+                        <select id="show-entries">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="Search">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="payment-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%;">Name <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 20%;">Member ID <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 20%;">Plan <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 20%;">Payment <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 15%;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payment-table-body">
+                            <!-- Payment rows will be inserted here by JavaScript -->
+                            <tr><td colspan="5" style="text-align: center;">Loading payments...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Global Firebase and Config ---
+        let db;
+        let auth;
+        let userId = '';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        setLogLevel('Debug');
+
+        // --- UI Element References ---
+        const paymentTableBody = document.getElementById('payment-table-body');
+        const searchInput = document.getElementById('search-input');
+
+        let currentPayments = []; // Local cache for filtering/sorting
+
+        // --- Utility Function for Feedback ---
+        function showMessage(message, isError = false) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = isError ? 'error' : '';
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
+        
+        // --- Firestore References ---
+        // Path: /artifacts/{appId}/public/data/members (Reusing member data for payment view)
+        function getMembersCollectionRef() {
+            return collection(db, 'artifacts', appId, 'public', 'data', 'members');
+        }
+
+        // --- Data Rendering and Filtering ---
+
+        function renderPayments(members, searchTerm = '') {
+            paymentTableBody.innerHTML = '';
+            
+            const lowerSearchTerm = searchTerm.toLowerCase().trim();
+            
+            const filteredMembers = members.filter(member => 
+                member.name.toLowerCase().includes(lowerSearchTerm) ||
+                member.id.toLowerCase().includes(lowerSearchTerm) ||
+                member.plan.toLowerCase().includes(lowerSearchTerm)
+            );
+
+            if (filteredMembers.length === 0) {
+                const row = `<tr><td colspan="5" style="text-align: center; color: var(--color-table-header);">No members found matching search criteria.</td></tr>`;
+                paymentTableBody.innerHTML = row;
+                return;
+            }
+            
+            // Map plan names to display names and currency (e.g., 'monthly' -> '1 month')
+            const planDisplayMap = {
+                'weekly': '1 week', 
+                'monthly': '1 month',
+                'biannually': '6 months',
+                'yearly': '1 year'
+            };
+
+
+            filteredMembers.forEach((member, index) => {
+                // Generate a unique, consistent Member ID for display
+                const memberId = member.id ? member.id.substring(0, 8).toUpperCase() : `SFM${(index + 101).toString().slice(1)}`;
+                const planDisplay = planDisplayMap[member.plan] || member.plan;
+                const isPaid = member.paymentStatus === 'Paid';
+                const buttonClass = isPaid ? 'action-button' : 'action-button unpaid';
+                const buttonText = isPaid ? 'Paid' : 'Unpaid';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${member.name}</td>
+                    <td>${memberId}</td>
+                    <td>${planDisplay}</td>
+                    <td>Nu. ${member.price ? member.price.toFixed(2) : 'N/A'}</td>
+                    <td>
+                        <button class="${buttonClass}" onclick="togglePaymentStatus('${member.id}', '${member.name}', ${isPaid})">
+                            ${buttonText}
+                        </button>
+                    </td>
+                `;
+                paymentTableBody.appendChild(row);
+            });
+        }
+        
+        // Define global handler for table button
+        window.togglePaymentStatus = async function(memberId, memberName, isCurrentlyPaid) {
+            if (!db) {
+                showMessage("Database connection error.", true);
+                return;
+            }
+            
+            // Toggle the status
+            const newStatus = isCurrentlyPaid ? 'Pending' : 'Paid';
+            const confirmationMessage = `Are you sure you want to set ${memberName}'s status to '${newStatus}'?`;
+
+            // IMPORTANT: Replace confirm() with a custom modal in a production app
+            if (!confirm(confirmationMessage)) {
+                return;
+            }
+
+            try {
+                const memberRef = doc(db, 'artifacts', appId, 'public', 'data', 'members', memberId);
+                await updateDoc(memberRef, {
+                    paymentStatus: newStatus
+                });
+                showMessage(`Payment status for ${memberName} updated to ${newStatus}.`);
+            } catch (error) {
+                console.error("Error updating payment status:", error);
+                showMessage("Failed to update payment status.", true);
+            }
+        }
+
+
+        // --- Event Handlers ---
+        
+        function handleSearch() {
+            renderPayments(currentPayments, searchInput.value);
+        }
+
+        // --- Firebase Listener Setup ---
+
+        function setupPaymentListener() {
+            if (!db) {
+                console.error("Firestore not initialized.");
+                return;
+            }
+            
+            // Listen to the members collection (where registration data is stored)
+            onSnapshot(getMembersCollectionRef(), (querySnapshot) => {
+                const members = [];
+                querySnapshot.forEach((doc) => {
+                    // Combine document ID with data and default paymentStatus if missing
+                    const data = doc.data();
+                    members.push({ 
+                        id: doc.id, 
+                        ...data,
+                        // Ensure paymentStatus exists, default to 'Pending'
+                        paymentStatus: data.paymentStatus || 'Pending' 
+                    });
+                });
+                
+                currentPayments = members;
+                renderPayments(currentPayments, searchInput.value);
+
+                if (members.length === 0) {
+                    paymentTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No members found in the database.</td></tr>';
+                }
+            }, (error) => {
+                console.error("Error listening to members data:", error);
+                showMessage("Failed to load payment data.", true);
+            });
+        }
+        
+        // --- Firebase Initialization ---
+        async function initFirebaseAndAuth() {
+            if (Object.keys(firebaseConfig).length === 0) {
+                console.error("Firebase config is missing.");
+                paymentTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">FIREBASE CONFIG MISSING. Cannot load data.</td></tr>';
+                return;
+            }
+            
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        document.getElementById('sidebar-admin-name').textContent = 'Admin ' + userId.substring(0, 5);
+                        document.getElementById('sidebar-admin-email').textContent = user.email || 'authenticated@user.com';
+                        setupPaymentListener();
+                    } else {
+                        console.log("Not authenticated. Using anonymous/default data.");
+                        userId = crypto.randomUUID();
+                        document.getElementById('sidebar-admin-name').textContent = 'Guest Admin';
+                        setupPaymentListener(); 
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase initialization or authentication failed:", error);
+                showMessage("System Error: Failed to connect to database.", true);
+            }
+        }
+
+        // --- Setup Event Listeners ---
+        searchInput.addEventListener('input', handleSearch);
+        
+        window.onload = initFirebaseAndAuth;
+
+    </script>
+</body>
+</html>

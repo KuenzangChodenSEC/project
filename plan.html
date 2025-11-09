@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plans | Campus Gym</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for social icons (for the nav/footer) and plan icons (for the cards) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Top Bar for Social Icons -->
+    <div class="top-bar">
+        <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="index.html">
+            <img src="logo.png" alt="Campus Gym Logo" class="logo">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="whyjoinus.html">Why Join Us?</a>
+            <a href="plan.html" class="active">Plan</a>
+        </div>
+        <div class="nav-right">
+            <a href="signup.html" class="auth-link">Sign-up</a>
+            <a href="login.html" class="auth-link">Login</a>
+        </div>
+    </nav>
+
+    <!-- Plan Section - Note: This uses the dark background image implied by the screenshot -->
+    <section class="plan-section">
+        <div class="plan-section-overlay"></div>
+        <div class="plan-content-wrapper">
+
+            <!-- Left side: Hover Descriptions -->
+            <div class="plan-descriptions">
+                
+                <!-- Description 1: Weekly -->
+                <div class="description-box" id="desc-weekly">
+                    <h2 class="desc-title">Weekly</h2>
+                    <p class="desc-text">A short-term plan that provides full access to the gym and its facilities for 7 consecutive days. Ideal for visitors, trial users, or those with flexible schedules.</p>
+                </div>
+
+                <!-- Description 2: Monthly -->
+                <div class="description-box" id="desc-monthly">
+                    <h2 class="desc-title">Monthly</h2>
+                    <p class="desc-text">A standard membership plan valid for one month. Includes unlimited access to equipment, classes, and regular services. Suitable for members who prefer short-term commitments with the option to renew monthly.</p>
+                </div>
+
+                <!-- Description 3: Biannually -->
+                <div class="description-box" id="desc-biannual">
+                    <h2 class="desc-title">Biannually</h2>
+                    <p class="desc-text">A long-term membership offering significant value at a discounted price compared to monthly. Designed for members who are committed to long-term fitness goals and want better value with extended access.</p>
+                </div>
+            </div>
+
+            <!-- Right Side/Center: Plan Grid -->
+            <div class="plan-grid-container">
+                <h1 class="plan-title">Our Plan:</h1>
+                <div class="plan-grid">
+                    
+                    <!-- Plan 1: Weekly Rate -->
+                    <div class="plan-card" data-plan="weekly">
+                        <div class="plan-icon"><i class="fas fa-calendar-week"></i></div>
+                        <h3 class="plan-period">7 Days</h3>
+                        <p class="plan-rate">Weekly Rate</p>
+                    </div>
+
+                    <!-- Plan 2: Monthly Rate -->
+                    <div class="plan-card" data-plan="monthly">
+                        <div class="plan-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <h3 class="plan-period">1 Month</h3>
+                        <p class="plan-rate">Monthly Rate</p>
+                    </div>
+
+                    <!-- Plan 3: Biannual Rate (6 Months) -->
+                    <div class="plan-card" data-plan="biannual">
+                        <div class="plan-icon"><i class="fas fa-crown"></i></div>
+                        <h3 class="plan-period">6 Months</h3>
+                        <p class="plan-rate">Biannual Rate</p>
+                    </div>
+                </div>
+                <h2 class="join-callout">JOIN OUR MEMBERSHIP</h2>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-item about-us">
+                <h3>About</h3>
+                <p>Campus gym for students of Samtse college provides proper training and conditioning for members who want to improve and transform their body.</p>
+            </div>
+            <div class="footer-item contact-us">
+                <h3>Contact Us</h3>
+                <p>+975- 77716553</p>
+                <p>+975- 17686789</p>
+                <p>scagym101@gmail.com</p>
+            </div>
+            <div class="footer-item quick-links">
+                <h3>Plan</h3>
+                <ul>
+                    <li><a href="#">Monthly</a></li>
+                    <li><a href="#">Quarterly</a></li>
+                    <li><a href="#">Annual</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const planCards = document.querySelectorAll('.plan-card');
+            
+            // Function to show a specific description
+            const showDescription = (planType) => {
+                // Hide all descriptions first
+                document.querySelectorAll('.description-box').forEach(desc => {
+                    desc.style.opacity = '0';
+                    desc.style.transform = 'translateX(-20px)';
+                });
+
+                // Show the specific description
+                const targetId = `desc-${planType}`;
+                const targetDesc = document.getElementById(targetId);
+                if (targetDesc) {
+                    targetDesc.style.opacity = '1';
+                    targetDesc.style.transform = 'translateX(0)';
+                }
+            };
+
+            planCards.forEach(card => {
+                const planType = card.getAttribute('data-plan');
+
+                // Mouse Enter (Hover Start)
+                card.addEventListener('mouseenter', () => {
+                    // Only run hover effect on larger screens (preventing issues on mobile where descriptions are always visible)
+                    if (window.innerWidth > 1024) { 
+                        showDescription(planType);
+                    }
+                });
+
+                // Mouse Leave (Hover End) - Hide all descriptions when cursor leaves
+                card.addEventListener('mouseleave', () => {
+                    if (window.innerWidth > 1024) {
+                        document.querySelectorAll('.description-box').forEach(desc => {
+                            desc.style.opacity = '0';
+                            desc.style.transform = 'translateX(-20px)';
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <!-- Using Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-dark-bg: #1a1a1a;
+            --color-dark-sidebar: #222;
+            --color-light-bg: #f5f5f5;
+            --color-card-bg: #fff;
+            --color-accent: #6f5f90; /* Purple accent color from the avatar/chart */
+            --color-text-light: #aaa;
+            --color-text-dark: #333;
+            --color-active: #40384a; /* Slightly lighter shade for active state */
+            --color-member-card: #383840; /* Darker ash/grey for active members list */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--color-light-bg);
+            color: var(--color-text-dark);
+            overflow: hidden; /* Prevent body scroll */
+        }
+
+        /* ----------------------- */
+        /* 1. Sidebar (Left Panel) */
+        /* ----------------------- */
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--color-dark-bg);
+            color: var(--color-text-light);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-header {
+            padding: 0 20px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .admin-profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0 30px;
+            border-bottom: 1px solid var(--color-dark-sidebar);
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #333; /* Placeholder color for avatar */
+            border: 2px solid #fff;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .avatar-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            color: #fff;
+        }
+
+        .admin-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .admin-email {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--color-text-light);
+        }
+
+        .nav-links-container {
+            flex-grow: 1;
+        }
+
+        /* Sidebar links with smooth hover and no underline */
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-light);
+            cursor: pointer;
+            text-decoration: none; /* Remove underline */
+            border-radius: 8px; /* Optional subtle rounded effect */
+            transition: all 0.3s ease; /* Smooth transition for background & color */
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            margin-right: 15px;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background-color: var(--color-dark-sidebar);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .nav-link:hover i {
+            color: #fff;
+        }
+
+        .nav-link.active {
+            background-color: var(--color-active);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .nav-link.active i {
+            color: #fff;
+        }
+
+        .logout-section {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--color-dark-sidebar);
+        }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-light);
+            cursor: pointer;
+            transition: color 0.3s;
+            text-decoration: none; /* Remove underline */
+        }
+
+        .logout-link i {
+            margin-right: 10px;
+        }
+
+        .logout-link:hover {
+            color: var(--color-accent);
+        }
+
+        .bottom-logo {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            background-color: #333; /* Placeholder for logo */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        /* Custom styles for matching the exact visual appearance of the sidebar */
+        .nav-link:nth-child(4) { border-top: 1px solid var(--color-dark-sidebar); padding-top: 15px; }
+        .nav-link:nth-child(8) { border-bottom: 1px solid var(--color-dark-sidebar); padding-bottom: 15px; margin-bottom: 20px; }
+
+
+        /* ----------------------- */
+        /* 2. Main Content (Right Panel) */
+        /* ----------------------- */
+        
+        .main-content {
+            margin-left: 250px; /* Offset for the fixed sidebar */
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto; /* Allows scrolling within the main content area */
+        }
+
+        .grid-container {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: 2fr 1fr; /* Two columns: 2/3 for welcome/members, 1/3 for calendar/inventory */
+        }
+
+        /* Standard Card Styling */
+        .card {
+            background-color: var(--color-card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            min-height: 200px; /* Standard minimum height */
+        }
+
+        /* Top Left: Welcome Card */
+        .welcome-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            min-height: 180px;
+        }
+
+        .welcome-text h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-text-dark);
+            margin-bottom: 10px;
+        }
+
+        .welcome-text p {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+            max-width: 80%;
+        }
+
+        .welcome-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--color-accent);
+            flex-shrink: 0;
+            margin-left: 20px;
+        }
+
+        /* Top Right: Calendar Card */
+        .calendar-card {
+            min-height: 180px;
+        }
+
+        .calendar-card h3 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        /* Bottom Row Styling */
+        .grid-bottom {
+            grid-column: 1 / 3; /* Spans both columns */
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* Active members wide, Inventory narrow */
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        /* Active Members Card */
+        .active-members-card {
+            background-color: var(--color-card-bg);
+            padding: 0; /* Padding handled by the inner member list */
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .active-members-card h3 {
+            padding: 20px 25px 15px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-text-dark);
+        }
+
+        .members-list-container {
+            background-color: var(--color-member-card); /* Dark background for the list area */
+            padding: 20px 25px;
+            color: #fff;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .list-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .search-box {
+            position: relative;
+            flex-grow: 1;
+            margin-right: 20px;
+        }
+
+        .search-box input {
+            background-color: #555;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 10px 8px 35px;
+            width: 100%;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .search-box input::placeholder {
+            color: #ccc;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ccc;
+            font-size: 14px;
+        }
+        
+        .sort-by span {
+            margin-right: 5px;
+        }
+        
+        /* Member List */
+        .member-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #555;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .member-item:last-child {
+            border-bottom: none;
+        }
+
+        .member-name {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .member-avatar-small {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--color-accent);
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .member-details {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .member-details .status {
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        .member-options {
+            color: #ccc;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: auto;
+        }
+
+        /* Inventory Card */
+        .inventory-card h3 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 70px; /* Collapsed sidebar */
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span {
+                display: none;
+            }
+
+            .admin-profile {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            .avatar {
+                margin-bottom: 20px;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .nav-link i {
+                margin-right: 0;
+            }
+
+            .logout-section {
+                justify-content: center;
+            }
+
+            .logout-link i {
+                margin-right: 0;
+            }
+            .bottom-logo {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-container, .grid-bottom {
+                grid-template-columns: 1fr; /* Single column layout on small screens */
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+            
+            .grid-bottom {
+                grid-column: 1 / 2;
+            }
+            
+            .plan-card, .welcome-card {
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="dashboard-header">Admin Dashboard</div>
+        
+        <div class="admin-profile">
+            <div class="avatar">
+                 <!-- Placeholder icon -->
+                <div class="avatar-inner"><i class="fas fa-user"></i></div>
+            </div>
+            <div class="admin-name">Administrator Name</div>
+            <div class="admin-email">kunil03@gmail.com</div>
+        </div>
+
+        <div class="nav-links-container">
+            <a class="nav-link active" href="admin.html">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a class="nav-link" href="pfp.html">
+                <i class="fas fa-user-circle"></i>
+                <span>Admin Profile</span>
+            </a>
+            <a class="nav-link" href="registration.html">
+                <i class="fas fa-registered"></i>
+                <span>Registration</span>
+            </a>
+            <a class="nav-link" href="viewplan.html">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Plan</span>
+            </a>
+            <a class="nav-link" href="viewpayment.html">
+                <i class="fas fa-credit-card"></i>
+                <span>View Payment</span>
+            </a>
+            <a class="nav-link" href="inventory.html">
+                <i class="fas fa-box-open"></i>
+                <span>Inventory</span>
+            </a>
+            <a class="nav-link" href="viewmembers.html">
+                <i class="fas fa-users"></i>
+                <span>View Members</span>
+            </a>
+        </div>
+
+        <div class="logout-section">
+            <a class="logout-link" href="index.html">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+            <div class="bottom-logo">CG</div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="grid-container">
+            <!-- 1. Welcome Card -->
+            <div class="card welcome-card">
+                <div class="welcome-text">
+                    <h2>Welcome kun</h2>
+                    <p>Non illat iuto lui Inves It is simply text to pursue it but consider city resources, urban area only. Involves all plan considering length, size and pasture.</p>
+                </div>
+                <div class="welcome-circle"></div>
+            </div>
+
+            <!-- 2. Calendar Card -->
+            <div class="card calendar-card">
+                <h3>Calendar</h3>
+                <!-- Calendar content placeholder -->
+            </div>
+        </div>
+
+        <div class="grid-bottom">
+            <!-- 3. Active Members Card -->
+            <div class="active-members-card">
+                <h3>Active Members</h3>
+                <div class="members-list-container">
+                    <div class="list-controls">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search">
+                        </div>
+                        <div class="sort-by">
+                            <span>Sort by</span>
+                            <i class="fas fa-sort"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Member Headers -->
+                    <div class="member-item member-header">
+                        <div class="member-name"></div>
+                        <div class="member-details">
+                            <small style="width: 80px;">Date paid</small>
+                            <small style="width: 80px;">Date Expiry</small>
+                            <small style="width: 50px;">Status</small>
+                        </div>
+                        <div class="member-options" style="visibility: hidden;">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                    </div>
+
+                    <!-- Member 1 -->
+                    <div class="member-item">
+                        <div class="member-name">
+                            <div class="member-avatar-small">LC</div>
+                            Lungton Chaden
+                        </div>
+                        <div class="member-details">
+                            <span style="width: 80px;">DD/MM/YY</span>
+                            <span style="width: 80px;">DD/MM/YY</span>
+                            <span class="status" style="width: 50px;">Active</span>
+                        </div>
+                        <div class="member-options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                    </div>
+
+                    <!-- Member 2 -->
+                    <div class="member-item">
+                        <div class="member-name">
+                            <div class="member-avatar-small">PD</div>
+                            Passang Dem
+                        </div>
+                        <div class="member-details">
+                            <span style="width: 80px;">DD/MM/YY</span>
+                            <span style="width: 80px;">DD/MM/YY</span>
+                            <span class="status" style="width: 50px;">Active</span>
+                        </div>
+                        <div class="member-options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                    </div>
+
+                    <!-- Member 3 -->
+                    <div class="member-item">
+                        <div class="member-name">
+                            <div class="member-avatar-small">PY</div>
+                            Pema Yangki
+                        </div>
+                        <div class="member-details">
+                            <span style="width: 80px;">DD/MM/YY</span>
+                            <span style="width: 80px;">DD/MM/YY</span>
+                            <span class="status" style="width: 50px;">Active</span>
+                        </div>
+                        <div class="member-options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 4. Inventory Card -->
+            <div class="card inventory-card">
+                <h3>Inventory</h3>
+                <!-- Inventory content placeholder -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>

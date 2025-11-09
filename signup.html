@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Sign-up</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-purple: #6f5f90;
+            --dark-button: #222222;
+            --light-bg: #ffffff;
+            --border-color: #8a819b;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .image-container {
+            background-image: url('https://placehold.co/600x900/40384a/ffffff?text=FITNESS+IMAGE'); 
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+        }
+
+        .custom-input {
+            height: 48px; 
+            border: 1px solid var(--primary-purple);
+            border-radius: 8px;
+            padding: 0 16px;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .custom-input:focus {
+            border-color: #40384a;
+            box-shadow: 0 0 0 1px #40384a;
+        }
+
+        .register-button {
+            background-color: var(--dark-button);
+            color: var(--light-bg);
+            padding: 12px 0;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        
+        .register-button:hover {
+            background-color: #333333;
+        }
+
+        .main-grid {
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="bg-white">
+
+    <!-- Top Left Title -->
+    <div class="absolute top-0 left-0 p-4 font-semibold text-gray-700">Sign-up</div>
+
+    <!-- Main Content Grid -->
+    <div class="main-grid grid grid-cols-1 lg:grid-cols-2">
+
+        <!-- Left Column: Sign-up Form -->
+        <div class="flex items-center justify-center p-8 lg:p-16">
+            <div class="w-full max-w-md">
+                <h1 class="text-4xl font-bold mb-10 text-gray-800">Sign-up</h1>
+                
+                <form onsubmit="handleRegistration(event)" class="space-y-6">
+
+                    <!-- Username Field -->
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username<span class="text-red-500">*</span></label>
+                        <input type="text" id="username" class="custom-input" required>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email<span class="text-red-500">*</span></label>
+                        <input type="email" id="email" class="custom-input" required>
+                    </div>
+
+                    <!-- Create Password Field -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Create Password<span class="text-red-500">*</span></label>
+                        <input type="password" id="password" class="custom-input" required>
+                    </div>
+
+                    <!-- Re-type Password Field -->
+                    <div>
+                        <label for="retype-password" class="block text-sm font-medium text-gray-700 mb-1">Re-type Password<span class="text-red-500">*</span></label>
+                        <input type="password" id="retype-password" class="custom-input" required>
+                    </div>
+
+                    <!-- Register Button -->
+                    <button type="submit" class="register-button w-full">
+                        Register
+                    </button>
+
+                    <!-- Terms and Conditions Checkbox -->
+                    <div class="flex items-center pt-2">
+                        <input id="terms" type="checkbox" class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" required>
+                        <label for="terms" class="ml-2 block text-xs text-gray-500">
+                            Accept all the Terms and Conditions
+                        </label>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column: Image -->
+        <div class="hidden lg:block image-container"></div>
+
+    </div>
+    
+    <!-- Notification Message Box -->
+    <div id="message-box" class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-3 rounded-lg shadow-xl hidden transition-all duration-300 transform translate-y-full"></div>
+
+    <script>
+        function showMessage(message, isError = false) {
+            const msgBox = document.getElementById('message-box');
+            msgBox.textContent = message;
+            msgBox.className = 'fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-xl transition-all duration-300 transform';
+            msgBox.classList.add(isError ? 'bg-red-600' : 'bg-green-600', 'translate-y-0', 'block');
+
+            setTimeout(() => {
+                msgBox.classList.add('translate-y-full');
+                msgBox.classList.remove('translate-y-0');
+            }, 3000);
+            setTimeout(() => {
+                 msgBox.classList.add('hidden');
+            }, 3500);
+        }
+
+        // Updated Registration Function with Redirect
+        function handleRegistration(event) {
+            event.preventDefault(); 
+            
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const retypePassword = document.getElementById('retype-password').value;
+            const termsChecked = document.getElementById('terms').checked;
+
+            // Validation
+            if (!username || !email) {
+                showMessage("Please fill in all required fields.", true);
+                return;
+            }
+
+            if (password !== retypePassword) {
+                showMessage("Passwords do not match. Please re-type your password.", true);
+                return;
+            }
+
+            if (!termsChecked) {
+                showMessage("You must accept the Terms and Conditions.", true);
+                return;
+            }
+
+            // Show success message
+            showMessage("Registration successful! Redirecting to admin page...");
+
+            // Redirect to admin.html after short delay
+            setTimeout(() => {
+                window.location.href = "admin.html";
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

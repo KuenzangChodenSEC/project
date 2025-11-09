@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Management</title>
+    <!-- Using Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-dark-bg: #1a1a1a;
+            --color-dark-sidebar: #222;
+            --color-light-bg: #f5f5f5;
+            --color-card-bg: #fff;
+            --color-accent: #6f5f90; 
+            --color-text-light: #aaa;
+            --color-text-dark: #333;
+            --color-active: #40384a; 
+            --color-border: #e0e0e0;
+            --color-form-bg: #32353a; /* Dark background for Add Plan card */
+            --color-form-text: #f0f0f0;
+            --color-input-bg: #4c5056;
+            --color-input-border: #60646b;
+            --color-table-bg: #40384a; /* Dark background for Table card */
+            --color-table-header: #8a819b;
+            --color-table-row: #f0f0f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--color-light-bg);
+            color: var(--color-text-dark);
+            overflow: hidden; 
+        }
+
+        /* ----------------------- */
+        /* 1. Sidebar (Reused Styles) */
+        /* ----------------------- */
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--color-dark-bg);
+            color: var(--color-text-light);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-header {
+            padding: 0 20px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .admin-profile-sidebar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0 30px;
+            border-bottom: 1px solid var(--color-dark-sidebar);
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #333; 
+            border: 2px solid #fff;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .avatar-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            color: #fff;
+        }
+
+        .admin-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .admin-email {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--color-text-light);
+        }
+
+        .nav-links-container {
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-light);
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            margin-right: 15px;
+            font-size: 16px;
+        }
+
+        .nav-link:hover {
+            background-color: var(--color-dark-sidebar);
+            color: #fff;
+        }
+
+        .nav-link.active {
+            background-color: var(--color-active);
+            color: #fff;
+        }
+        
+        .nav-link.active i {
+            color: #fff;
+        }
+        
+        .nav-links-container > a:nth-child(2) { border-top: 1px solid var(--color-dark-sidebar); padding-top: 15px; }
+        .nav-links-container > a:last-child { border-bottom: 1px solid var(--color-dark-sidebar); padding-bottom: 15px; margin-bottom: 20px; }
+
+
+        .logout-section {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--color-dark-sidebar);
+        }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-light);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .logout-link i {
+            margin-right: 10px;
+        }
+
+        .logout-link:hover {
+            color: var(--color-accent);
+        }
+
+        .bottom-logo {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            background-color: #333; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        /* ----------------------- */
+        /* 2. Main Content (Plan Management) */
+        /* ----------------------- */
+        
+        .main-content {
+            margin-left: 250px; 
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto; 
+            background-color: var(--color-light-bg); 
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .plan-management-container {
+            max-width: 900px;
+            background-color: var(--color-light-bg);
+            padding: 0;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .page-header {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-text-dark);
+            margin-bottom: 10px;
+        }
+        
+        /* --- Plan Card Styles --- */
+        .plan-card {
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Top Card: Add Plan */
+        .add-plan-card {
+            background-color: var(--color-form-bg);
+            color: var(--color-form-text);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--color-accent);
+            display: inline-block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 40px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            padding: 10px 15px;
+            border: 1px solid var(--color-input-border);
+            border-radius: 6px;
+            background-color: var(--color-input-bg);
+            color: var(--color-form-text);
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--color-accent);
+            outline: none;
+        }
+        
+        /* Ensure amount spans full width below plan name/validity */
+        .input-group-amount {
+            grid-column: 1 / -1;
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .form-actions button {
+            padding: 10px 25px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-save {
+            background-color: var(--color-accent);
+            color: #fff;
+            border: none;
+        }
+
+        .btn-save:hover {
+            background-color: #564c70;
+        }
+
+        .btn-cancel {
+            background-color: var(--color-form-text);
+            color: var(--color-dark-bg);
+            border: none;
+        }
+
+        /* --- Table Card Styles --- */
+        .plan-list-card {
+            background-color: var(--color-table-bg);
+            color: var(--color-table-row);
+        }
+
+        .list-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .show-entries label, .show-entries select {
+            color: var(--color-table-header);
+            font-size: 13px;
+        }
+
+        .show-entries select {
+            background-color: transparent;
+            border: 1px solid var(--color-table-header);
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .search-box input {
+            padding: 8px 15px;
+            border-radius: 6px;
+            border: 1px solid var(--color-input-border);
+            background-color: var(--color-input-bg);
+            color: var(--color-form-text);
+            font-size: 14px;
+        }
+
+        .plan-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .plan-table thead th {
+            color: var(--color-table-header);
+            font-weight: 600;
+            font-size: 13px;
+            text-align: left;
+            padding: 10px 15px;
+            border-bottom: 1px solid #555;
+        }
+        
+        .plan-table tbody tr {
+            border-bottom: 1px solid #3d3d3d;
+            transition: background-color 0.2s;
+        }
+
+        .plan-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .plan-table td {
+            padding: 15px;
+            font-size: 14px;
+        }
+
+        .sort-icon {
+            margin-left: 5px;
+            color: var(--color-table-header);
+        }
+
+        .action-buttons button {
+            background-color: var(--color-accent);
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-right: 5px;
+        }
+        
+        .action-buttons button:hover {
+            background-color: #564c70;
+        }
+
+        /* Message/Modal styles */
+        #messageBox {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transition: opacity 0.5s, transform 0.5s;
+            opacity: 0;
+            transform: translateY(-20px);
+            font-weight: 500;
+        }
+        #messageBox.error {
+            background-color: #f44336;
+        }
+        #messageBox.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar { width: 70px; }
+            .main-content { margin-left: 70px; }
+            .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span, .bottom-logo { display: none; }
+            .admin-profile-sidebar { border-bottom: none; padding-bottom: 0; }
+            .avatar { margin-bottom: 20px; }
+            .nav-link { justify-content: center; padding: 15px 0; }
+            .nav-link i { margin-right: 0; }
+            .logout-section { justify-content: center; }
+            .logout-link i { margin-right: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content { padding: 20px; }
+            .form-grid { grid-template-columns: 1fr; gap: 20px; }
+            .input-group-amount { grid-column: 1 / 1; }
+            .form-actions { justify-content: center; }
+            .list-controls { flex-direction: column; gap: 15px; align-items: flex-start; }
+            .plan-table th, .plan-table td { padding: 10px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Message Box for feedback -->
+    <div id="messageBox"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="dashboard-header">Plan</div>
+        
+        <div class="admin-profile-sidebar">
+            <div class="avatar">
+                <div class="avatar-inner"><i class="fas fa-user"></i></div>
+            </div>
+            <div class="admin-name" id="sidebar-admin-name">Administrator Name</div>
+            <div class="admin-email" id="sidebar-admin-email">admin@example.com</div>
+        </div>
+
+        <div class="nav-links-container">
+            <a class="nav-link" href="#">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-user-circle"></i>
+                <span>Admin Profile</span>
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-registered"></i>
+                <span>Registration</span>
+            </a>
+            <a class="nav-link active">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Plan</span>
+            </a>
+            <a class="nav-link">
+                <i class="fas fa-credit-card"></i>
+                <span>View Payment</span>
+            </a>
+            <a class="nav-link">
+                <i class="fas fa-box-open"></i>
+                <span>Inventory</span>
+            </a>
+            <a class="nav-link">
+                <i class="fas fa-users"></i>
+                <span>View Members</span>
+            </a>
+        </div>
+
+        <div class="logout-section">
+            <a class="logout-link" id="logout-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+            <div class="bottom-logo">CG</div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1 class="page-header">Plan</h1>
+        <div class="plan-management-container">
+            
+            <!-- 1. Add Plan Card (Top Section) -->
+            <div class="plan-card add-plan-card">
+                <div class="card-title">Add Plan</div>
+                <form id="add-plan-form">
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="plan-name">Plan Name</label>
+                            <input type="text" id="plan-name" required placeholder="e.g., Monthly Pro">
+                        </div>
+                        <div class="input-group">
+                            <label for="validity">Validity (Months)</label>
+                            <input type="number" id="validity" min="1" required placeholder="e.g., 1 or 6">
+                        </div>
+                        <div class="input-group input-group-amount">
+                            <label for="amount">Amount (Currency)</label>
+                            <input type="number" id="amount" min="0" required placeholder="e.g., 800">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save">Save</button>
+                            <button type="button" class="btn-cancel" id="btn-cancel-add">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 2. Plan List Card (Bottom Section) -->
+            <div class="plan-card plan-list-card">
+                <div class="list-controls">
+                    <div class="show-entries">
+                        <label for="show-entries">Show Entities</label>
+                        <select id="show-entries">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="Search">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="plan-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">Plan Name <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 20%;">Validity <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 20%;">Amount <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 15%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="plans-table-body">
+                            <!-- Plan rows will be inserted here by JavaScript -->
+                            <tr><td colspan="4" style="text-align: center;">Loading plans...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Global Firebase and Config ---
+        let db;
+        let auth;
+        let userId = '';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Set Firebase logging level to Debug
+        setLogLevel('Debug');
+
+        // --- UI Element References ---
+        const addPlanForm = document.getElementById('add-plan-form');
+        const planNameInput = document.getElementById('plan-name');
+        const validityInput = document.getElementById('validity');
+        const amountInput = document.getElementById('amount');
+        const plansTableBody = document.getElementById('plans-table-body');
+        const btnCancelAdd = document.getElementById('btn-cancel-add');
+        const searchInput = document.getElementById('search-input');
+
+        let currentPlans = []; // Local cache for filtering
+
+        // --- Utility Function for Feedback ---
+        function showMessage(message, isError = false) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = isError ? 'error' : '';
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
+        
+        // --- Firestore References ---
+        // Path: /artifacts/{appId}/public/data/plans
+        function getPlansCollectionRef() {
+            return collection(db, 'artifacts', appId, 'public', 'data', 'plans');
+        }
+
+        // --- Data Manipulation ---
+
+        function renderPlans(plans, searchTerm = '') {
+            plansTableBody.innerHTML = '';
+            
+            const lowerSearchTerm = searchTerm.toLowerCase().trim();
+            const filteredPlans = plans.filter(plan => 
+                plan.planName.toLowerCase().includes(lowerSearchTerm) ||
+                plan.validity.toString().includes(lowerSearchTerm) ||
+                plan.amount.toString().includes(lowerSearchTerm)
+            );
+
+            if (filteredPlans.length === 0) {
+                const row = `<tr><td colspan="4" style="text-align: center; color: var(--color-table-header);">No plans found.</td></tr>`;
+                plansTableBody.innerHTML = row;
+                return;
+            }
+
+            filteredPlans.forEach(plan => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${plan.planName}</td>
+                    <td>${plan.validity} ${plan.validity > 1 ? 'months' : 'month'}</td>
+                    <td>$${plan.amount.toFixed(2)}</td>
+                    <td class="action-buttons">
+                        <button onclick="handleEdit('${plan.id}')">Edit</button>
+                        <button onclick="handleDelete('${plan.id}', '${plan.planName}')">Delete</button>
+                    </td>
+                `;
+                plansTableBody.appendChild(row);
+            });
+        }
+        
+        // Define global handlers for table buttons (must be defined globally for HTML attributes to work)
+        window.handleEdit = function(planId) {
+            // In a full application, this would open a modal pre-filled with the plan data
+            console.log("Editing Plan ID:", planId);
+            showMessage(`Editing Plan ID: ${planId} (Simulated)`);
+        }
+
+        window.handleDelete = async function(planId, planName) {
+            // Use a custom modal/confirmation in a real application. Here we use console.log
+            if (!confirm(`Are you sure you want to delete the plan: ${planName}?`)) {
+                return;
+            }
+            
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'plans', planId));
+                showMessage(`Plan '${planName}' deleted successfully!`);
+            } catch (error) {
+                console.error("Error deleting plan:", error);
+                showMessage("Failed to delete plan. Check console.", true);
+            }
+        }
+
+
+        // --- Event Handlers ---
+        
+        async function handleAddPlan(event) {
+            event.preventDefault();
+
+            if (!userId) {
+                showMessage("Authentication not ready. Cannot add plan.", true);
+                return;
+            }
+            
+            const newPlan = {
+                planName: planNameInput.value.trim(),
+                validity: parseInt(validityInput.value.trim()),
+                amount: parseFloat(amountInput.value.trim()),
+            };
+
+            if (isNaN(newPlan.validity) || newPlan.validity <= 0) {
+                showMessage("Validity must be a positive number.", true);
+                return;
+            }
+            if (isNaN(newPlan.amount) || newPlan.amount < 0) {
+                showMessage("Amount must be a non-negative number.", true);
+                return;
+            }
+
+            try {
+                await addDoc(getPlansCollectionRef(), newPlan);
+                showMessage(`Plan '${newPlan.planName}' added successfully!`);
+                addPlanForm.reset();
+            } catch (error) {
+                console.error("Error adding plan:", error);
+                showMessage("Failed to add plan. Check console for details.", true);
+            }
+        }
+        
+        function handleCancelAdd() {
+            addPlanForm.reset();
+        }
+
+        function handleSearch() {
+            renderPlans(currentPlans, searchInput.value);
+        }
+
+        // --- Firebase Listener Setup ---
+
+        function setupPlanListener() {
+            if (!db) {
+                console.error("Firestore not initialized.");
+                return;
+            }
+            
+            onSnapshot(getPlansCollectionRef(), (querySnapshot) => {
+                const plans = [];
+                querySnapshot.forEach((doc) => {
+                    plans.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Sort by validity (ascending) for better readability
+                plans.sort((a, b) => a.validity - b.validity);
+                
+                currentPlans = plans;
+                renderPlans(currentPlans, searchInput.value);
+
+                if (plans.length === 0) {
+                    showMessage("No plans found in the database. Add one now!", false);
+                }
+            }, (error) => {
+                console.error("Error listening to plans data:", error);
+                showMessage("Failed to load plans data.", true);
+            });
+        }
+        
+        // --- Firebase Initialization ---
+        async function initFirebaseAndAuth() {
+            if (Object.keys(firebaseConfig).length === 0) {
+                console.error("Firebase config is missing.");
+                // Use a default state for display purposes if config is missing
+                document.getElementById('plans-table-body').innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">FIREBASE CONFIG MISSING. Cannot load data.</td></tr>';
+                return;
+            }
+            
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        // Update sidebar for context
+                        document.getElementById('sidebar-admin-name').textContent = 'Admin ' + userId.substring(0, 5);
+                        document.getElementById('sidebar-admin-email').textContent = user.email || 'authenticated@user.com';
+                        setupPlanListener();
+                    } else {
+                        console.log("Not authenticated. Using anonymous/default data.");
+                        userId = crypto.randomUUID();
+                        document.getElementById('sidebar-admin-name').textContent = 'Guest Admin';
+                        // Still run listener even if anonymous, as plan data is public
+                        setupPlanListener();
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase initialization or authentication failed:", error);
+                showMessage("System Error: Failed to connect to database.", true);
+            }
+        }
+
+        // --- Setup Event Listeners ---
+        addPlanForm.addEventListener('submit', handleAddPlan);
+        btnCancelAdd.addEventListener('click', handleCancelAdd);
+        searchInput.addEventListener('input', handleSearch);
+        
+        window.onload = initFirebaseAndAuth;
+
+    </script>
+</body>
+</html>
