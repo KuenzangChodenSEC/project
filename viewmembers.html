@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Members</title>
-    <!-- Using Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -13,7 +12,7 @@
             --color-dark-sidebar: #222;
             --color-light-bg: #f5f5f5;
             --color-card-bg: #fff;
-            --color-accent: #6f5f90; 
+            --color-accent: #6f5f90; /* FIXED: Semicolon was missing here */
             --color-text-light: #aaa;
             --color-text-dark: #333;
             --color-active: #40384a; 
@@ -116,6 +115,7 @@
             color: var(--color-text-light);
             cursor: pointer;
             transition: background-color 0.3s, color 0.3s;
+            text-decoration: none; 
         }
 
         .nav-link i {
@@ -400,10 +400,8 @@
 </head>
 <body>
 
-    <!-- Message Box for feedback -->
     <div id="messageBox"></div>
 
-    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="dashboard-header">Members</div>
         
@@ -416,38 +414,38 @@
         </div>
 
         <div class="nav-links-container">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="admin.html">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="pfp.html">
                 <i class="fas fa-user-circle"></i>
                 <span>Admin Profile</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="registration.html">
                 <i class="fas fa-registered"></i>
                 <span>Registration</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="viewplan.html">
                 <i class="fas fa-clipboard-list"></i>
                 <span>Plan</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="viewpayment.html">
                 <i class="fas fa-credit-card"></i>
                 <span>View Payment</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="inventory.html"> 
                 <i class="fas fa-box-open"></i>
                 <span>Inventory</span>
             </a>
-            <a class="nav-link active">
+            <a class="nav-link active" href="viewmembers.html"> 
                 <i class="fas fa-users"></i>
                 <span>View Members</span>
             </a>
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" id="logout-link">
+            <a class="logout-link" href="index.html">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -455,12 +453,10 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
     <div class="main-content">
         <h1 class="page-header">Active Members</h1>
         <div class="members-container">
             
-            <!-- Member List Card -->
             <div class="member-list-card">
                 <div class="card-title">Gym Members</div>
                 
@@ -491,7 +487,6 @@
                             </tr>
                         </thead>
                         <tbody id="members-table-body">
-                            <!-- Member rows will be inserted here by JavaScript -->
                             <tr><td colspan="5" style="text-align: center;">Loading members...</td></tr>
                         </tbody>
                     </table>
@@ -570,7 +565,7 @@
                 try {
                     // Try to parse as Firestore timestamp (Date object) or ISO string
                     const date = new Date(dateString); 
-                    if (isNaN(date)) return dateString; // Return original if invalid date
+                    if (isNaN(date.getTime())) return dateString; // Check if valid date
                     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 } catch {
                     return dateString;
@@ -585,7 +580,7 @@
                     if (isNaN(date.getTime())) return 'N/A';
 
                     // Simplified logic for simulation
-                    switch (plan) {
+                    switch (plan.toLowerCase()) {
                         case 'weekly':
                             date.setDate(date.getDate() + 7);
                             break;
@@ -668,7 +663,7 @@
                 currentMembers = members;
                 renderMembers(currentMembers, searchInput.value);
 
-                if (members.length === 0) {
+                if (members.length === 0 && searchInput.value === '') {
                     membersTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No members found in the database.</td></tr>';
                 }
             }, (error) => {

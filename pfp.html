@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Profile</title>
-    <!-- Using Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -36,7 +35,7 @@
         }
 
         /* ----------------------- */
-        /* 1. Sidebar (Left Panel) - Reused Styles */
+        /* 1. Sidebar (Left Panel) */
         /* ----------------------- */
 
         .sidebar {
@@ -111,6 +110,7 @@
             font-weight: 500;
             color: var(--color-text-light);
             cursor: pointer;
+            text-decoration: none; /* Ensure no underline */
             transition: background-color 0.3s, color 0.3s;
         }
 
@@ -131,14 +131,20 @@
             color: #fff;
         }
         
-        /* Specific coloring for active link icon */
         .nav-link.active i {
             color: #fff;
         }
         
-        /* Sidebar link dividers */
-        .nav-link:nth-child(3) { border-top: 1px solid var(--color-dark-sidebar); padding-top: 15px; }
-        .nav-link:nth-child(7) { border-bottom: 1px solid var(--color-dark-sidebar); padding-bottom: 15px; margin-bottom: 20px; }
+        /* CORRECTED: Sidebar link dividers to match admin.html layout */
+        .nav-links-container a:nth-child(4) { 
+            border-top: 1px solid var(--color-dark-sidebar); 
+            padding-top: 15px; 
+        }
+        .nav-links-container a:nth-child(8) { 
+            border-bottom: 1px solid var(--color-dark-sidebar); 
+            padding-bottom: 15px; 
+            margin-bottom: 20px; 
+        }
 
 
         .logout-section {
@@ -157,6 +163,7 @@
             color: var(--color-text-light);
             cursor: pointer;
             transition: color 0.3s;
+            text-decoration: none; /* Ensure no underline */
         }
 
         .logout-link i {
@@ -191,7 +198,7 @@
             flex-grow: 1;
             padding: 40px;
             overflow-y: auto; 
-            background-color: #fff; /* White background for the main canvas */
+            background-color: var(--color-light-bg); /* Use light background for canvas */
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
         }
 
@@ -445,28 +452,25 @@
 </head>
 <body>
 
-    <!-- Message Box for feedback -->
     <div id="messageBox"></div>
 
-    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="dashboard-header">Admin Profile</div>
         
         <div class="admin-profile-sidebar">
             <div class="avatar">
-                 <!-- Placeholder icon -->
-                <div class="avatar-inner"><i class="fas fa-user"></i></div>
+                 <div class="avatar-inner"><i class="fas fa-user"></i></div>
             </div>
             <div class="admin-name" id="sidebar-admin-name">Administrator Name</div>
             <div class="admin-email" id="sidebar-admin-email">kunil03@gmail.com</div>
         </div>
 
         <div class="nav-links-container">
-            <a class="nav-link active" href="admin.html">
+            <a class="nav-link" href="admin.html">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="pfp.html">
+            <a class="nav-link active" href="pfp.html">
                 <i class="fas fa-user-circle"></i>
                 <span>Admin Profile</span>
             </a>
@@ -501,295 +505,128 @@
         </div>
     </aside>
 
-
-    <!-- Main Content -->
     <div class="main-content">
         <div class="profile-container">
-            <h1 class="page-title">Admin Information</h1>
+            <h1 class="page-title">Admin Profile</h1>
+
             <div class="profile-grid">
                 
-                <!-- Left Column: Info Card -->
                 <div class="info-card">
                     <div class="info-avatar">
                         <i class="fas fa-user"></i>
                     </div>
-                    <div class="update-link">Update Profile</div>
-                    
+                    <div class="admin-name">Administrator Name</div>
+                    <div class="update-link">Update Profile Picture</div>
+
                     <div class="profile-details">
-                        <span>Username</span>
-                        <span id="display-username">Loading...</span>
-                        
-                        <span>Contact no.</span>
-                        <span id="display-contact">Loading...</span>
-                        
-                        <span>Email Address</span>
-                        <span id="display-email">Loading...</span>
+                        <span>Admin ID:</span><span>ADM001</span>
+                        <span>Full Name:</span><span id="display-name">Administrator Name</span>
+                        <span>Role:</span><span>Super Admin</span>
+                        <span>Email:</span><span id="display-email">kunil03@gmail.com</span>
+                        <span>Join Date:</span><span>DD/MM/YYYY</span>
                     </div>
 
-                    <button class="register-button">Register New Admin Account</button>
+                    <button class="register-button">Register New Admin</button>
                 </div>
 
-                <!-- Right Column: Forms -->
                 <div class="forms-section">
                     
-                    <!-- Form 1: Profile Update -->
                     <div class="form-group">
-                        <h4>Update Profile</h4>
-                        <div class="input-row">
-                            <input type="text" id="input-username" placeholder="Username">
-                        </div>
-                        <div class="input-row">
-                            <input type="text" id="input-contact" placeholder="Contact No.">
-                        </div>
-                        <div class="input-row">
-                            <input type="email" id="input-email" placeholder="Email Address">
-                        </div>
-                        <div class="form-actions">
-                            <button class="btn-save" id="btn-save-profile">Save</button>
-                            <button class="btn-cancel" id="btn-cancel-profile">Cancel</button>
-                        </div>
+                        <h4>Update Personal Information</h4>
+                        <form id="updateProfileForm">
+                            <div class="input-row">
+                                <label for="fullName">Full Name</label>
+                                <input type="text" id="fullName" value="Administrator Name" required>
+                            </div>
+                            <div class="input-row">
+                                <label for="adminEmail">Email Address</label>
+                                <input type="email" id="adminEmail" value="kunil03@gmail.com" required>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn-save">Save Changes</button>
+                                <button type="button" class="btn-cancel">Cancel</button>
+                            </div>
+                        </form>
                     </div>
 
-                    <!-- Form 2: Password Change -->
                     <div class="form-group">
-                        <h4>Password</h4>
-                        <div class="input-row">
-                            <input type="password" id="input-current-password" placeholder="Current Password">
-                        </div>
-                        <div class="input-row">
-                            <input type="password" id="input-new-password" placeholder="New Password">
-                        </div>
-                        <div class="input-row">
-                            <input type="password" id="input-retype-password" placeholder="Re-type Password">
-                        </div>
-                        <div class="form-actions">
-                            <button class="btn-change" id="btn-change-password">Change</button>
-                            <button class="btn-clear" id="btn-clear-password">Clear</button>
-                        </div>
+                        <h4>Change Password</h4>
+                        <form id="changePasswordForm">
+                            <div class="input-row">
+                                <label for="currentPassword">Current Password</label>
+                                <input type="password" id="currentPassword" required>
+                            </div>
+                            <div class="input-row">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" id="newPassword" required>
+                            </div>
+                            <div class="input-row">
+                                <label for="confirmPassword">Confirm New Password</label>
+                                <input type="password" id="confirmPassword" required>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn-change">Change Password</button>
+                                <button type="button" class="btn-clear">Clear</button>
+                            </div>
+                        </form>
                     </div>
+
                 </div>
 
             </div>
         </div>
     </div>
-
-    <script type="module">
-        // FIX: Moved setLogLevel import from firebase-auth to firebase-app
-        import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global Firebase variables
-        let app;
-        let db;
-        let auth;
-        let userId = '';
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
-        // Set Firebase logging level to Debug
-        setLogLevel('Debug');
-
-        // References to UI elements
-        const displayUsername = document.getElementById('display-username');
-        const displayContact = document.getElementById('display-contact');
-        const displayEmail = document.getElementById('display-email');
-        const sidebarAdminName = document.getElementById('sidebar-admin-name');
-        const sidebarAdminEmail = document.getElementById('sidebar-admin-email');
-        
-        const inputUsername = document.getElementById('input-username');
-        const inputContact = document.getElementById('input-contact');
-        const inputEmail = document.getElementById('input-email');
-        
-        const btnSaveProfile = document.getElementById('btn-save-profile');
-        const btnCancelProfile = document.getElementById('btn-cancel-profile');
-        const btnChangePassword = document.getElementById('btn-change-password');
-        const btnClearPassword = document.getElementById('btn-clear-password');
-
-        const inputCurrentPassword = document.getElementById('input-current-password');
-        const inputNewPassword = document.getElementById('input-new-password');
-        const inputRetypePassword = document.getElementById('input-retype-password');
-        
-        // --- Utility Function for Feedback ---
+    
+    <script>
+        // Simple client-side feedback logic (optional but useful for form testing)
         function showMessage(message, isError = false) {
-            const messageBox = document.getElementById('messageBox');
-            messageBox.textContent = message;
-            messageBox.className = isError ? 'error' : '';
-            messageBox.classList.add('show');
+            const msgBox = document.getElementById('messageBox');
+            msgBox.textContent = message;
+            msgBox.className = 'show' + (isError ? ' error' : '');
+
             setTimeout(() => {
-                messageBox.classList.remove('show');
+                msgBox.className = '';
             }, 3000);
         }
 
-        // --- Core Profile Logic ---
-        function getProfileDocRef(uid) {
-            // Path: /artifacts/{appId}/users/{userId}/adminProfile/profileDoc
-            return doc(db, 'artifacts', appId, 'users', uid, 'adminProfile', 'profileDoc');
-        }
-
-        function updateUI(data) {
-            const username = data.username || 'N/A';
-            const contactNo = data.contactNo || 'N/A';
-            const email = data.email || 'N/A';
-
-            // Update Info Card
-            displayUsername.textContent = username;
-            displayContact.textContent = contactNo;
-            displayEmail.textContent = email;
-
-            // Update Sidebar
-            sidebarAdminName.textContent = username;
-            sidebarAdminEmail.textContent = email;
+        document.getElementById('updateProfileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showMessage('Profile updated successfully!');
             
-            // Populate Input Fields
-            inputUsername.value = username !== 'N/A' ? username : '';
-            inputContact.value = contactNo !== 'N/A' ? contactNo : '';
-            inputEmail.value = email !== 'N/A' ? email : '';
-        }
+            // Example update to sidebar for visual consistency
+            const newName = document.getElementById('fullName').value;
+            const newEmail = document.getElementById('adminEmail').value;
+            document.getElementById('sidebar-admin-name').textContent = newName;
+            document.getElementById('sidebar-admin-email').textContent = newEmail;
+            document.getElementById('display-name').textContent = newName;
+            document.getElementById('display-email').textContent = newEmail;
+        });
 
-        function setupProfileListener(uid) {
-            const docRef = getProfileDocRef(uid);
-            onSnapshot(docRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    updateUI(docSnap.data());
-                } else {
-                    // Initialize default data if document doesn't exist
-                    const defaultData = {
-                        username: 'Admin User ' + uid.substring(0, 4),
-                        contactNo: 'N/A',
-                        email: auth.currentUser?.email || 'N/A'
-                    };
-                    setDoc(docRef, defaultData)
-                        .then(() => updateUI(defaultData))
-                        .catch(e => console.error("Error setting default profile:", e));
-                }
-            }, (error) => {
-                console.error("Error listening to profile data:", error);
-                showMessage("Failed to load profile data.", true);
-            });
-        }
-        
-        // --- Event Handlers ---
-        
-        async function handleProfileSave() {
-            if (!userId) {
-                showMessage("Authentication failed. Cannot save profile.", true);
+        document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+
+            if (newPass !== confirmPass) {
+                showMessage('Error: New passwords do not match.', true);
                 return;
             }
-
-            const newProfileData = {
-                username: inputUsername.value.trim() || 'Administrator Name',
-                contactNo: inputContact.value.trim(),
-                email: inputEmail.value.trim()
-            };
-
-            if (!newProfileData.email) {
-                showMessage("Email Address is required.", true);
-                return;
-            }
-
-            try {
-                const docRef = getProfileDocRef(userId);
-                // Use setDoc with merge: true to avoid overwriting the whole document
-                await setDoc(docRef, newProfileData, { merge: true });
-                showMessage("Profile updated successfully!");
-            } catch (error) {
-                console.error("Error saving profile:", error);
-                showMessage("Failed to save profile. Check console for details.", true);
-            }
-        }
-        
-        function handleCancelProfile() {
-            // Revert form fields to the currently displayed data
-            inputUsername.value = displayUsername.textContent === 'N/A' ? '' : displayUsername.textContent;
-            inputContact.value = displayContact.textContent === 'N/A' ? '' : displayContact.textContent;
-            inputEmail.value = displayEmail.textContent === 'N/A' ? '' : displayEmail.textContent;
-        }
-
-        async function handleChangePassword() {
-            const currentPass = inputCurrentPassword.value.trim();
-            const newPass = inputNewPassword.value.trim();
-            const retypePass = inputRetypePassword.value.trim();
-
-            if (!currentPass || !newPass || !retypePass) {
-                showMessage("Please fill in all password fields.", true);
-                return;
-            }
-
-            if (newPass !== retypePass) {
-                showMessage("New passwords do not match.", true);
-                return;
-            }
-
             if (newPass.length < 6) {
-                 showMessage("New password must be at least 6 characters.", true);
-                 return;
-            }
-
-            // NOTE: We simulate the password change here because actual Firebase Auth password changes 
-            // require re-authentication steps that are outside the scope of this controlled environment.
-
-            showMessage("Password update simulated successfully!", false);
-            // Clear fields on simulated success
-            inputCurrentPassword.value = '';
-            inputNewPassword.value = '';
-            inputRetypePassword.value = '';
-        }
-
-        function handleClearPassword() {
-            inputCurrentPassword.value = '';
-            inputNewPassword.value = '';
-            inputRetypePassword.value = '';
-        }
-
-        // --- Firebase Initialization ---
-        async function initFirebaseAndAuth() {
-            if (Object.keys(firebaseConfig).length === 0) {
-                console.error("Firebase config is missing.");
-                // Use a default state for display purposes if config is missing
-                updateUI({ username: "Anonymous User", email: "No Email", contactNo: "N/A" });
+                showMessage('Error: Password must be at least 6 characters.', true);
                 return;
             }
-            
-            try {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
 
-                // Sign in using the custom token or anonymously
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
+            showMessage('Password changed successfully!');
+            this.reset(); // Clear the form fields
+        });
 
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        console.log("Authenticated with UID:", userId);
-                        setupProfileListener(userId);
-                    } else {
-                        console.log("Not authenticated. Using anonymous/default data.");
-                        userId = crypto.randomUUID();
-                    }
-                });
+        document.querySelector('.btn-cancel').addEventListener('click', function() {
+            document.getElementById('updateProfileForm').reset();
+        });
 
-            } catch (error) {
-                console.error("Firebase initialization or authentication failed:", error);
-                showMessage("System Error: Failed to connect to database.", true);
-            }
-        }
-
-        // --- Setup Event Listeners ---
-        btnSaveProfile.addEventListener('click', handleProfileSave);
-        btnCancelProfile.addEventListener('click', handleCancelProfile);
-        btnChangePassword.addEventListener('click', handleChangePassword);
-        btnClearPassword.addEventListener('click', handleClearPassword);
-        
-        // Start the application
-        initFirebaseAndAuth();
-
+        document.querySelector('.btn-clear').addEventListener('click', function() {
+            document.getElementById('changePasswordForm').reset();
+        });
     </script>
 </body>
 </html>

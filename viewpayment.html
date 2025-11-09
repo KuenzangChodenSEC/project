@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Payment</title>
-    <!-- Using Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -40,7 +39,7 @@
         }
 
         /* ----------------------- */
-        /* 1. Sidebar (Reused Styles) */
+        /* 1. Sidebar (Updated Styles) */
         /* ----------------------- */
 
         .sidebar {
@@ -107,6 +106,7 @@
             flex-grow: 1;
         }
 
+        /* Removed underline from links */
         .nav-link {
             display: flex;
             align-items: center;
@@ -116,8 +116,13 @@
             color: var(--color-text-light);
             cursor: pointer;
             transition: background-color 0.3s, color 0.3s;
+            text-decoration: none; /* Fixed */
         }
 
+        .nav-links-container a:not(.active) {
+            padding-left: 20px; 
+        }
+        
         .nav-link i {
             width: 20px;
             text-align: center;
@@ -130,9 +135,13 @@
             color: #fff;
         }
 
+        /* Smooth Active State */
         .nav-link.active {
             background-color: var(--color-active);
             color: #fff;
+            border-left: 5px solid var(--color-accent); 
+            padding-left: 15px; /* Compensate for the border-left */
+            transition: background-color 0.3s, color 0.3s, border-left 0.3s, padding 0.3s; /* Fixed */
         }
         
         .nav-link.active i {
@@ -151,6 +160,7 @@
             border-top: 1px solid var(--color-dark-sidebar);
         }
 
+        /* Removed underline from logout link */
         .logout-link {
             display: flex;
             align-items: center;
@@ -159,6 +169,7 @@
             color: var(--color-text-light);
             cursor: pointer;
             transition: color 0.3s;
+            text-decoration: none; /* Fixed */
         }
 
         .logout-link i {
@@ -367,6 +378,17 @@
             .nav-link i { margin-right: 0; }
             .logout-section { justify-content: center; }
             .logout-link i { margin-right: 0; }
+
+            /* Adjust mobile active link */
+            .nav-link.active {
+                border-left: none;
+                border-top: 5px solid var(--color-accent);
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+            .nav-links-container a:not(.active) {
+                padding-left: 0; 
+            }
         }
         
         @media (max-width: 768px) {
@@ -379,10 +401,8 @@
 </head>
 <body>
 
-    <!-- Message Box for feedback -->
     <div id="messageBox"></div>
 
-    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="dashboard-header">Payment</div>
         
@@ -395,38 +415,38 @@
         </div>
 
         <div class="nav-links-container">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="admin.html">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="pfp.html">
                 <i class="fas fa-user-circle"></i>
                 <span>Admin Profile</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="registration.html">
                 <i class="fas fa-registered"></i>
                 <span>Registration</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="viewplan.html">
                 <i class="fas fa-clipboard-list"></i>
                 <span>Plan</span>
             </a>
-            <a class="nav-link active">
+            <a class="nav-link active" href="viewpayment.html">
                 <i class="fas fa-credit-card"></i>
                 <span>View Payment</span>
             </a>
-            <a class="nav-link">
+            <a class="nav-link" href="inventory.html">
                 <i class="fas fa-box-open"></i>
                 <span>Inventory</span>
             </a>
-            <a class="nav-link">
+            <a class="nav-link" href="viewmembers.html">
                 <i class="fas fa-users"></i>
                 <span>View Members</span>
             </a>
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" id="logout-link">
+            <a class="logout-link" href="index.html">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -434,12 +454,10 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
     <div class="main-content">
         <h1 class="page-header">View Payment</h1>
         <div class="payment-container">
             
-            <!-- Payment List Card -->
             <div class="plan-card payment-list-card">
                 <div class="card-title">Gym Members</div>
                 
@@ -470,7 +488,6 @@
                             </tr>
                         </thead>
                         <tbody id="payment-table-body">
-                            <!-- Payment rows will be inserted here by JavaScript -->
                             <tr><td colspan="5" style="text-align: center;">Loading payments...</td></tr>
                         </tbody>
                     </table>

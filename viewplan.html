@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plan Management</title>
-    <!-- Using Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -118,6 +117,7 @@
             font-weight: 500;
             color: var(--color-text-light);
             cursor: pointer;
+            text-decoration: none; 
             transition: background-color 0.3s, color 0.3s;
         }
 
@@ -161,6 +161,7 @@
             font-weight: 500;
             color: var(--color-text-light);
             cursor: pointer;
+            text-decoration: none; 
             transition: color 0.3s;
         }
 
@@ -331,6 +332,15 @@
             border: 1px solid var(--color-table-header);
             padding: 5px;
             border-radius: 4px;
+            /* Fix for select background on dark theme */
+            color: var(--color-table-row); 
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%238a819b%22%20d%3D%22M287%20188.7L146.4%2050.2%205.8%20188.7H287z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 8px top 50%;
+            background-size: 8px auto;
         }
 
         .search-box input {
@@ -441,10 +451,8 @@
 </head>
 <body>
 
-    <!-- Message Box for feedback -->
     <div id="messageBox"></div>
 
-    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="dashboard-header">Plan</div>
         
@@ -456,39 +464,39 @@
             <div class="admin-email" id="sidebar-admin-email">admin@example.com</div>
         </div>
 
-        <div class="nav-links-container">
-            <a class="nav-link" href="#">
+       <div class="nav-links-container">
+            <a class="nav-link" href="admin.html">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="pfp.html"> 
                 <i class="fas fa-user-circle"></i>
                 <span>Admin Profile</span>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="registration.html"> 
                 <i class="fas fa-registered"></i>
                 <span>Registration</span>
             </a>
-            <a class="nav-link active">
+            <a class="nav-link active" href="viewplan.html"> 
                 <i class="fas fa-clipboard-list"></i>
                 <span>Plan</span>
             </a>
-            <a class="nav-link">
+            <a class="nav-link" href="viewpayment.html">
                 <i class="fas fa-credit-card"></i>
                 <span>View Payment</span>
             </a>
-            <a class="nav-link">
+            <a class="nav-link" href="inventory.html">
                 <i class="fas fa-box-open"></i>
                 <span>Inventory</span>
             </a>
-            <a class="nav-link">
+            <a class="nav-link" href="viewmembers.html">
                 <i class="fas fa-users"></i>
                 <span>View Members</span>
             </a>
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" id="logout-link">
+            <a class="logout-link" href="index.html">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -496,12 +504,11 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
+
     <div class="main-content">
         <h1 class="page-header">Plan</h1>
         <div class="plan-management-container">
             
-            <!-- 1. Add Plan Card (Top Section) -->
             <div class="plan-card add-plan-card">
                 <div class="card-title">Add Plan</div>
                 <form id="add-plan-form">
@@ -526,7 +533,6 @@
                 </form>
             </div>
 
-            <!-- 2. Plan List Card (Bottom Section) -->
             <div class="plan-card plan-list-card">
                 <div class="list-controls">
                     <div class="show-entries">
@@ -553,7 +559,6 @@
                             </tr>
                         </thead>
                         <tbody id="plans-table-body">
-                            <!-- Plan rows will be inserted here by JavaScript -->
                             <tr><td colspan="4" style="text-align: center;">Loading plans...</td></tr>
                         </tbody>
                     </table>
