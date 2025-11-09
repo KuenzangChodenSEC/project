@@ -3,273 +3,793 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Dashboard</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
+    <title>Admin Profile</title>
+    <!-- Using Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Custom scrollbar for aesthetic purposes */
-        ::-webkit-scrollbar {
-            width: 8px;
+        :root {
+            --color-dark-bg: #1a1a1a;
+            --color-dark-sidebar: #222;
+            --color-light-bg: #f5f5f5;
+            --color-card-bg: #fff;
+            --color-accent: #6f5f90; /* Purple accent color */
+            --color-text-light: #aaa;
+            --color-text-dark: #333;
+            --color-active: #40384a; /* Slightly lighter shade for active state */
+            --color-border: #e0e0e0;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #5b21b6; /* Indigo-700 */
-            border-radius: 4px;
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
-        ::-webkit-scrollbar-track {
-            background: #1e1b4b; /* Indigo-900 */
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--color-light-bg);
+            color: var(--color-text-dark);
+            overflow: hidden; /* Prevent body scroll */
         }
-        /* Mobile: Sidebar should be hidden by default and appear on button click */
-        #sidebar {
-            transform: translateX(-100%);
-            transition: transform 0.3s ease-in-out;
+
+        /* ----------------------- */
+        /* 1. Sidebar (Left Panel) - Reused Styles */
+        /* ----------------------- */
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--color-dark-bg);
+            color: var(--color-text-light);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
         }
-        #sidebar.open {
-            transform: translateX(0);
+
+        .dashboard-header {
+            padding: 0 20px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
         }
-        @media (min-width: 768px) {
-            #sidebar {
-                transform: translateX(0);
+
+        .admin-profile-sidebar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0 30px;
+            border-bottom: 1px solid var(--color-dark-sidebar);
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #333; /* Placeholder color for avatar */
+            border: 2px solid #fff;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .avatar-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            color: #fff;
+        }
+
+        .admin-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .admin-email {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--color-text-light);
+        }
+
+        .nav-links-container {
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-light);
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            margin-right: 15px;
+            font-size: 16px;
+        }
+
+        .nav-link:hover {
+            background-color: var(--color-dark-sidebar);
+            color: #fff;
+        }
+
+        .nav-link.active {
+            background-color: var(--color-active);
+            color: #fff;
+        }
+        
+        /* Specific coloring for active link icon */
+        .nav-link.active i {
+            color: #fff;
+        }
+        
+        /* Sidebar link dividers */
+        .nav-link:nth-child(3) { border-top: 1px solid var(--color-dark-sidebar); padding-top: 15px; }
+        .nav-link:nth-child(7) { border-bottom: 1px solid var(--color-dark-sidebar); padding-bottom: 15px; margin-bottom: 20px; }
+
+
+        .logout-section {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--color-dark-sidebar);
+        }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-light);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .logout-link i {
+            margin-right: 10px;
+        }
+
+        .logout-link:hover {
+            color: var(--color-accent);
+        }
+
+        .bottom-logo {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            background-color: #333; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+
+        /* ----------------------- */
+        /* 2. Main Content (Profile) */
+        /* ----------------------- */
+        
+        .main-content {
+            margin-left: 250px; 
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto; 
+            background-color: #fff; /* White background for the main canvas */
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-container {
+            max-width: 1000px;
+            background-color: var(--color-card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-text-dark);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr; /* Info card vs Forms */
+            gap: 40px;
+        }
+        
+        /* Admin Information Card */
+        .info-card {
+            background-color: var(--color-light-bg);
+            border-radius: 10px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #eee;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 36px;
+            position: relative;
+        }
+
+        .update-link {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 25px;
+            cursor: pointer;
+        }
+
+        .profile-details {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 15px 10px;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .profile-details span:nth-child(odd) {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .register-button {
+            background-color: var(--color-accent);
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .register-button:hover {
+            background-color: #564c70;
+        }
+
+
+        /* Forms Section */
+        .forms-section {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .form-group h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--color-text-dark);
+            margin-bottom: 15px;
+        }
+
+        .input-row {
+            margin-bottom: 15px;
+        }
+
+        .input-row label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .input-row input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            background-color: #f9f9f9;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .input-row input:focus {
+            border-color: var(--color-accent);
+            outline: none;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+            margin-top: 20px;
+        }
+
+        .form-actions button {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .form-actions button:hover {
+            opacity: 0.9;
+        }
+
+        /* Profile Update Buttons */
+        .btn-save {
+            background-color: var(--color-dark-bg);
+            color: #fff;
+            border: none;
+        }
+
+        .btn-cancel {
+            background-color: #fff;
+            color: var(--color-dark-bg);
+            border: 1px solid var(--color-dark-bg);
+        }
+        
+        /* Password Change Buttons */
+        .btn-change {
+            background-color: var(--color-dark-bg);
+            color: #fff;
+            border: none;
+        }
+
+        .btn-clear {
+            background-color: #fff;
+            color: var(--color-dark-bg);
+            border: 1px solid #aaa;
+        }
+
+        /* Message/Modal styles */
+        #messageBox {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transition: opacity 0.5s, transform 0.5s;
+            opacity: 0;
+            transform: translateY(-20px);
+            font-weight: 500;
+        }
+        #messageBox.error {
+            background-color: #f44336;
+        }
+        #messageBox.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span {
+                display: none;
+            }
+
+            .admin-profile-sidebar {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            .avatar {
+                margin-bottom: 20px;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .nav-link i {
+                margin-right: 0;
+            }
+
+            .logout-section {
+                justify-content: center;
+            }
+
+            .logout-link i {
+                margin-right: 0;
+            }
+            .bottom-logo {
+                display: none;
             }
         }
-        /* Style for the main content area */
-        .content-card {
-            min-height: 50vh;
+        
+        @media (max-width: 768px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
-    <!-- Load Lucide Icons for aesthetic icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-gray-100 font-sans antialiased">
+<body>
 
-    <!-- Mobile Menu Button -->
-    <div class="md:hidden p-4 bg-indigo-800 shadow-lg flex justify-between items-center">
-        <span class="text-xl font-bold text-white">App Name</span>
-        <button id="menu-button" class="text-white p-2 rounded-lg hover:bg-indigo-700 transition duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-        </button>
-    </div>
+    <!-- Message Box for feedback -->
+    <div id="messageBox"></div>
 
-    <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="dashboard-header">Admin Profile</div>
         
-        <!-- Sidebar -->
-        <aside id="sidebar" class="w-64 bg-indigo-900 text-white flex-shrink-0 z-20 fixed md:relative md:translate-x-0 h-full overflow-y-auto">
-            <div class="p-6">
-                <h1 class="text-3xl font-extrabold text-indigo-300">My App</h1>
-                <p class="text-xs text-indigo-400 mt-1">Productivity Suite</p>
+        <div class="admin-profile-sidebar">
+            <div class="avatar">
+                 <!-- Placeholder icon -->
+                <div class="avatar-inner"><i class="fas fa-user"></i></div>
             </div>
-            
-            <nav class="p-4 space-y-2">
-                <!-- Navigation Links -->
-                <a href="#" data-page="dashboard" class="nav-link flex items-center space-x-3 p-3 text-white rounded-lg transition-colors duration-200 hover:bg-indigo-600">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" data-page="projects" class="nav-link flex items-center space-x-3 p-3 text-white rounded-lg transition-colors duration-200 hover:bg-indigo-600">
-                    <i data-lucide="folder-git-2" class="w-5 h-5"></i>
-                    <span>Projects</span>
-                </a>
-                <a href="#" data-page="tasks" class="nav-link flex items-center space-x-3 p-3 text-white rounded-lg transition-colors duration-200 hover:bg-indigo-600">
-                    <i data-lucide="check-square" class="w-5 h-5"></i>
-                    <span>Tasks</span>
-                </a>
-                <a href="#" data-page="reports" class="nav-link flex items-center space-x-3 p-3 text-white rounded-lg transition-colors duration-200 hover:bg-indigo-600">
-                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-                    <span>Reports</span>
-                </a>
-                <a href="#" data-page="settings" class="nav-link flex items-center space-x-3 p-3 text-white rounded-lg transition-colors duration-200 hover:bg-indigo-600">
-                    <i data-lucide="settings" class="w-5 h-5"></i>
-                    <span>Settings</span>
-                </a>
-            </nav>
+            <div class="admin-name" id="sidebar-admin-name">Administrator Name</div>
+            <div class="admin-email" id="sidebar-admin-email">kunil03@gmail.com</div>
+        </div>
 
-            <div class="p-4 mt-auto">
-                <a href="#" data-page="logout" class="nav-link flex items-center space-x-3 p-3 text-indigo-300 rounded-lg transition-colors duration-200 hover:bg-indigo-800">
-                    <i data-lucide="log-out" class="w-5 h-5"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
+        <div class="nav-links-container">
+            <a class="nav-link active" href="admin.html">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a class="nav-link" href="pfp.html">
+                <i class="fas fa-user-circle"></i>
+                <span>Admin Profile</span>
+            </a>
+            <a class="nav-link" href="registration.html">
+                <i class="fas fa-registered"></i>
+                <span>Registration</span>
+            </a>
+            <a class="nav-link" href="viewplan.html">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Plan</span>
+            </a>
+            <a class="nav-link" href="viewpayment.html">
+                <i class="fas fa-credit-card"></i>
+                <span>View Payment</span>
+            </a>
+            <a class="nav-link" href="inventory.html">
+                <i class="fas fa-box-open"></i>
+                <span>Inventory</span>
+            </a>
+            <a class="nav-link" href="viewmembers.html">
+                <i class="fas fa-users"></i>
+                <span>View Members</span>
+            </a>
+        </div>
 
-        </aside>
-        
-        <!-- Main Content Area -->
-        <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8">
-            <!-- Header/Breadcrumbs (optional, kept simple for content) -->
-            <header class="mb-6">
-                <h2 id="page-title" class="text-3xl font-semibold text-gray-800">Dashboard</h2>
-                <p class="text-sm text-gray-500">Overview of your productivity.</p>
-            </header>
+        <div class="logout-section">
+            <a class="logout-link" href="index.html">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+            <div class="bottom-logo">CG</div>
+        </div>
+    </aside>
 
-            <!-- Content Display Area -->
-            <section id="content-area" class="space-y-6">
-                <!-- Content will be injected here -->
-            </section>
-        </main>
-        
-        <!-- Overlay for Mobile Menu -->
-        <div id="sidebar-overlay" class="fixed inset-0 bg-black opacity-50 z-10 hidden md:hidden"></div>
-    </div>
 
-    <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="profile-container">
+            <h1 class="page-title">Admin Information</h1>
+            <div class="profile-grid">
+                
+                <!-- Left Column: Info Card -->
+                <div class="info-card">
+                    <div class="info-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="update-link">Update Profile</div>
+                    
+                    <div class="profile-details">
+                        <span>Username</span>
+                        <span id="display-username">Loading...</span>
+                        
+                        <span>Contact no.</span>
+                        <span id="display-contact">Loading...</span>
+                        
+                        <span>Email Address</span>
+                        <span id="display-email">Loading...</span>
+                    </div>
 
-        // --- Core Content Definitions ---
-        const pageContent = {
-            'dashboard': {
-                title: 'Dashboard',
-                html: `
-                    <div class="content-card bg-white p-6 rounded-xl shadow-lg">
-                        <h3 class="text-xl font-bold mb-4 text-indigo-600">Welcome Back!</h3>
-                        <p class="text-gray-700">This is your main dashboard. Track your key metrics and recent activity here.</p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                            <div class="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
-                                <p class="text-sm font-medium text-gray-500">Total Projects</p>
-                                <p class="text-2xl font-extrabold text-indigo-800">42</p>
-                            </div>
-                            <div class="p-4 bg-green-50 rounded-lg border border-green-200">
-                                <p class="text-sm font-medium text-gray-500">Open Tasks</p>
-                                <p class="text-2xl font-extrabold text-green-800">18</p>
-                            </div>
-                            <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                                <p class="text-sm font-medium text-gray-500">Upcoming Deadlines</p>
-                                <p class="text-2xl font-extrabold text-yellow-800">3</p>
-                            </div>
+                    <button class="register-button">Register New Admin Account</button>
+                </div>
+
+                <!-- Right Column: Forms -->
+                <div class="forms-section">
+                    
+                    <!-- Form 1: Profile Update -->
+                    <div class="form-group">
+                        <h4>Update Profile</h4>
+                        <div class="input-row">
+                            <input type="text" id="input-username" placeholder="Username">
+                        </div>
+                        <div class="input-row">
+                            <input type="text" id="input-contact" placeholder="Contact No.">
+                        </div>
+                        <div class="input-row">
+                            <input type="email" id="input-email" placeholder="Email Address">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn-save" id="btn-save-profile">Save</button>
+                            <button class="btn-cancel" id="btn-cancel-profile">Cancel</button>
                         </div>
                     </div>
-                `
-            },
-            'projects': {
-                title: 'Projects',
-                html: `
-                    <div class="content-card bg-white p-6 rounded-xl shadow-lg">
-                        <h3 class="text-xl font-bold mb-4 text-indigo-600">Manage Active Projects</h3>
-                        <p class="text-gray-700">List of projects you are currently managing. This section is under development.</p>
-                        <ul class="mt-4 space-y-2">
-                            <li class="p-3 bg-gray-50 rounded-md">Project Phoenix - Status: On Track</li>
-                            <li class="p-3 bg-gray-50 rounded-md">Marketing Campaign Q4 - Status: Blocked</li>
-                        </ul>
-                    </div>
-                `
-            },
-            'tasks': {
-                title: 'Tasks',
-                html: `
-                    <div class="content-card bg-white p-6 rounded-xl shadow-lg">
-                        <h3 class="text-xl font-bold mb-4 text-indigo-600">Your Task List</h3>
-                        <p class="text-gray-700">A detailed view of all pending tasks across your projects. Focus on your priorities.</p>
-                    </div>
-                `
-            },
-            'reports': {
-                title: 'Reports',
-                html: `
-                    <div class="content-card bg-white p-6 rounded-xl shadow-lg">
-                        <h3 class="text-xl font-bold mb-4 text-indigo-600">Performance Reports</h3>
-                        <p class="text-gray-700">Generate and view performance reports for projects and team members.</p>
-                        <div class="mt-4"><button class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-200">Generate Monthly Report</button></div>
-                    </div>
-                `
-            },
-            'settings': {
-                title: 'Settings',
-                html: `
-                    <div class="content-card bg-white p-6 rounded-xl shadow-lg">
-                        <h3 class="text-xl font-bold mb-4 text-indigo-600">Application Settings</h3>
-                        <p class="text-gray-700">Manage user profile, preferences, and notifications here.</p>
-                    </div>
-                `
-            },
-            'logout': {
-                title: 'Logout',
-                html: `
-                    <div class="content-card bg-white p-6 rounded-xl shadow-lg text-center">
-                        <h3 class="text-xl font-bold mb-4 text-red-600">Logging Out...</h3>
-                        <p class="text-gray-700">Thank you for using My App. You are now being securely signed out.</p>
-                    </div>
-                `
-            }
-        };
 
-        // --- Navigation and Active State Logic ---
+                    <!-- Form 2: Password Change -->
+                    <div class="form-group">
+                        <h4>Password</h4>
+                        <div class="input-row">
+                            <input type="password" id="input-current-password" placeholder="Current Password">
+                        </div>
+                        <div class="input-row">
+                            <input type="password" id="input-new-password" placeholder="New Password">
+                        </div>
+                        <div class="input-row">
+                            <input type="password" id="input-retype-password" placeholder="Re-type Password">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn-change" id="btn-change-password">Change</button>
+                            <button class="btn-clear" id="btn-clear-password">Clear</button>
+                        </div>
+                    </div>
+                </div>
 
-        const contentArea = document.getElementById('content-area');
-        const pageTitle = document.getElementById('page-title');
-        const navLinks = document.querySelectorAll('.nav-link');
-        const ACTIVE_CLASS = 'bg-indigo-700'; // The class for the highlighted, active state
+            </div>
+        </div>
+    </div>
 
-        /**
-         * Updates the main content area and highlights the active link.
-         * @param {string} pageId - The data-page attribute value.
-         */
-        function showPage(pageId) {
-            // 1. Update Content
-            const content = pageContent[pageId];
-            if (content) {
-                pageTitle.textContent = content.title;
-                contentArea.innerHTML = content.html;
-            } else {
-                pageTitle.textContent = 'Error';
-                contentArea.innerHTML = '<div class="text-red-500">Page not found.</div>';
-            }
+    <script type="module">
+        // FIX: Moved setLogLevel import from firebase-auth to firebase-app
+        import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-            // 2. Manage Active Link State (The requested highlight functionality)
-            navLinks.forEach(link => {
-                // Remove active class from all links
-                link.classList.remove(ACTIVE_CLASS);
-                
-                // Check if this is the link for the current page
-                if (link.getAttribute('data-page') === pageId) {
-                    // Add active class to the current link
-                    link.classList.add(ACTIVE_CLASS);
-                }
-            });
+        // Global Firebase variables
+        let app;
+        let db;
+        let auth;
+        let userId = '';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Set Firebase logging level to Debug
+        setLogLevel('Debug');
+
+        // References to UI elements
+        const displayUsername = document.getElementById('display-username');
+        const displayContact = document.getElementById('display-contact');
+        const displayEmail = document.getElementById('display-email');
+        const sidebarAdminName = document.getElementById('sidebar-admin-name');
+        const sidebarAdminEmail = document.getElementById('sidebar-admin-email');
+        
+        const inputUsername = document.getElementById('input-username');
+        const inputContact = document.getElementById('input-contact');
+        const inputEmail = document.getElementById('input-email');
+        
+        const btnSaveProfile = document.getElementById('btn-save-profile');
+        const btnCancelProfile = document.getElementById('btn-cancel-profile');
+        const btnChangePassword = document.getElementById('btn-change-password');
+        const btnClearPassword = document.getElementById('btn-clear-password');
+
+        const inputCurrentPassword = document.getElementById('input-current-password');
+        const inputNewPassword = document.getElementById('input-new-password');
+        const inputRetypePassword = document.getElementById('input-retype-password');
+        
+        // --- Utility Function for Feedback ---
+        function showMessage(message, isError = false) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = isError ? 'error' : '';
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
         }
 
-        // --- Event Listeners and Initialization ---
+        // --- Core Profile Logic ---
+        function getProfileDocRef(uid) {
+            // Path: /artifacts/{appId}/users/{userId}/adminProfile/profileDoc
+            return doc(db, 'artifacts', appId, 'users', uid, 'adminProfile', 'profileDoc');
+        }
 
-        // Attach click listener to all navigation links
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault(); // Stop default link behavior
-                const pageId = e.currentTarget.getAttribute('data-page');
-                if (pageId) {
-                    showPage(pageId);
-                    // Close sidebar on mobile after selection
-                    if (window.innerWidth < 768) {
-                        toggleSidebar();
+        function updateUI(data) {
+            const username = data.username || 'N/A';
+            const contactNo = data.contactNo || 'N/A';
+            const email = data.email || 'N/A';
+
+            // Update Info Card
+            displayUsername.textContent = username;
+            displayContact.textContent = contactNo;
+            displayEmail.textContent = email;
+
+            // Update Sidebar
+            sidebarAdminName.textContent = username;
+            sidebarAdminEmail.textContent = email;
+            
+            // Populate Input Fields
+            inputUsername.value = username !== 'N/A' ? username : '';
+            inputContact.value = contactNo !== 'N/A' ? contactNo : '';
+            inputEmail.value = email !== 'N/A' ? email : '';
+        }
+
+        function setupProfileListener(uid) {
+            const docRef = getProfileDocRef(uid);
+            onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    updateUI(docSnap.data());
+                } else {
+                    // Initialize default data if document doesn't exist
+                    const defaultData = {
+                        username: 'Admin User ' + uid.substring(0, 4),
+                        contactNo: 'N/A',
+                        email: auth.currentUser?.email || 'N/A'
+                    };
+                    setDoc(docRef, defaultData)
+                        .then(() => updateUI(defaultData))
+                        .catch(e => console.error("Error setting default profile:", e));
+                }
+            }, (error) => {
+                console.error("Error listening to profile data:", error);
+                showMessage("Failed to load profile data.", true);
+            });
+        }
+        
+        // --- Event Handlers ---
+        
+        async function handleProfileSave() {
+            if (!userId) {
+                showMessage("Authentication failed. Cannot save profile.", true);
+                return;
+            }
+
+            const newProfileData = {
+                username: inputUsername.value.trim() || 'Administrator Name',
+                contactNo: inputContact.value.trim(),
+                email: inputEmail.value.trim()
+            };
+
+            if (!newProfileData.email) {
+                showMessage("Email Address is required.", true);
+                return;
+            }
+
+            try {
+                const docRef = getProfileDocRef(userId);
+                // Use setDoc with merge: true to avoid overwriting the whole document
+                await setDoc(docRef, newProfileData, { merge: true });
+                showMessage("Profile updated successfully!");
+            } catch (error) {
+                console.error("Error saving profile:", error);
+                showMessage("Failed to save profile. Check console for details.", true);
+            }
+        }
+        
+        function handleCancelProfile() {
+            // Revert form fields to the currently displayed data
+            inputUsername.value = displayUsername.textContent === 'N/A' ? '' : displayUsername.textContent;
+            inputContact.value = displayContact.textContent === 'N/A' ? '' : displayContact.textContent;
+            inputEmail.value = displayEmail.textContent === 'N/A' ? '' : displayEmail.textContent;
+        }
+
+        async function handleChangePassword() {
+            const currentPass = inputCurrentPassword.value.trim();
+            const newPass = inputNewPassword.value.trim();
+            const retypePass = inputRetypePassword.value.trim();
+
+            if (!currentPass || !newPass || !retypePass) {
+                showMessage("Please fill in all password fields.", true);
+                return;
+            }
+
+            if (newPass !== retypePass) {
+                showMessage("New passwords do not match.", true);
+                return;
+            }
+
+            if (newPass.length < 6) {
+                 showMessage("New password must be at least 6 characters.", true);
+                 return;
+            }
+
+            // NOTE: We simulate the password change here because actual Firebase Auth password changes 
+            // require re-authentication steps that are outside the scope of this controlled environment.
+
+            showMessage("Password update simulated successfully!", false);
+            // Clear fields on simulated success
+            inputCurrentPassword.value = '';
+            inputNewPassword.value = '';
+            inputRetypePassword.value = '';
+        }
+
+        function handleClearPassword() {
+            inputCurrentPassword.value = '';
+            inputNewPassword.value = '';
+            inputRetypePassword.value = '';
+        }
+
+        // --- Firebase Initialization ---
+        async function initFirebaseAndAuth() {
+            if (Object.keys(firebaseConfig).length === 0) {
+                console.error("Firebase config is missing.");
+                // Use a default state for display purposes if config is missing
+                updateUI({ username: "Anonymous User", email: "No Email", contactNo: "N/A" });
+                return;
+            }
+            
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Sign in using the custom token or anonymously
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Authenticated with UID:", userId);
+                        setupProfileListener(userId);
+                    } else {
+                        console.log("Not authenticated. Using anonymous/default data.");
+                        userId = crypto.randomUUID();
                     }
-                }
-            });
-        });
+                });
 
-        // Initialize on page load (default to dashboard)
-        window.onload = () => {
-            showPage('dashboard');
-        };
-
-        // --- Mobile Sidebar Toggling ---
-        const sidebar = document.getElementById('sidebar');
-        const menuButton = document.getElementById('menu-button');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
-
-        function toggleSidebar() {
-            sidebar.classList.toggle('open');
-            sidebarOverlay.classList.toggle('hidden');
+            } catch (error) {
+                console.error("Firebase initialization or authentication failed:", error);
+                showMessage("System Error: Failed to connect to database.", true);
+            }
         }
 
-        menuButton.addEventListener('click', toggleSidebar);
-        sidebarOverlay.addEventListener('click', toggleSidebar); // Close when clicking overlay
+        // --- Setup Event Listeners ---
+        btnSaveProfile.addEventListener('click', handleProfileSave);
+        btnCancelProfile.addEventListener('click', handleCancelProfile);
+        btnChangePassword.addEventListener('click', handleChangePassword);
+        btnClearPassword.addEventListener('click', handleClearPassword);
+        
+        // Start the application
+        initFirebaseAndAuth();
+
     </script>
 </body>
 </html>
