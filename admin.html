@@ -7,6 +7,7 @@
     <!-- Using Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --color-dark-bg: #1a1a1a;
@@ -617,5 +618,53 @@
             </div>
         </div>
     </div>
+<script>
+    // Load current admin/user info from localStorage
+    const username = localStorage.getItem('username');
+    const email = localStorage.getItem('email');
+
+   if(username) document.getElementById('adminName').textContent = username;
+   if(email) document.getElementById('adminEmail').textContent = email;
+   if(username) document.getElementById('welcomeText').textContent = `Welcome ${username}`;
+
+    // Load members list from localStorage
+    const membersListContainer = document.getElementById('membersList');
+    let members = JSON.parse(localStorage.getItem('members')) || [];
+
+    function renderMembers(filter = '') {
+        // Remove existing member items (except header)
+        const items = membersListContainer.querySelectorAll('.member-item:not(.member-header)');
+        items.forEach(item => item.remove());
+
+        members.filter(m => m.name.toLowerCase().includes(filter.toLowerCase()))
+               .forEach(member => {
+            const memberItem = document.createElement('div');
+            memberItem.classList.add('member-item');
+
+            const initials = member.name.split(' ').map(n=>n[0].toUpperCase()).join('').slice(0,2);
+
+            memberItem.innerHTML = `
+                <div class="member-name">
+                    <div class="member-avatar-small">${initials}</div>
+                    ${member.name}
+                </div>
+                <div class="member-details">
+                    <span style="width:80px;">DD/MM/YY</span>
+                    <span style="width:80px;">DD/MM/YY</span>
+                    <span class="status" style="width:50px;">Active</span>
+                </div>
+                <div class="member-options"><i class="fas fa-ellipsis-v"></i></div>
+            `;
+            membersListContainer.appendChild(memberItem);
+        });
+    }
+
+    renderMembers();
+
+    // Search filter
+    document.getElementById('memberSearch').addEventListener('input', (e)=>{
+        renderMembers(e.target.value);
+    });
+</script>
 </body>
 </html>
