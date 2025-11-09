@@ -19,7 +19,6 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* Using a local placeholder image that you should replace with a real gym image */
         .login-background {
             background-image: url('https://placehold.co/1200x800/222222/ffffff?text=GYM+BACKGROUND'); 
             background-size: cover;
@@ -100,6 +99,12 @@
             color: var(--primary-purple); /* Highlighted color */
             font-weight: 600;
         }
+
+        /* Message Box styles */
+        #message-box {
+            background-color: white; /* Default color, overwritten by JS */
+            color: black; /* Default color, overwritten by JS */
+        }
     </style>
 </head>
 <body class="bg-gray-900">
@@ -148,46 +153,79 @@
         </div>
     </div>
     
-    <div id="message-box" class="fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-xl hidden transition-all duration-300 transform translate-y-full"></div>
+    <div id="message-box" class="fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-xl hidden transition-all duration-300"></div>
 
-   <script>
-    // ... (Your showMessage function remains here) ...
+    <script>
+        function showMessage(message, isError = false) {
+            const msgBox = document.getElementById('message-box');
+            msgBox.textContent = message;
+            
+            // Set styles based on whether it's an error or success message
+            msgBox.style.backgroundColor = isError ? '#dc3545' : '#28a745'; // Red for error, Green for success
+            msgBox.style.color = 'white';
+            
+            // Remove the 'hidden' class to make the box appear
+            msgBox.classList.remove('hidden');
 
-    function handleLogin(event) {
-        event.preventDefault(); 
-        
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim();
-
-        if (email.length < 5 || password.length < 4) {
-            showMessage("Please enter a valid email and password.", true);
-            return;
+            // Hide after a delay
+            setTimeout(() => {
+                // Add the 'hidden' class back to hide the box
+                msgBox.classList.add('hidden');
+            }, 4000);
         }
 
-        // --- SIMULATED LOGIN FOR WORKABLE LINKING ---
-        // Successful Login Condition:
-        if (email === "admin@test.com" && password === "1234") { 
-            const userData = {
-                name: "Alex Johnson",
-                email: email,
-                role: "Senior Manager",
-                id: "SM-7790"
-            };
+        // Helper function to get the current list of registered users
+        function getRegisteredUsers() {
+            const usersString = localStorage.getItem('registeredUsers');
+            // If the key is missing or empty, return an empty array
+            return usersString ? JSON.parse(usersString) : [];
+        }
 
-            // CRUCIAL: Save User Data to Local Storage
-            localStorage.setItem('loggedInUser', JSON.stringify(userData));
+        function handleLogin(event) {
+            event.preventDefault(); 
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
 
-            showMessage("Login successful! Redirecting to admin page...");
+            if (email.length < 5 || password.length < 4) {
+                showMessage("Please enter a valid email and password.", true);
+                return;
+            }
 
-            // Redirect to admin.html
+            // 1. Load the list of all registered users
+            const registeredUsers = getRegisteredUsers();
+
+            // 2. Find the user with the matching email
+            const user = registeredUsers.find(u => u.email === email);
+
+            // --- Authentication Logic ---
+
+            if (!user) {
+                // Case 1: Email not registered
+                showMessage("🚫 Error: Email address is not registered.", true);
+                return;
+            }
+
+            if (user.password !== password) {
+                // Case 2: Email found, but password is incorrect
+                showMessage("❌ Error: Incorrect password.", true);
+                return;
+            }
+
+            // Case 3: Authentication Successful! (Email found AND password matches)
+            
+            // CRUCIAL: Save the specific user data to the active session key
+            // NOTE: We strip the password before saving to the active session for security
+            const { password: _, ...userDataForSession } = user;
+            localStorage.setItem('loggedInUser', JSON.stringify(userDataForSession));
+
+            showMessage("✅ Login successful! Redirecting to dashboard...", false);
+
+            // Redirect to admin.html (User Dashboard)
             setTimeout(() => {
                 window.location.href = "admin.html"; 
             }, 1500);
-
-        } else {
-            showMessage("Login failed: Invalid email or password.", true);
         }
-    }
-</script>
+    </script>
 </body>
 </html>

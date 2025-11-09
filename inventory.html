@@ -141,6 +141,7 @@
             color: #fff;
         }
         
+        /* Adjusted the border for the second link since registration is removed */
         .nav-links-container > a:nth-child(2) { border-top: 1px solid var(--color-dark-sidebar); padding-top: 15px; }
         .nav-links-container > a:last-child { border-bottom: 1px solid var(--color-dark-sidebar); padding-bottom: 15px; margin-bottom: 20px; }
 
@@ -433,8 +434,8 @@
             <div class="avatar">
                 <div class="avatar-inner"><i class="fas fa-user"></i></div>
             </div>
-            <div class="admin-name" id="sidebar-admin-name">Administrator Name</div>
-            <div class="admin-email" id="sidebar-admin-email">admin@example.com</div>
+            <div class="admin-name" id="sidebar-admin-name">User Name</div>
+            <div class="admin-email" id="sidebar-admin-email">user@example.com</div>
         </div>
 
         <div class="nav-links-container">
@@ -444,12 +445,9 @@
             </a>
             <a class="nav-link" href="pfp.html">
                 <i class="fas fa-user-circle"></i>
-                <span>Admin Profile</span>
+                <span>User Profile</span>
             </a>
-            <a class="nav-link" href="registration.html">
-                <i class="fas fa-registered"></i>
-                <span>Registration</span>
-            </a>
+            
             <a class="nav-link" href="viewplan.html">
                 <i class="fas fa-clipboard-list"></i>
                 <span>Plan</span>
@@ -673,13 +671,15 @@
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         userId = user.uid;
-                        document.getElementById('sidebar-admin-name').textContent = 'Admin ' + userId.substring(0, 5);
+                        // Changed 'Admin' to 'User'
+                        document.getElementById('sidebar-admin-name').textContent = 'User ' + userId.substring(0, 5);
                         document.getElementById('sidebar-admin-email').textContent = user.email || 'authenticated@user.com';
                         setupEquipmentListener();
                     } else {
                         console.log("Not authenticated. Using anonymous/default data.");
                         userId = crypto.randomUUID();
-                        document.getElementById('sidebar-admin-name').textContent = 'Guest Admin';
+                        // Changed 'Guest Admin' to 'Guest User'
+                        document.getElementById('sidebar-admin-name').textContent = 'Guest User';
                         setupEquipmentListener(); 
                     }
                 });

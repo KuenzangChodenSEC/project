@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Profile</title>
+    <title>User Profile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -57,7 +57,7 @@
             color: #fff;
         }
 
-        .admin-profile-sidebar {
+        .user-profile-sidebar { /* Renamed class */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -70,7 +70,7 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background-color: #333; /* Placeholder color for avatar */
+            background-color: var(--color-accent); /* Use accent color for user avatar */
             border: 2px solid #fff;
             margin-bottom: 10px;
             position: relative;
@@ -83,16 +83,19 @@
             transform: translate(-50%, -50%);
             font-size: 30px;
             color: #fff;
+            /* Changed to initials: */
+            font-size: 24px; 
+            font-weight: 700;
         }
 
-        .admin-name {
+        .user-name { /* Renamed class */
             font-size: 16px;
             font-weight: 600;
             color: #fff;
             margin-bottom: 2px;
         }
 
-        .admin-email {
+        .user-email { /* Renamed class */
             font-size: 12px;
             font-weight: 400;
             color: var(--color-text-light);
@@ -110,7 +113,7 @@
             font-weight: 500;
             color: var(--color-text-light);
             cursor: pointer;
-            text-decoration: none; /* Ensure no underline */
+            text-decoration: none; 
             transition: background-color 0.3s, color 0.3s;
         }
 
@@ -163,7 +166,7 @@
             color: var(--color-text-light);
             cursor: pointer;
             transition: color 0.3s;
-            text-decoration: none; /* Ensure no underline */
+            text-decoration: none;
         }
 
         .logout-link i {
@@ -198,7 +201,7 @@
             flex-grow: 1;
             padding: 40px;
             overflow-y: auto; 
-            background-color: var(--color-light-bg); /* Use light background for canvas */
+            background-color: var(--color-light-bg);
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
         }
 
@@ -225,7 +228,7 @@
             gap: 40px;
         }
         
-        /* Admin Information Card */
+        /* User Information Card */
         .info-card {
             background-color: var(--color-light-bg);
             border-radius: 10px;
@@ -240,14 +243,15 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background-color: #eee;
+            background-color: var(--color-accent); /* Use accent color */
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #666;
+            color: #fff;
             font-size: 36px;
             position: relative;
+            font-weight: 700; /* Added font weight for initials */
         }
 
         .update-link {
@@ -272,19 +276,8 @@
         }
 
         .register-button {
-            background-color: var(--color-accent);
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .register-button:hover {
-            background-color: #564c70;
+            /* This button is hidden for users, only admins should see it */
+            display: none; 
         }
 
 
@@ -409,11 +402,11 @@
                 margin-left: 70px;
             }
 
-            .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span {
+            .dashboard-header, .user-email, .user-name, .nav-link span, .logout-link span { /* Adjusted visibility */
                 display: none;
             }
 
-            .admin-profile-sidebar {
+            .user-profile-sidebar { /* Adjusted class */
                 border-bottom: none;
                 padding-bottom: 0;
             }
@@ -455,14 +448,14 @@
     <div id="messageBox"></div>
 
     <aside class="sidebar">
-        <div class="dashboard-header">Admin Profile</div>
+        <div class="dashboard-header">User Dashboard</div>
         
-        <div class="admin-profile-sidebar">
+        <div class="user-profile-sidebar">
             <div class="avatar">
-                 <div class="avatar-inner"><i class="fas fa-user"></i></div>
+                 <div class="avatar-inner" id="sidebar-avatar-initials">US</div> 
             </div>
-            <div class="admin-name" id="sidebar-admin-name">Administrator Name</div>
-            <div class="admin-email" id="sidebar-admin-email">kunil03@gmail.com</div>
+            <div class="user-name" id="sidebar-user-name">User Name</div>
+            <div class="user-email" id="sidebar-user-email">user@example.com</div>
         </div>
 
         <div class="nav-links-container">
@@ -472,11 +465,7 @@
             </a>
             <a class="nav-link active" href="pfp.html">
                 <i class="fas fa-user-circle"></i>
-                <span>Admin Profile</span>
-            </a>
-            <a class="nav-link" href="registration.html">
-                <i class="fas fa-registered"></i>
-                <span>Registration</span>
+                <span>User Profile</span>
             </a>
             <a class="nav-link" href="viewplan.html">
                 <i class="fas fa-clipboard-list"></i>
@@ -491,13 +480,12 @@
                 <span>Inventory</span>
             </a>
             <a class="nav-link" href="viewmembers.html">
-                <i class="fas fa-users"></i>
-                <span>View Members</span>
+                <i class="fas fa-users"></i> <span>View members</span>
             </a>
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" href="index.html">
+            <a class="logout-link" id="logout-button" href="index.html">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -507,27 +495,25 @@
 
     <div class="main-content">
         <div class="profile-container">
-            <h1 class="page-title">Admin Profile</h1>
+            <h1 class="page-title">My Profile</h1>
 
             <div class="profile-grid">
                 
                 <div class="info-card">
                     <div class="info-avatar">
-                        <i class="fas fa-user"></i>
+                        <span id="info-avatar-initials">US</span> 
                     </div>
-                    <div class="admin-name">Administrator Name</div>
+                    <div class="user-name" id="info-user-name">User Name</div>
                     <div class="update-link">Update Profile Picture</div>
 
                     <div class="profile-details">
-                        <span>Admin ID:</span><span>ADM001</span>
-                        <span>Full Name:</span><span id="display-name">Administrator Name</span>
-                        <span>Role:</span><span>Super Admin</span>
-                        <span>Email:</span><span id="display-email">kunil03@gmail.com</span>
-                        <span>Join Date:</span><span>DD/MM/YYYY</span>
+                        <span>Member ID:</span><span id="display-id">N/A</span>
+                        <span>Full Name:</span><span id="display-name">User Name</span>
+                        <span>Membership:</span><span id="display-membership">N/A</span> <span>Email:</span><span id="display-email">user@example.com</span>
+                        <span>Join Date:</span><span id="display-join-date">N/A</span>
                     </div>
 
-                    <button class="register-button" onclick="window.location.href='registration.html';">Register New Admin</button>
-                </div>
+                    </div>
 
                 <div class="forms-section">
                     
@@ -536,11 +522,11 @@
                         <form id="updateProfileForm">
                             <div class="input-row">
                                 <label for="fullName">Full Name</label>
-                                <input type="text" id="fullName" value="Administrator Name" required>
+                                <input type="text" id="fullName" value="" required>
                             </div>
                             <div class="input-row">
-                                <label for="adminEmail">Email Address</label>
-                                <input type="email" id="adminEmail" value="kunil03@gmail.com" required>
+                                <label for="userEmail">Email Address</label>
+                                <input type="email" id="userEmail" value="" required>
                             </div>
                             <div class="form-actions">
                                 <button type="submit" class="btn-save">Save Changes</button>
@@ -570,15 +556,13 @@
                             </div>
                         </form>
                     </div>
-
                 </div>
-
             </div>
         </div>
     </div>
     
     <script>
-        // Simple client-side feedback logic (optional but useful for form testing)
+        // Message function (retained)
         function showMessage(message, isError = false) {
             const msgBox = document.getElementById('messageBox');
             msgBox.textContent = message;
@@ -589,28 +573,127 @@
             }, 3000);
         }
 
+        // Helper function to get the current list of registered users
+        function getRegisteredUsers() {
+            const usersString = localStorage.getItem('registeredUsers');
+            return usersString ? JSON.parse(usersString) : [];
+        }
+
+        // Helper function to save the updated list of registered users
+        function saveRegisteredUsers(users) {
+            localStorage.setItem('registeredUsers', JSON.stringify(users));
+        }
+
+        // --- CORE USER DATA LOAD & CHECK ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const loggedInUserString = localStorage.getItem('loggedInUser');
+            if (!loggedInUserString) {
+                // If no user is logged in, redirect to login page
+                window.location.href = "index.html"; 
+                return;
+            }
+
+            const user = JSON.parse(loggedInUserString);
+            
+            // --- Populate Page Elements ---
+            
+            // Sidebar
+            document.getElementById('sidebar-user-name').textContent = user.name || 'User Name';
+            document.getElementById('sidebar-user-email').textContent = user.email || 'user@example.com';
+            document.getElementById('sidebar-avatar-initials').textContent = user.avatarInitials || 'US';
+
+            // Info Card
+            document.getElementById('info-avatar-initials').textContent = user.avatarInitials || 'US';
+            document.getElementById('info-user-name').textContent = user.name || 'User Name';
+            document.getElementById('display-id').textContent = user.userID || 'N/A';
+            document.getElementById('display-name').textContent = user.name || 'User Name';
+            document.getElementById('display-membership').textContent = user.membership || 'Basic'; // Updated field
+            document.getElementById('display-email').textContent = user.email || 'user@example.com';
+            document.getElementById('display-join-date').textContent = user.joinDate || 'Today'; // Assuming you might add join date later
+
+            // Forms
+            document.getElementById('fullName').value = user.name || '';
+            document.getElementById('userEmail').value = user.email || '';
+        });
+        
+        // --- LOGOUT FUNCTION ---
+        document.getElementById('logout-button').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('loggedInUser');
+            window.location.href = "index.html";
+        });
+
+
+        // --- UPDATE PROFILE FORM ---
         document.getElementById('updateProfileForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            showMessage('Profile updated successfully!');
             
-            // Update values on the page and sidebar after successful submission
-            const newName = document.getElementById('fullName').value;
-            const newEmail = document.getElementById('adminEmail').value;
-            document.getElementById('sidebar-admin-name').textContent = newName;
-            document.getElementById('sidebar-admin-email').textContent = newEmail;
+            const newName = document.getElementById('fullName').value.trim();
+            const newEmail = document.getElementById('userEmail').value.trim();
+            
+            // Load current user data
+            let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            const oldEmail = loggedInUser.email;
+
+            // 1. Update the local user session data
+            loggedInUser.name = newName;
+            loggedInUser.email = newEmail;
+            loggedInUser.avatarInitials = newName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) || 'US';
+            
+            localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+
+            // 2. Update the main 'registeredUsers' array in localStorage
+            let registeredUsers = getRegisteredUsers();
+            const userIndex = registeredUsers.findIndex(u => u.email === oldEmail);
+            
+            if (userIndex !== -1) {
+                // Create the updated user object with the password retained
+                const updatedUser = { 
+                    ...registeredUsers[userIndex], 
+                    name: newName, 
+                    email: newEmail,
+                    avatarInitials: loggedInUser.avatarInitials // Use the newly calculated initials
+                };
+
+                // Remove the old entry and add the updated entry
+                registeredUsers.splice(userIndex, 1, updatedUser);
+                saveRegisteredUsers(registeredUsers);
+            }
+
+            // 3. Update all displayed elements and show success message
+            document.getElementById('sidebar-user-name').textContent = newName;
+            document.getElementById('sidebar-user-email').textContent = newEmail;
+            document.getElementById('sidebar-avatar-initials').textContent = loggedInUser.avatarInitials;
+            document.getElementById('info-avatar-initials').textContent = loggedInUser.avatarInitials;
+            document.getElementById('info-user-name').textContent = newName;
             document.getElementById('display-name').textContent = newName;
             document.getElementById('display-email').textContent = newEmail;
             
-            // Note: In a real application, you would send this data to a server here.
+            showMessage('Profile updated successfully!');
         });
 
+        document.querySelector('.btn-cancel').addEventListener('click', function() {
+            // Revert profile inputs to the current session values
+            const user = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (user) {
+                document.getElementById('fullName').value = user.name || '';
+                document.getElementById('userEmail').value = user.email || '';
+            }
+        });
+
+
+        // --- CHANGE PASSWORD FORM ---
         document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const currentPass = document.getElementById('currentPassword').value;
-            const newPass = document.getElementById('newPassword').value;
-            const confirmPass = document.getElementById('confirmPassword').value;
+            const currentPass = document.getElementById('currentPassword').value.trim();
+            const newPass = document.getElementById('newPassword').value.trim();
+            const confirmPass = document.getElementById('confirmPassword').value.trim();
+
+            const userSession = JSON.parse(localStorage.getItem('loggedInUser'));
             
-            // Basic client-side validation
+            if (!userSession) return; 
+
+            // 1. Basic client-side validation
             if (newPass !== confirmPass) {
                 showMessage('Error: New passwords do not match.', true);
                 return;
@@ -624,16 +707,27 @@
                 return;
             }
 
-            // Note: In a real application, you would validate the current password against the server here.
+            // 2. Load the full user list to check current password
+            let registeredUsers = getRegisteredUsers();
+            const userIndex = registeredUsers.findIndex(u => u.email === userSession.email);
+
+            if (userIndex === -1) {
+                showMessage('Error: User data missing from database.', true);
+                return;
+            }
+
+            // 3. Check Current Password
+            if (registeredUsers[userIndex].password !== currentPass) {
+                showMessage('Error: Incorrect current password.', true);
+                return;
+            }
+            
+            // 4. Update Password in registeredUsers list
+            registeredUsers[userIndex].password = newPass;
+            saveRegisteredUsers(registeredUsers);
             
             showMessage('Password changed successfully!');
             this.reset(); // Clear the form fields
-        });
-
-        document.querySelector('.btn-cancel').addEventListener('click', function() {
-            // Revert profile inputs to displayed values
-            document.getElementById('fullName').value = document.getElementById('display-name').textContent;
-            document.getElementById('adminEmail').value = document.getElementById('display-email').textContent;
         });
 
         document.querySelector('.btn-clear').addEventListener('click', function() {
@@ -641,4 +735,4 @@
         });
     </script>
 </body>
-</html>
+</html>s

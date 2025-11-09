@@ -12,10 +12,10 @@
             --color-dark-sidebar: #222;
             --color-light-bg: #f5f5f5;
             --color-card-bg: #fff;
-            --color-accent: #6f5f90; 
+            --color-accent: #6f5f90;
             --color-text-light: #aaa;
             --color-text-dark: #333;
-            --color-active: #40384a; 
+            --color-active: #40384a;
             --color-border: #e0e0e0;
             --color-form-bg: #32353a; /* Dark background for Add Plan card */
             --color-form-text: #f0f0f0;
@@ -38,7 +38,7 @@
             min-height: 100vh;
             background-color: var(--color-light-bg);
             color: var(--color-text-dark);
-            overflow: hidden; 
+            overflow: hidden;
         }
 
         /* ----------------------- */
@@ -77,7 +77,7 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background-color: #333; 
+            background-color: #333;
             border: 2px solid #fff;
             margin-bottom: 10px;
             position: relative;
@@ -117,7 +117,7 @@
             font-weight: 500;
             color: var(--color-text-light);
             cursor: pointer;
-            text-decoration: none; 
+            text-decoration: none;
             transition: background-color 0.3s, color 0.3s;
         }
 
@@ -137,11 +137,12 @@
             background-color: var(--color-active);
             color: #fff;
         }
-        
+
         .nav-link.active i {
             color: #fff;
         }
-        
+
+        /* Adjusting CSS for the removal of the third link */
         .nav-links-container > a:nth-child(2) { border-top: 1px solid var(--color-dark-sidebar); padding-top: 15px; }
         .nav-links-container > a:last-child { border-bottom: 1px solid var(--color-dark-sidebar); padding-bottom: 15px; margin-bottom: 20px; }
 
@@ -161,7 +162,7 @@
             font-weight: 500;
             color: var(--color-text-light);
             cursor: pointer;
-            text-decoration: none; 
+            text-decoration: none;
             transition: color 0.3s;
         }
 
@@ -178,7 +179,7 @@
             height: 30px;
             border: 1px solid #fff;
             border-radius: 50%;
-            background-color: #333; 
+            background-color: #333;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -190,13 +191,13 @@
         /* ----------------------- */
         /* 2. Main Content (Plan Management) */
         /* ----------------------- */
-        
+
         .main-content {
-            margin-left: 250px; 
+            margin-left: 250px;
             flex-grow: 1;
             padding: 40px;
-            overflow-y: auto; 
-            background-color: var(--color-light-bg); 
+            overflow-y: auto;
+            background-color: var(--color-light-bg);
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
         }
 
@@ -216,7 +217,7 @@
             color: var(--color-text-dark);
             margin-bottom: 10px;
         }
-        
+
         /* --- Plan Card Styles --- */
         .plan-card {
             padding: 30px;
@@ -270,7 +271,7 @@
             border-color: var(--color-accent);
             outline: none;
         }
-        
+
         /* Ensure amount spans full width below plan name/validity */
         .input-group-amount {
             grid-column: 1 / -1;
@@ -333,7 +334,7 @@
             padding: 5px;
             border-radius: 4px;
             /* Fix for select background on dark theme */
-            color: var(--color-table-row); 
+            color: var(--color-table-row);
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
@@ -365,7 +366,7 @@
             padding: 10px 15px;
             border-bottom: 1px solid #555;
         }
-        
+
         .plan-table tbody tr {
             border-bottom: 1px solid #3d3d3d;
             transition: background-color 0.2s;
@@ -397,7 +398,7 @@
             transition: background-color 0.2s;
             margin-right: 5px;
         }
-        
+
         .action-buttons button:hover {
             background-color: #564c70;
         }
@@ -438,7 +439,7 @@
             .logout-section { justify-content: center; }
             .logout-link i { margin-right: 0; }
         }
-        
+
         @media (max-width: 768px) {
             .main-content { padding: 20px; }
             .form-grid { grid-template-columns: 1fr; gap: 20px; }
@@ -455,7 +456,7 @@
 
     <aside class="sidebar">
         <div class="dashboard-header">Plan</div>
-        
+
         <div class="admin-profile-sidebar">
             <div class="avatar">
                 <div class="avatar-inner"><i class="fas fa-user"></i></div>
@@ -469,15 +470,11 @@
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="pfp.html"> 
+            <a class="nav-link" href="pfp.html">
                 <i class="fas fa-user-circle"></i>
-                <span>Admin Profile</span>
+                <span>User Profile</span>
             </a>
-            <a class="nav-link" href="registration.html"> 
-                <i class="fas fa-registered"></i>
-                <span>Registration</span>
-            </a>
-            <a class="nav-link active" href="viewplan.html"> 
+            <a class="nav-link active" href="viewplan.html">
                 <i class="fas fa-clipboard-list"></i>
                 <span>Plan</span>
             </a>
@@ -508,7 +505,7 @@
     <div class="main-content">
         <h1 class="page-header">Plan</h1>
         <div class="plan-management-container">
-            
+
             <div class="plan-card add-plan-card">
                 <div class="card-title">Add Plan</div>
                 <form id="add-plan-form">
@@ -568,6 +565,50 @@
         </div>
     </div>
 
+    <script>
+        // Global variables will be available here, but we need to pass db and appId from the module
+        let globalDb = null;
+        let globalAppId = null;
+        function showMessage(message, isError = false) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = isError ? 'error' : '';
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
+
+        window.handleEdit = function(planId) {
+            // In a full application, this would open a modal pre-filled with the plan data
+            console.log("Editing Plan ID:", planId);
+            showMessage(`Editing Plan ID: ${planId} (Simulated)`);
+        }
+
+        window.handleDelete = async function(planId, planName) {
+            if (!globalDb) {
+                 showMessage("Database not initialized for deletion.", true);
+                 return;
+            }
+
+            if (!confirm(`Are you sure you want to delete the plan: ${planName}?`)) {
+                return;
+            }
+            
+            try {
+                if(window.deletePlanFromModule) {
+                     window.deletePlanFromModule(planId, planName);
+                } else {
+                     showMessage("Deletion function not ready.", true);
+                }
+
+            } catch (error) {
+                console.error("Error deleting plan:", error);
+                showMessage("Failed to delete plan. Check console.", true);
+            }
+        }
+    </script>
+
     <script type="module">
         import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -580,7 +621,7 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
+
         // Set Firebase logging level to Debug
         setLogLevel('Debug');
 
@@ -595,19 +636,10 @@
 
         let currentPlans = []; // Local cache for filtering
 
-        // --- Utility Function for Feedback ---
-        function showMessage(message, isError = false) {
-            const messageBox = document.getElementById('messageBox');
-            messageBox.textContent = message;
-            messageBox.className = isError ? 'error' : '';
-            messageBox.classList.add('show');
-            setTimeout(() => {
-                messageBox.classList.remove('show');
-            }, 3000);
-        }
-        
+        // --- Utility Function for Feedback (using the global one) ---
+        const showMessage = window.showMessage;
+
         // --- Firestore References ---
-        // Path: /artifacts/{appId}/public/data/plans
         function getPlansCollectionRef() {
             return collection(db, 'artifacts', appId, 'public', 'data', 'plans');
         }
@@ -616,9 +648,9 @@
 
         function renderPlans(plans, searchTerm = '') {
             plansTableBody.innerHTML = '';
-            
+
             const lowerSearchTerm = searchTerm.toLowerCase().trim();
-            const filteredPlans = plans.filter(plan => 
+            const filteredPlans = plans.filter(plan =>
                 plan.planName.toLowerCase().includes(lowerSearchTerm) ||
                 plan.validity.toString().includes(lowerSearchTerm) ||
                 plan.amount.toString().includes(lowerSearchTerm)
@@ -632,6 +664,7 @@
 
             filteredPlans.forEach(plan => {
                 const row = document.createElement('tr');
+                // The onclick attributes now correctly call the functions defined in the global <script> block
                 row.innerHTML = `
                     <td>${plan.planName}</td>
                     <td>${plan.validity} ${plan.validity > 1 ? 'months' : 'month'}</td>
@@ -644,32 +677,20 @@
                 plansTableBody.appendChild(row);
             });
         }
-        
-        // Define global handlers for table buttons (must be defined globally for HTML attributes to work)
-        window.handleEdit = function(planId) {
-            // In a full application, this would open a modal pre-filled with the plan data
-            console.log("Editing Plan ID:", planId);
-            showMessage(`Editing Plan ID: ${planId} (Simulated)`);
-        }
 
-        window.handleDelete = async function(planId, planName) {
-            // Use a custom modal/confirmation in a real application. Here we use console.log
-            if (!confirm(`Are you sure you want to delete the plan: ${planName}?`)) {
-                return;
-            }
-            
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'plans', planId));
-                showMessage(`Plan '${planName}' deleted successfully!`);
-            } catch (error) {
-                console.error("Error deleting plan:", error);
-                showMessage("Failed to delete plan. Check console.", true);
-            }
+        // Expose a dedicated delete function to the global scope that has access to the imported functions
+        window.deletePlanFromModule = async function(planId, planName) {
+             try {
+                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'plans', planId));
+                 showMessage(`Plan '${planName}' deleted successfully!`);
+             } catch (error) {
+                 console.error("Error deleting plan:", error);
+                 showMessage("Failed to delete plan. Check console.", true);
+             }
         }
-
 
         // --- Event Handlers ---
-        
+
         async function handleAddPlan(event) {
             event.preventDefault();
 
@@ -677,7 +698,7 @@
                 showMessage("Authentication not ready. Cannot add plan.", true);
                 return;
             }
-            
+
             const newPlan = {
                 planName: planNameInput.value.trim(),
                 validity: parseInt(validityInput.value.trim()),
@@ -702,7 +723,7 @@
                 showMessage("Failed to add plan. Check console for details.", true);
             }
         }
-        
+
         function handleCancelAdd() {
             addPlanForm.reset();
         }
@@ -718,16 +739,16 @@
                 console.error("Firestore not initialized.");
                 return;
             }
-            
+
             onSnapshot(getPlansCollectionRef(), (querySnapshot) => {
                 const plans = [];
                 querySnapshot.forEach((doc) => {
                     plans.push({ id: doc.id, ...doc.data() });
                 });
-                
+
                 // Sort by validity (ascending) for better readability
                 plans.sort((a, b) => a.validity - b.validity);
-                
+
                 currentPlans = plans;
                 renderPlans(currentPlans, searchInput.value);
 
@@ -739,7 +760,7 @@
                 showMessage("Failed to load plans data.", true);
             });
         }
-        
+
         // --- Firebase Initialization ---
         async function initFirebaseAndAuth() {
             if (Object.keys(firebaseConfig).length === 0) {
@@ -748,11 +769,16 @@
                 document.getElementById('plans-table-body').innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">FIREBASE CONFIG MISSING. Cannot load data.</td></tr>';
                 return;
             }
-            
+
             try {
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
+
+                // Make db available to global scope for deletion (used by the global <script> block)
+                window.globalDb = db;
+                window.globalAppId = appId;
+
 
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
@@ -786,7 +812,7 @@
         addPlanForm.addEventListener('submit', handleAddPlan);
         btnCancelAdd.addEventListener('click', handleCancelAdd);
         searchInput.addEventListener('input', handleSearch);
-        
+
         window.onload = initFirebaseAndAuth;
 
     </script>
