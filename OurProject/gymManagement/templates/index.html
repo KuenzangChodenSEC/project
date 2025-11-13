@@ -1,13 +1,36 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Campus Gym - Achieve Your Best</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{% static 'styles/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
 </head>
+
+   <style>
+        .hero-section {
+            position: relative;
+            height: 70vh; /* Adjust as needed */
+            width: 100%;
+            overflow: hidden;
+            /* Use Django static tag for background image */
+            background: url("{% static 'images/Homepage.jpg' %}") no-repeat center center;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Align content to the left */
+            color: white; /* Example text color */
+            padding: 20px;
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+    </style>
 <body>
 
     <div class="top-bar">
@@ -20,17 +43,17 @@
     </div>
 
     <nav class="navbar">
-        <a href="index.html">
+        <a href="{% url 'index' %}">
             <img src="logo.png" alt="Campus Gym Logo" class="logo">
         </a>
         <div class="nav-links">
-            <a href="index.html" class="active">Home</a>
-            <a href="whyjoinus.html">Why Join Us?</a>
-            <a href="plan.html">Plan</a>
+            <a href="{% url 'index' %}" class="active">Home</a>
+            <a href="{% url 'why_join_us' %}">Why Join Us?</a>
+            <a href="{% url 'plan' %}">Plan</a>
         </div>
         <div class="nav-right">
-            <a href="signup.html" class="auth-link">Sign-up</a>
-            <a href="login.html" class="auth-link">Login</a>
+            <a href="{% url 'signup' %}" class="auth-link">Sign-up</a>
+            <a href="{% url 'login' %}" class="auth-link">Login</a>
         </div>
     </nav>
 
@@ -40,7 +63,7 @@
             <div class="quote-container">
                 <h1 class="quote">“A strong body starts with <br>a strong mind”</h1>
             </div>
-            <a href="#" class="cta-button">JOIN NOW</a>
+            <a href="{% url 'signup' %}" class="cta-button">JOIN NOW</a>
         </div>
     </section>
 
@@ -57,14 +80,14 @@
                 <h3>Contact Us</h3>
                 <p>+975- 77716553</p>
                 <p>+975- 17686789</p>
-                <p>scagym101@gmail.com</p>
+                <p>scegym101@gmail.com</p>
             </div>
             <div class="footer-item quick-links">
                 <h3>Plan</h3>
                 <ul>
-                    <li><a href="#">Monthly</a></li>
-                    <li><a href="#">Quarterly</a></li>
-                    <li><a href="#">Annual</a></li>
+                    <li><a href="{% url 'plan' %}">Monthly</a></li>
+                    <li><a href="{% url 'plan' %}">Quarterly</a></li>
+                    <li><a href="{% url 'plan' %}">Annual</a></li>
                 </ul>
             </div>
         </div>

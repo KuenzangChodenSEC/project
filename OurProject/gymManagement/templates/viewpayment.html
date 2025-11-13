@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -542,35 +543,35 @@
         </div>
 
         <div class="nav-links-container">
-            <a class="nav-link" href="admin.html">
+            <a class="nav-link" href="{% url 'admin_page' %}">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="pfp.html">
+            <a class="nav-link" href="{% url 'pfp' %}">
                 <i class="fas fa-user-circle"></i>
                 <span>User Profile</span>
             </a>
 
-            <a class="nav-link" href="viewplan.html">
+            <a class="nav-link" href="{% url 'view_plan' %}">
                 <i class="fas fa-clipboard-list"></i>
                 <span>Plan</span>
             </a>
-            <a class="nav-link active" href="viewpayment.html">
+            <a class="nav-link active" href="{% url 'view_payment' %}">
                 <i class="fas fa-credit-card"></i>
                 <span>View Payment</span>
             </a>
-            <a class="nav-link" href="inventory.html">
+            <a class="nav-link" href="{% url 'inventory' %}">
                 <i class="fas fa-box-open"></i>
                 <span>Inventory</span>
             </a>
-            <a class="nav-link" href="viewmembers.html">
+            <a class="nav-link" href="{% url 'view_members' %}">
                 <i class="fas fa-users"></i>
                 <span>View Members</span>
             </a>
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" href="index.html" id="logout-button"> 
+            <a class="logout-link" href="{% url 'index' %}" id="logout-button"> 
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -578,349 +579,258 @@
         </div>
     </aside>
 
-    <div class="main-content">
-        <h1 class="page-header">View Payments</h1>
-        <div class="payment-container">
+<div class="main-content">
+    <h1 class="page-header">View Payments</h1>
+    <div class="payment-container">
+        <div class="plan-card payment-list-card">
+            <div class="card-title">User Payments</div>
 
-            <div class="plan-card payment-list-card">
-                <div class="card-title">User Payments</div>
-
-                <div class="list-controls">
-                    <div class="show-entries">
-                        <label for="show-entries">Show Entities</label>
-                        <select id="show-entries">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
-                    <div class="search-box">
-                        <input type="text" id="search-input" placeholder="Search">
-                        <i class="fas fa-search"></i>
-                    </div>
+            <div class="list-controls">
+                <div class="show-entries">
+                    <label for="show-entries">Show Entries</label>
+                    <select id="show-entries">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
                 </div>
-
-                <div class="table-responsive">
-                    <table class="payment-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 20%;">Name <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 20%;">Member ID <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 20%;">Plan <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 20%;">Payment <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 15%;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="payment-table-body">
-                            <tr><td colspan="5" style="text-align: center;">Loading payments...</td></tr>
-                        </tbody>
-                    </table>
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search">
+                    <i class="fas fa-search"></i>
                 </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="payment-table">
+                    <thead>
+                        <tr>
+                            <th>Name <i class="fas fa-sort sort-icon"></i></th>
+                            <th>Member ID <i class="fas fa-sort sort-icon"></i></th>
+                            <th>Plan <i class="fas fa-sort sort-icon"></i></th>
+                            <th>Payment <i class="fas fa-sort sort-icon"></i></th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payment-table-body">
+                        {% for member in members %}
+                        <tr>
+                            <td>{{ member.name }}</td>
+                            <td>{{ member.member_id }}</td>
+                            <td>
+                                {% if member.plan == 'weekly' %}1 week{% elif member.plan == 'monthly' %}1 month
+                                {% elif member.plan == 'biannually' %}6 months{% else %}{{ member.plan }}{% endif %}
+                            </td>
+                            <td>Nu. {{ member.price }}</td>
+                            <td>
+                                <form method="post" action="show">
+                                    {% csrf_token %}
+                                    {% if member.payment_status == 'Paid' %}
+                                    <button type="submit" class="action-button paid">Paid</button>
+                                    {% else %}
+                                    <button type="submit" class="action-button unpaid">Pending</button>
+                                    {% endif %}
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align:center;">No members found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
         </div>
     </div>
+</div>
 
-    <script>
-        // --- Mock Data Setup (Used to initialize LocalStorage if empty) ---
-        const MOCK_MEMBERS_DATA = [
-            { id: '1a2b3c4d5e', name: 'Jigme Tenzin', plan: 'monthly', price: 1500.00, paymentStatus: 'Paid' },
-            { id: '2b3c4d5e6f', name: 'Dechen Wangmo', plan: 'yearly', price: 15000.00, paymentStatus: 'Pending' },
-            { id: '3c4d5e6f7g', name: 'Tashi Phuntsho', plan: 'weekly', price: 400.00, paymentStatus: 'Paid' },
-            { id: '4d5e6f7g8h', name: 'Kinley Dorji', plan: 'biannually', price: 7500.00, paymentStatus: 'Pending' },
-            { id: '5e6f7g8h9i', name: 'Sonam Choden', plan: 'monthly', price: 1500.00, paymentStatus: 'Paid' },
-            { id: '6f7g8h9i0j', name: 'Pema Lhaki', plan: 'weekly', price: 400.00, paymentStatus: 'Pending' },
-            { id: '7g8h9i0j1k', name: 'Dema Yangzom', plan: 'yearly', price: 15000.00, paymentStatus: 'Paid' },
-            { id: '8h9i0j1k2l', name: 'Chimi Dema', plan: 'monthly', price: 1500.00, paymentStatus: 'Pending' }
-        ];
-        
-        // --- UI Element References ---
-        const paymentTableBody = document.getElementById('payment-table-body');
-        const searchInput = document.getElementById('search-input');
-        const showEntriesSelect = document.getElementById('show-entries');
-        const modalOverlay = document.getElementById('confirmationModal');
-        const modalMessage = document.getElementById('modalMessage');
-        const modalConfirmBtn = modalOverlay.querySelector('.confirm-btn');
-        const modalCancelBtn = modalOverlay.querySelector('.cancel-btn');
-        const nameElement = document.getElementById('sidebar-admin-name');
-        const emailElement = document.getElementById('sidebar-admin-email');
-        // UPDATED: Use the new ID for the avatar container
-        const avatarInnerElement = document.getElementById('sidebar-admin-avatar-inner'); 
-        const logoutButton = document.getElementById('logout-button');
 
-        let currentPayments = []; 
-        let modalResolver = null; 
+   <script>
+    // --- UI Element References ---
+    const paymentTableBody = document.getElementById('payment-table-body');
+    const searchInput = document.getElementById('search-input');
+    const showEntriesSelect = document.getElementById('show-entries');
+    const modalOverlay = document.getElementById('confirmationModal');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalConfirmBtn = modalOverlay.querySelector('.confirm-btn');
+    const modalCancelBtn = modalOverlay.querySelector('.cancel-btn');
+    const nameElement = document.getElementById('sidebar-admin-name');
+    const emailElement = document.getElementById('sidebar-admin-email');
+    const avatarInnerElement = document.getElementById('sidebar-admin-avatar-inner'); 
+    const logoutButton = document.getElementById('logout-button');
 
-        // --- Utility Function for Feedback ---
-        function showMessage(message, isError = false) {
-            const messageBox = document.getElementById('messageBox');
-            messageBox.textContent = message;
-            messageBox.className = isError ? 'error' : '';
-            messageBox.classList.add('show');
-            setTimeout(() => {
-                messageBox.classList.remove('show');
-            }, 3000);
+    let currentPayments = []; 
+    let modalResolver = null; 
+
+    // --- Feedback function ---
+    function showMessage(message, isError = false) {
+        const messageBox = document.getElementById('messageBox');
+        messageBox.textContent = message;
+        messageBox.className = isError ? 'error' : '';
+        messageBox.classList.add('show');
+        setTimeout(() => messageBox.classList.remove('show'), 3000);
+    }
+
+    // --- Modal Handler ---
+    function showConfirmationModal(message) {
+        modalMessage.innerHTML = message;
+        modalOverlay.style.display = 'flex';
+        return new Promise(resolve => modalResolver = resolve);
+    }
+
+
+    
+
+    // --- Authentication/Profile ---
+    function getInitials(name) {
+        if (!name) return 'A';
+        const parts = name.trim().split(/\s+/).filter(Boolean);
+        return parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() :
+               parts.length === 1 ? parts[0][0].toUpperCase() : 'A';
+    }
+
+    function checkAuthenticationAndLoadProfile() {
+        const loggedInUser = localStorage.getItem('loggedInUser');
+        const profilePictureData = localStorage.getItem('profilePictureData');
+
+        if (!loggedInUser) {
+            alert("You must be logged in.");
+            window.location.href = '{% url "login" %}';
+            return false;
         }
 
-        // --- Custom Modal Handler (Replaces confirm()) ---
-        function showConfirmationModal(message) {
-            modalMessage.innerHTML = message;
-            modalOverlay.style.display = 'flex';
+        try {
+            const user = JSON.parse(loggedInUser);
+            const userName = user.name || 'Admin User';
+            const userEmail = user.email || 'admin@mockgym.com';
 
-            return new Promise((resolve) => {
-                modalResolver = resolve;
-            });
-        }
+            nameElement.textContent = userName;
+            emailElement.textContent = userEmail;
 
-
-        // --- LOCAL STORAGE DATA HANDLING ---
-        function loadMemberData() {
-            const storedData = localStorage.getItem('mockGymMembers');
-            if (!storedData) {
-                // Initialize local storage with mock data if not present
-                localStorage.setItem('mockGymMembers', JSON.stringify(MOCK_MEMBERS_DATA));
-                return MOCK_MEMBERS_DATA;
+            if (profilePictureData) {
+                avatarInnerElement.innerHTML = `<img src="${profilePictureData}" alt="${userName[0]}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+                avatarInnerElement.style.fontSize = '0';
+                avatarInnerElement.style.padding = '0';
             } else {
-                return JSON.parse(storedData);
-            }
-        }
-
-        function updateMemberPayment(memberId, newStatus) {
-            const members = loadMemberData();
-            const memberIndex = members.findIndex(m => m.id === memberId);
-
-            if (memberIndex > -1) {
-                members[memberIndex].paymentStatus = newStatus;
-                localStorage.setItem('mockGymMembers', JSON.stringify(members));
-                return true;
-            } else {
-                throw new Error("Member not found in local storage.");
-            }
-        }
-        
-        // --- AUTHENTICATION & PROFILE FUNCTIONS ---
-
-        function getInitials(name) {
-            if (!name || typeof name !== 'string') {
-                return 'A'; 
-            }
-            const parts = name.trim().split(/\s+/).filter(Boolean);
-            
-            if (parts.length > 1) {
-                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-            } else if (parts.length === 1) {
-                return parts[0][0].toUpperCase();
-            } else {
-                return 'A';
-            }
-        }
-
-        function checkAuthenticationAndLoadProfile() {
-            const loggedInUser = localStorage.getItem('loggedInUser');
-            // NEW: Retrieve the stored profile picture data
-            const profilePictureData = localStorage.getItem('profilePictureData');
-
-            if (!loggedInUser) {
-                alert("You must be logged in to view this page.");
-                window.location.href = 'login.html'; 
-                return false;
+                avatarInnerElement.innerHTML = getInitials(userName);
+                avatarInnerElement.style.fontSize = '30px';
+                avatarInnerElement.style.padding = '5px';
             }
 
-            try {
-                const user = JSON.parse(loggedInUser);
-                const userName = user.name || 'Admin User';
-                const userEmail = user.email || 'admin@mockgym.com';
-
-                // Update text elements
-                nameElement.textContent = userName;
-                emailElement.textContent = userEmail;
-
-                // NEW: Logic to display either the image or the initials
-                if (profilePictureData) {
-                    // Use the stored image (Data URI or URL)
-                    avatarInnerElement.innerHTML = `<img src="${profilePictureData}" alt="${userName[0]}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                    avatarInnerElement.style.fontSize = '0'; // Hide text initials size
-                    avatarInnerElement.style.padding = '0';
-                } else {
-                    // Fallback to initials
-                    const initials = getInitials(userName);
-                    avatarInnerElement.innerHTML = initials; 
-                    avatarInnerElement.style.fontSize = '30px'; 
-                    avatarInnerElement.style.padding = '5px';
-                }
-
-                return true;
-            } catch (error) {
-                console.error("Error parsing user data:", error);
-                localStorage.removeItem('loggedInUser'); 
-                alert("Session data invalid. Please log in again.");
-                window.location.href = 'login.html';
-                return false;
-            }
-        }
-        
-        function handleLogout(event) {
-            event.preventDefault();
+            return true;
+        } catch (error) {
+            console.error(error);
             localStorage.removeItem('loggedInUser');
-            // OPTIONAL: Also remove the profile picture data on logout
-            localStorage.removeItem('profilePictureData'); 
-            window.location.href = 'login.html'; 
+            alert("Session invalid. Please login again.");
+            window.location.href = '{% url "login" %}';
+            return false;
         }
+    }
 
-        // --- Data Rendering and Filtering ---
-        function renderPayments(members, searchTerm = '', entryLimit = Infinity) {
-            paymentTableBody.innerHTML = '';
+    function handleLogout(event) {
+        event.preventDefault();
+        localStorage.removeItem('loggedInUser');
+        localStorage.removeItem('profilePictureData');
+        window.location.href = '{% url "login" %}';
+    }
 
-            const lowerSearchTerm = searchTerm.toLowerCase().trim();
-            const limit = parseInt(entryLimit, 10);
+    // --- Load Django payments passed via context ---
+    function loadMemberData() {
+        // payments_json is passed as safe JSON from Django view
+        currentPayments = JSON.parse('{{ payments_json|escapejs }}');
+        renderPayments(currentPayments, searchInput.value, showEntriesSelect.value);
+    }
 
-            // 1. Filter: Apply search filter
-            const filteredMembers = members.filter(member =>
-                member.name.toLowerCase().includes(lowerSearchTerm) ||
-                (member.id || '').toLowerCase().includes(lowerSearchTerm) ||
-                (member.plan || '').toLowerCase().includes(lowerSearchTerm) ||
-                (member.paymentStatus || '').toLowerCase().includes(lowerSearchTerm)
-            );
+    
 
-            // 2. Sort: Apply sort by paymentStatus (Pending first), then Name
-            filteredMembers.sort((a, b) => {
-                const statusA = a.paymentStatus || 'Pending';
-                const statusB = b.paymentStatus || 'Pending';
-                // Custom sort: Pending comes before Paid
-                if (statusA === 'Pending' && statusB !== 'Pending') return -1;
-                if (statusA !== 'Pending' && statusB === 'Pending') return 1;
-                // Secondary sort by name
-                return a.name.localeCompare(b.name);
-            });
-            
-            // 3. Limit: Apply entry limit
-            const finalMembers = limit !== Infinity ? filteredMembers.slice(0, limit) : filteredMembers;
+    // --- Render Table ---
+    function renderPayments(members, searchTerm = '', entryLimit = Infinity) {
+        paymentTableBody.innerHTML = '';
+        const lowerSearchTerm = searchTerm.toLowerCase().trim();
+        const limit = parseInt(entryLimit, 10);
 
+        const filteredMembers = members.filter(member =>
+            member.user_name.toLowerCase().includes(lowerSearchTerm) ||
+            (member.member_id || '').toLowerCase().includes(lowerSearchTerm) ||
+            (member.plan_name || '').toLowerCase().includes(lowerSearchTerm) ||
+            (member.payment_status || '').toLowerCase().includes(lowerSearchTerm)
+        );
 
-            if (finalMembers.length === 0) {
-                const row = `<tr><td colspan="5" style="text-align: center; color: var(--color-table-header);">No members found matching search criteria.</td></tr>`;
-                paymentTableBody.innerHTML = row;
-                return;
-            }
-
-            const planDisplayMap = {
-                'weekly': '1 week',
-                'monthly': '1 month',
-                'biannually': '6 months',
-                'yearly': '1 year'
-            };
-
-
-            finalMembers.forEach((member) => {
-                const memberIdDisplay = (member.id ? member.id.substring(0, 8).toUpperCase() : 'N/A').padEnd(8, '0');
-                const planDisplay = planDisplayMap[member.plan] || member.plan;
-                const isPaid = (member.paymentStatus || 'Pending') === 'Paid';
-                const buttonClass = isPaid ? 'action-button paid' : 'action-button unpaid';
-                const buttonText = isPaid ? 'Paid' : 'Pending';
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${member.name}</td>
-                    <td>${memberIdDisplay}</td>
-                    <td>${planDisplay}</td>
-                    <td>Nu. ${member.price ? member.price.toFixed(2) : 'N/A'}</td>
-                    <td>
-                        <button class="${buttonClass}"
-                                onclick="window.handlePaymentToggle('${member.id}', '${member.name}', ${isPaid})">
-                            ${buttonText}
-                        </button>
-                    </td>
-                `;
-                paymentTableBody.appendChild(row);
-            });
-        }
-
-        // Define global handler for table button
-        window.handlePaymentToggle = async function(memberId, memberName, isCurrentlyPaid) {
-            const newStatus = isCurrentlyPaid ? 'Pending' : 'Paid';
-            const confirmationMessage = `Are you sure you want to set **${memberName}**'s payment status to **'${newStatus}'**?`;
-
-            const confirmed = await showConfirmationModal(confirmationMessage);
-
-            if (!confirmed) {
-                showMessage(`Action canceled for ${memberName}.`, true);
-                return;
-            }
-
-            try {
-                updateMemberPayment(memberId, newStatus);
-                showMessage(`Payment status for ${memberName} successfully updated to ${newStatus}.`);
-                
-                // Re-render table after update
-                const updatedMembers = loadMemberData();
-                currentPayments = updatedMembers;
-                handleSearch(); 
-
-            } catch (error) {
-                console.error("Error updating payment status:", error);
-                showMessage(`Failed to update payment status: ${error.message}`, true);
-            }
-        }
-
-        // --- Event Handlers ---
-        function handleSearch() {
-            const limit = showEntriesSelect.value;
-            renderPayments(currentPayments, searchInput.value, limit);
-        }
-
-        modalConfirmBtn.addEventListener('click', () => {
-            if (modalResolver) {
-                modalResolver(true);
-                modalOverlay.style.display = 'none';
-            }
+        filteredMembers.sort((a, b) => {
+            const statusA = a.payment_status || 'Pending';
+            const statusB = b.payment_status || 'Pending';
+            if (statusA === 'Pending' && statusB !== 'Pending') return -1;
+            if (statusA !== 'Pending' && statusB === 'Pending') return 1;
+            return a.user_name.localeCompare(b.user_name);
         });
 
-        modalCancelBtn.addEventListener('click', () => {
-            if (modalResolver) {
-                modalResolver(false);
-                modalOverlay.style.display = 'none';
-            }
-        });
+        const finalMembers = limit !== Infinity ? filteredMembers.slice(0, limit) : filteredMembers;
 
-        // --- Initialization ---
-        function initApp() {
-            // 1. Check Auth and Load Profile (including the new image/initials logic)
-            if (!checkAuthenticationAndLoadProfile()) {
-                return; 
-            }
-
-            // 2. Load and render payment data
-            try {
-                const members = loadMemberData();
-                currentPayments = members;
-                renderPayments(currentPayments, searchInput.value, showEntriesSelect.value); 
-
-                if (members.length === 0) {
-                    paymentTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--color-table-header);">No members found in the database.</td></tr>';
-                }
-            } catch (error) {
-                console.error("Error loading payment data:", error);
-                showMessage("System Error: Failed to load data from local storage.", true);
-                paymentTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Failed to load data.</td></tr>';
-            }
-            
-            // 3. Setup event listeners
-            searchInput.addEventListener('input', handleSearch);
-            logoutButton.addEventListener('click', handleLogout); 
-            showEntriesSelect.addEventListener('change', handleSearch);
-            
-            // NEW: Add storage event listener for cross-page updates
-            window.addEventListener('storage', (event) => {
-                // If the profile picture data changes in another tab/window
-                if (event.key === 'profilePictureData') {
-                    // Re-run the profile loading function to update the sidebar avatar
-                    checkAuthenticationAndLoadProfile();
-                }
-            });
+        if (!finalMembers.length) {
+            paymentTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--color-table-header);">No members found.</td></tr>`;
+            return;
         }
 
-        window.onload = initApp;
+        const planMap = { weekly: '1 week', monthly: '1 month', biannually: '6 months', yearly: '1 year' };
 
-    </script>
-</body>
-</html>
+        finalMembers.forEach(member => {
+            const memberIdDisplay = (member.member_id ? member.member_id.substring(0, 8).toUpperCase() : 'N/A').padEnd(8, '0');
+            const planDisplay = planMap[member.plan_name] || member.plan_name;
+            const isPaid = (member.payment_status || 'Pending') === 'Paid';
+            const buttonClass = isPaid ? 'action-button paid' : 'action-button unpaid';
+            const buttonText = isPaid ? 'Paid' : 'Pending';
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${member.user_name}</td>
+                <td>${memberIdDisplay}</td>
+                <td>${planDisplay}</td>
+                <td>Nu. ${member.price ? parseFloat(member.price).toFixed(2) : 'N/A'}</td>
+                <td>
+                    <button class="${buttonClass}" onclick="window.handlePaymentToggle('${member.member_id}', '${member.user_name}', ${isPaid})">${buttonText}</button>
+                </td>
+            `;
+            paymentTableBody.appendChild(row);
+        });
+    }
+
+    // --- Payment Toggle Handler ---
+    window.handlePaymentToggle = async function(memberId, memberName, isCurrentlyPaid) {
+        const newStatus = isCurrentlyPaid ? 'Pending' : 'Paid';
+        const confirmed = await showConfirmationModal(`Are you sure you want to set **${memberName}**'s payment status to **${newStatus}**?`);
+
+        if (!confirmed) {
+            showMessage(`Action canceled for ${memberName}.`, true);
+            return;
+        }
+
+        try {
+            await updateMemberPayment(memberId, newStatus);
+            showMessage(`Payment status for ${memberName} updated to ${newStatus}.`);
+            loadMemberData(); // reload updated data
+        } catch (error) {
+            showMessage(`Failed to update payment: ${error.message}`, true);
+        }
+    }
+
+    // --- Search ---
+    function handleSearch() {
+        renderPayments(currentPayments, searchInput.value, showEntriesSelect.value);
+    }
+
+    // --- Modal Buttons ---
+    modalConfirmBtn.addEventListener('click', () => { if (modalResolver) { modalResolver(true); modalOverlay.style.display = 'none'; } });
+    modalCancelBtn.addEventListener('click', () => { if (modalResolver) { modalResolver(false); modalOverlay.style.display = 'none'; } });
+
+    // --- Init ---
+    function initApp() {
+        if (!checkAuthenticationAndLoadProfile()) return;
+        loadMemberData();
+        searchInput.addEventListener('input', handleSearch);
+        showEntriesSelect.addEventListener('change', handleSearch);
+        logoutButton.addEventListener('click', handleLogout);
+    }
+
+    window.onload = initApp;
+</script>

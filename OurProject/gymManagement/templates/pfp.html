@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -556,33 +557,33 @@
         </div>
 
         <div class="nav-links-container">
-            <a class="nav-link" href="admin.html">
+            <a class="nav-link" href="{% url 'admin_page' %}">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link active" href="pfp.html">
+            <a class="nav-link active" href="{% url 'pfp' %}">
                 <i class="fas fa-user-circle"></i>
                 <span>User Profile</span>
             </a>
-            <a class="nav-link" href="viewplan.html">
+            <a class="nav-link" href="{% url 'view_plan' %}">
                 <i class="fas fa-clipboard-list"></i>
                 <span>Plan</span>
             </a>
-            <a class="nav-link" href="viewpayment.html">
+            <a class="nav-link" href="{% url 'view_payment' %}">
                 <i class="fas fa-credit-card"></i>
                 <span>View Payment</span>
             </a>
-            <a class="nav-link" href="inventory.html">
+            <a class="nav-link" href="{% url 'inventory' %}">
                 <i class="fas fa-box-open"></i>
                 <span>Inventory</span>
             </a>
-            <a class="nav-link" href="viewmembers.html">
+            <a class="nav-link" href="{% url 'view_members' %}">
                 <i class="fas fa-users"></i> <span>View members</span>
             </a>
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" id="logout-button" href="index.html">
+            <a class="logout-link" id="logout-button" href="{% url 'index' %}">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -788,7 +789,7 @@
         const loggedInUserString = localStorage.getItem(LOCAL_STORAGE_KEY);
         
         if (!loggedInUserString) {
-            window.location.href = "index.html";
+            window.location.href = "{% url 'index' %}";
             return;
         }
 
@@ -834,7 +835,7 @@
             logoutBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 localStorage.removeItem(LOCAL_STORAGE_KEY); 
-                window.location.href = "index.html";
+                window.location.href = "{% url 'index' %}";
             });
         }
         

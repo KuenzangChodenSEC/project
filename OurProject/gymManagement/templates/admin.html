@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -540,34 +541,34 @@
         </div>
 
         <div class="nav-links-container">
-            <a class="nav-link active" href="admin.html">
+            <a class="nav-link active" href="{% url 'admin_page' %}">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="pfp.html">
+            <a class="nav-link" href="{% url 'pfp' %}">
                 <i class="fas fa-user-circle"></i>
                 <span>User Profile</span> 
             </a>
-            <a class="nav-link" href="viewplan.html">
+            <a class="nav-link" href="{% url 'view_plan' %}">
                 <i class="fas fa-clipboard-list"></i>
                 <span>Plan</span>
             </a>
-            <a class="nav-link" href="viewpayment.html">
+            <a class="nav-link" href="{% url 'view_payment' %}">
                 <i class="fas fa-credit-card"></i>
                 <span>View Payment</span>
             </a>
-            <a class="nav-link" href="inventory.html">
+            <a class="nav-link" href="{% url 'inventory' %}">
                 <i class="fas fa-box-open"></i>
                 <span>Inventory</span>
             </a>
-            <a class="nav-link" href="viewmembers.html">
+            <a class="nav-link" href="{% url 'view_members' %}">
                 <i class="fas fa-users"></i>
                 <span>View Members</span>
             </a>
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" href="index.html" onclick="clearSession(event)">
+            <a class="logout-link" href="{% url 'index' %}" onclick="clearSession(event)">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -587,9 +588,28 @@
             </div>
 
             <div class="card calendar-card">
-                <h3>Calendar</h3>
-                <p class="text-xs text-gray-500">Events and upcoming deadlines will display here.</p>
-                </div>
+    <h3>Calendar</h3>
+
+    {% if events %}
+        <ul class="text-sm text-gray-700 space-y-2">
+            {% for event in events %}
+                <li class="border-b border-gray-200 pb-2">
+                    <strong>{{ event.title }}</strong>
+                    <div class="text-xs text-gray-500">
+                        {{ event.start_date|date:"M d, Y" }}
+                        {% if event.end_date %}–{{ event.end_date|date:"M d, Y" }}{% endif %}
+                    </div>
+                    {% if event.description %}
+                        <p class="text-xs text-gray-600 mt-1">{{ event.description }}</p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-xs text-gray-500">No upcoming events.</p>
+    {% endif %}
+</div>
+
             
             <div class="grid-bottom">
                 <div class="active-members-card members-summary-card">
@@ -770,7 +790,7 @@
         
         // Security Check
         if (!userDataString) {
-            window.location.href = "index.html"; 
+            window.location.href = "{% url 'index' %}"; 
             return;
         }
 
@@ -811,7 +831,7 @@
         } catch (e) {
             console.error("Error parsing user data:", e);
             clearSession();
-            window.location.href = "index.html"; 
+            window.location.href = "{% url 'index' %}"; 
         }
     }
 
@@ -838,7 +858,7 @@
         }
         
         localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear the logged-in user session
-        window.location.href = "index.html";
+        window.location.href = "{% url 'index' %}";
     }
     
     // Add a periodic update to keep the "Active Now" status and the profile data accurate

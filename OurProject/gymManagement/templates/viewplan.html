@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -441,54 +442,51 @@
 </head>
 <body>
 
-    <div id="messageBox"></div>
+      <div id="messageBox"></div>
 
     <aside class="sidebar">
         <div class="dashboard-header">Plan</div>
 
         <div class="admin-profile-sidebar">
             <div class="avatar" id="sidebar-avatar-container">
-                </div>
-            <div class="admin-name" id="sidebar-admin-name">Loading...</div>
-            <div class="admin-email" id="sidebar-admin-email">checking authentication...</div>
+                {% if user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" class="profile-picture">
+                {% else %}
+                    <span class="avatar-inner initials">{{ user.get_initials }}</span>
+                {% endif %}
+            </div>
+            <div class="admin-name">{{ user.get_full_name }}</div>
+            <div class="admin-email">{{ user.email }}</div>
         </div>
 
-       <div class="nav-links-container">
-            <a class="nav-link" href="admin.html">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
+        <div class="nav-links-container">
+            <a class="nav-link" href="{% url 'admin_page' %}">
+                <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
             </a>
-            <a class="nav-link" href="pfp.html">
-                <i class="fas fa-user-circle"></i>
-                <span>User Profile</span>
+            <a class="nav-link" href="{% url 'pfp' %}">
+                <i class="fas fa-user-circle"></i><span>User Profile</span>
             </a>
-            <a class="nav-link active" href="viewplan.html">
-                <i class="fas fa-clipboard-list"></i>
-                <span>Plan</span>
+            <a class="nav-link active" href="{% url 'view_plan' %}">
+                <i class="fas fa-clipboard-list"></i><span>Plan</span>
             </a>
-            <a class="nav-link" href="viewpayment.html">
-                <i class="fas fa-credit-card"></i>
-                <span>View Payment</span>
+            <a class="nav-link" href="{% url 'view_payment' %}">
+                <i class="fas fa-credit-card"></i><span>View Payment</span>
             </a>
-            <a class="nav-link" href="inventory.html">
-                <i class="fas fa-box-open"></i>
-                <span>Inventory</span>
+            <a class="nav-link" href="{% url 'inventory' %}">
+                <i class="fas fa-box-open"></i><span>Inventory</span>
             </a>
-            <a class="nav-link" href="viewmembers.html">
-                <i class="fas fa-users"></i>
-                <span>View Members</span>
+            <a class="nav-link" href="{% url 'view_members' %}">
+                <i class="fas fa-users"></i><span>View Members</span>
             </a>
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" href="#" id="logout-button">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
+            <a class="logout-link" href="{% url 'index' %}" id="logout-button">
+                <i class="fas fa-sign-out-alt"></i><span>Logout</span>
             </a>
             <div class="bottom-logo">CG</div>
         </div>
     </aside>
-
 
     <div class="main-content">
         <h1 class="page-header">Plans List</h1>
@@ -506,13 +504,31 @@
                     <table class="plan-table">
                         <thead>
                             <tr>
-                                <th style="width: 35%;" data-sort-key="planName" data-sort-direction="asc">Plan Name <i class="fas fa-sort-up sort-icon"></i></th>
-                                <th style="width: 30%;" data-sort-key="validity" data-sort-direction="none">Validity <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 35%;" data-sort-key="amount" data-sort-direction="none">Amount <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 35%;" data-sort-key="planName">Plan Name <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 30%;" data-sort-key="validity">Validity <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 35%;" data-sort-key="amount">Amount <i class="fas fa-sort sort-icon"></i></th>
                             </tr>
                         </thead>
                         <tbody id="plans-table-body">
-                            <tr><td colspan="3" style="text-align: center;">Loading plans...</td></tr>
+                            {% for plan in plans %}
+                            <tr>
+                                <td>{{ plan.plan_name }}</td>
+                                <td>
+                                    {% if plan.validity == 0.25 %}
+                                        7 Days
+                                    {% elif plan.validity == 1 %}
+                                        1 Month
+                                    {% else %}
+                                        {{ plan.validity }} Months
+                                    {% endif %}
+                                </td>
+                                <td>Nu.{{ plan.amount|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" style="text-align:center;">No plans found.</td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -520,7 +536,6 @@
 
         </div>
     </div>
-
     <script>
         // --- Core Utility Functions ---
         function showMessage(message, isError = false) {

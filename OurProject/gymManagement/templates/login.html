@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -20,7 +20,7 @@
         }
 
         .login-background {
-            background-image: url('https://placehold.co/1200x800/222222/ffffff?text=GYM+BACKGROUND'); 
+            background-image: url("{% static 'images/Homepage.jpg' %}");
             background-size: cover;
             background-position: center;
             height: 100vh;
@@ -136,7 +136,7 @@
                             Remember me
                         </label>
                     </div>
-                    <a href="forgot-password.html" class="text-link hover:underline">Forgot Password?</a>
+                    <a href="{% url 'forgot_password' %}" class="text-link hover:underline">Forgot Password?</a>
                 </div>
 
                 <button type="submit" class="login-button w-full mt-8">
@@ -146,7 +146,7 @@
 
             <div class="mt-6 text-sm text-gray-400">
                 Don't have an account? 
-                <a href="signup.html" class="signup-link hover:underline">
+                <a href="{% url 'signup' %}" class="signup-link hover:underline">
                     Create an account
                 </a>
             </div>
@@ -223,7 +223,7 @@
 
             // Redirect to admin.html (User Dashboard)
             setTimeout(() => {
-                window.location.href = "admin.html"; 
+                window.location.href = "{% url 'admin_page' %}"; 
             }, 1500);
         }
 

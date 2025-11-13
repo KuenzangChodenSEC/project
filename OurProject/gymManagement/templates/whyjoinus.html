@@ -1,13 +1,16 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Why Join Us? | Campus Gym</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{% static 'styles/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 </head>
+
+
 <body>
 
     <div class="top-bar">
@@ -20,16 +23,16 @@
     </div>
 
     <nav class="navbar">
-        <a href="index.html">
+        <a href="{% url 'index' %}">
             <img src="logo.png" alt="Campus Gym Logo" class="logo"> </a>
         <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="whyjoinus.html" class="active">Why Join Us?</a>
-            <a href="plan.html">Plan</a>
+            <a href="{% url 'index' %}">Home</a>
+            <a href="{% url 'why_join_us' %}" class="active">Why Join Us?</a>
+            <a href="{% url 'plan' %}">Plan</a>
         </div>
         <div class="nav-right">
-            <a href="signup.html" class="auth-link">Sign-up</a>
-            <a href="login.html" class="auth-link">Login</a>
+            <a href="{% url 'signup' %}" class="auth-link">Sign-up</a>
+            <a href="{% url 'login' %}" class="auth-link">Login</a>
         </div>
     </nav>
 
@@ -75,7 +78,7 @@
             
             <div class="cta-banner">
                 <p>Ready to start your transformation journey?</p>
-                <a href="plan.html" class="cta-button">View Membership Plans</a>
+                <a href="{% url 'plan' %}" class="cta-button">View Membership Plans</a>
             </div>
 
         </div>
@@ -96,9 +99,9 @@
             <div class="footer-item quick-links">
                 <h3>Plan</h3>
                 <ul>
-                    <li><a href="#">Monthly</a></li>
-                    <li><a href="#">Quarterly</a></li>
-                    <li><a href="#">Annual</a></li>
+                    <li><a href="{% url 'plan' %}">Monthly</a></li>
+                    <li><a href="{% url 'plan' %}">Quarterly</a></li>
+                    <li><a href="{% url 'plan' %}">Annual</a></li>
                 </ul>
             </div>
         </div>

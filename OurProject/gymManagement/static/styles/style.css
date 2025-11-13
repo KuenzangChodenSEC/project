@@ -104,18 +104,7 @@ ul {
 }
 
 /* --- Hero Section (Homepage Only) --- */
-.hero-section {
-    position: relative;
-    height: 70vh; /* Adjust as needed */
-    width: 100%;
-    overflow: hidden;
-    /* IMPORTANT: Replace 'homepage BG.jpg' with your actual image path */
-    background: url('homepage BG.jpg') no-repeat center center; 
-    background-size: cover;
-    display: flex;
-    align-items: center; 
-    justify-content: flex-start; /* Align content to the left */
-}
+
 
 .hero-overlay {
     position: absolute;
@@ -462,18 +451,7 @@ ul {
 }
 
 /* --- Hero Section (Homepage Only) --- */
-.hero-section {
-    position: relative;
-    height: 70vh;
-    width: 100%;
-    overflow: hidden;
-    /* NOTE: You need to replace 'homepage BG.jpg' with your actual image path */
-    background: url('homepage BG.jpg') no-repeat center center; 
-    background-size: cover;
-    display: flex;
-    align-items: center; 
-    justify-content: flex-start;
-}
+
 
 .hero-overlay {
     position: absolute;
@@ -805,17 +783,7 @@ ul {
 }
 
 /* --- Hero Section (Homepage Only) --- */
-.hero-section {
-    position: relative;
-    height: 70vh;
-    width: 100%;
-    overflow: hidden;
-    background: url('homepage BG.jpg') no-repeat center center; 
-    background-size: cover;
-    display: flex;
-    align-items: center; 
-    justify-content: flex-start;
-}
+
 
 .hero-overlay {
     position: absolute;

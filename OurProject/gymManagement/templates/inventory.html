@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -558,35 +559,35 @@
         </div>
 
         <div class="nav-links-container">
-            <a class="nav-link" href="admin.html">
+            <a class="nav-link" href="{% url 'admin_page' %}">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="pfp.html">
+            <a class="nav-link" href="{% url 'pfp' %}">
                 <i class="fas fa-user-circle"></i>
                 <span>User Profile</span>
             </a>
             
-            <a class="nav-link" href="viewplan.html">
+            <a class="nav-link" href="{% url 'view_plan' %}">
                 <i class="fas fa-clipboard-list"></i>
                 <span>Plan</span>
             </a>
-            <a class="nav-link" href="viewpayment.html">
+            <a class="nav-link" href="{% url 'view_payment' %}">
                 <i class="fas fa-credit-card"></i>
                 <span>View Payment</span>
             </a>
-            <a class="nav-link active" href="inventory.html">
+            <a class="nav-link active" href="{% url 'inventory' %}">
                 <i class="fas fa-box-open"></i>
                 <span>Inventory</span>
             </a>
-            <a class="nav-link" href="viewmembers.html">
+            <a class="nav-link" href="{% url 'view_members' %}">
                 <i class="fas fa-users"></i>
                 <span>View Members</span>
             </a>
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" href="#" id="logout-button">
+            <a class="logout-link" href="{% url 'index' %}" id="logout-button">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -594,17 +595,15 @@
         </div>
     </aside>
 
-    <div class="main-content">
+   <div class="main-content">
         <h1 class="page-header">Equipment</h1>
         <div class="inventory-container">
-            
             <div class="section-title">View Equipment</div>
-            
+
             <div class="equipment-list-card">
-                
                 <div class="list-controls">
                     <div class="show-entries">
-                        <label for="show-entries">Show Entities</label>
+                        <label for="show-entries">Show Entries</label>
                         <select id="show-entries">
                             <option value="10">10</option>
                             <option value="25">25</option>
@@ -613,7 +612,7 @@
                     </div>
                     <div class="search-box">
                         <label for="search-input">Search</label>
-                        <input type="text" id="search-input" placeholder="">
+                        <input type="text" id="search-input" placeholder="Search equipment...">
                         <i class="fas fa-search"></i>
                     </div>
                 </div>
@@ -622,335 +621,233 @@
                     <table class="equipment-table">
                         <thead>
                             <tr>
-                                <th style="width: 40%;" data-sort-key="name">Equipment Name <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 20%;" data-sort-key="totalNo">Total No. <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 20%;" data-sort-key="status">Status <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 15%;"></th>
+                                <th style="width: 40%;">Equipment Name</th>
+                                <th style="width: 20%;">Total No.</th>
+                                <th style="width: 20%;">Status</th>
+                                
                             </tr>
                         </thead>
                         <tbody id="equipment-table-body">
-                            <tr><td colspan="4" style="text-align: center;">Loading equipment...</td></tr>
+                            {% if equipment_list %}
+                                {% for item in equipment_list %}
+                                    <tr>
+                                        <td>{{ item.name }}</td>
+                                        <td>{{ item.total_no }}</td>
+                                        <td class="{% if item.status == 'Active' %}status-active{% else %}status-inactive{% endif %}">{{ item.status }}</td>
+                                        <td class="action-buttons">
+                                            
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" style="text-align: center; color: var(--color-table-header);">
+                                        No equipment found.
+                                    </td>
+                                </tr>
+                            {% endif %}
                         </tbody>
                     </table>
                 </div>
             </div>
-            
-            </div>
+        </div>
     </div>
 
-    <script>
-        // --- Global Constants ---
-        const LOCAL_STORAGE_KEY = 'loggedInUser';
-        const PROFILE_PICTURE_KEY = 'profilePictureData'; // 🌟 The key that holds the Base64 image data 🌟
+<script>
+    // --- Global Constants ---
+    const LOCAL_STORAGE_KEY = 'loggedInUser';
+    const PROFILE_PICTURE_KEY = 'profilePictureData'; 
 
-        // --- UI Element References ---
-        const equipmentTableBody = document.getElementById('equipment-table-body');
-        const searchInput = document.getElementById('search-input');
-        const logoutButton = document.getElementById('logout-button');
-        const sidebarAdminName = document.getElementById('sidebar-admin-name');
-        const sidebarAdminEmail = document.getElementById('sidebar-admin-email');
-        const sidebarAvatarContainer = document.getElementById('sidebar-avatar-container');
-        const tableHeaders = document.querySelectorAll('.equipment-table thead th');
-        
-        let currentEquipment = []; 
-        let equipmentData = []; // Data array for local storage simulation
-        let currentSort = { key: 'name', direction: 'asc' }; // Default sort state
+    // --- UI Element References ---
+    const equipmentTableBody = document.getElementById('equipment-table-body');
+    const searchInput = document.getElementById('search-input');
+    const logoutButton = document.getElementById('logout-button');
+    const sidebarAdminName = document.getElementById('sidebar-admin-name');
+    const sidebarAdminEmail = document.getElementById('sidebar-admin-email');
+    const sidebarAvatarContainer = document.getElementById('sidebar-avatar-container');
+    const tableHeaders = document.querySelectorAll('.equipment-table thead th');
 
-        // --- Utility Function for Feedback ---
-        function showMessage(message, isError = false) {
-            const messageBox = document.getElementById('messageBox');
-            messageBox.textContent = message;
-            messageBox.className = isError ? 'error' : '';
-            messageBox.classList.add('show');
-            setTimeout(() => {
-                messageBox.classList.remove('show');
-            }, 3000);
+    let currentEquipment = [];
+    let currentSort = { key: 'name', direction: 'asc' };
+
+    // --- Utility Function for Feedback ---
+    function showMessage(message, isError = false) {
+        const messageBox = document.getElementById('messageBox');
+        messageBox.textContent = message;
+        messageBox.className = isError ? 'error' : '';
+        messageBox.classList.add('show');
+        setTimeout(() => {
+            messageBox.classList.remove('show');
+        }, 3000);
+    }
+
+    // --- PROFILE FUNCTIONS ---
+    function renderProfilePicture() {
+        const loggedInUserString = localStorage.getItem(LOCAL_STORAGE_KEY);
+        const user = loggedInUserString ? JSON.parse(loggedInUserString) : {};
+        const userName = user.name || 'Admin User';
+        const avatarData = localStorage.getItem(PROFILE_PICTURE_KEY);
+
+        sidebarAvatarContainer.innerHTML = '';
+
+        if (avatarData) {
+            const img = document.createElement('img');
+            img.src = avatarData;
+            img.alt = 'Profile Picture';
+            img.classList.add('profile-picture');
+            sidebarAvatarContainer.appendChild(img);
+            sidebarAvatarContainer.style.fontSize = '0';
+        } else {
+            const span = document.createElement('div');
+            span.textContent = getInitials(userName);
+            span.classList.add('avatar-inner');
+            sidebarAvatarContainer.appendChild(span);
+            sidebarAvatarContainer.style.fontSize = '30px';
         }
-        
-        // --- PROFILE PICTURE RENDERING FUNCTION ---
-        function renderProfilePicture() {
-            const loggedInUserString = localStorage.getItem(LOCAL_STORAGE_KEY);
-            const user = loggedInUserString ? JSON.parse(loggedInUserString) : {};
-            const userName = user.name || 'Admin User';
-            
-            // 1. Get the profile picture data from the shared key
-            const avatarData = localStorage.getItem(PROFILE_PICTURE_KEY);
+    }
 
-            // 2. Clear existing content (image or initials)
-            sidebarAvatarContainer.innerHTML = ''; 
+    function getInitials(name) {
+        if (!name || typeof name !== 'string') return 'A';
+        const parts = name.trim().split(/\s+/).filter(Boolean);
+        if (parts.length > 1) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        if (parts.length === 1) return parts[0][0].toUpperCase();
+        return 'A';
+    }
 
-            if (avatarData) {
-                // If Base64 image exists, render it as an <img>
-                const img = document.createElement('img');
-                img.src = avatarData; 
-                img.alt = 'Profile Picture';
-                img.classList.add('profile-picture');
-                sidebarAvatarContainer.appendChild(img);
-                
-                // For proper display when image is present
-                sidebarAvatarContainer.style.fontSize = '0'; 
-            } else {
-                // Otherwise, render initials
-                const span = document.createElement('div'); // Using div to contain initials
-                span.textContent = getInitials(userName);
-                span.classList.add('avatar-inner');
-                sidebarAvatarContainer.appendChild(span);
-                
-                // For proper display when initials are present
-                sidebarAvatarContainer.style.fontSize = '30px'; 
-            }
+    function checkAuthenticationAndLoadProfile() {
+        const loggedInUser = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (!loggedInUser) {
+            const user = { name: "Admin User", email: "admin@mockgym.com" };
+            sidebarAdminName.textContent = user.name;
+            sidebarAdminEmail.textContent = user.email;
+            renderProfilePicture();
+            return true;
         }
-
-        // --- AUTHENTICATION & PROFILE FUNCTIONS ---
-
-        function getInitials(name) {
-            if (!name || typeof name !== 'string') return 'A';
-            const parts = name.trim().split(/\s+/).filter(Boolean);
-            if (parts.length > 1) {
-                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-            } else if (parts.length === 1) {
-                return parts[0][0].toUpperCase();
-            }
-            return 'A';
+        try {
+            const user = JSON.parse(loggedInUser);
+            sidebarAdminName.textContent = user.name || 'Admin User';
+            sidebarAdminEmail.textContent = user.email || 'admin@mockgym.com';
+            renderProfilePicture();
+            return true;
+        } catch (error) {
+            sidebarAdminName.textContent = 'Admin User';
+            sidebarAdminEmail.textContent = 'admin@mockgym.com';
+            renderProfilePicture();
+            return true;
         }
+    }
 
-        function checkAuthenticationAndLoadProfile() {
-            const loggedInUser = localStorage.getItem(LOCAL_STORAGE_KEY);
+    // --- Logout ---
+    function handleLogout(event) {
+        event.preventDefault();
+        localStorage.removeItem(LOCAL_STORAGE_KEY);
+        localStorage.removeItem(PROFILE_PICTURE_KEY);
+        window.location.href = '{% url "index" %}';
+    }
 
-            if (!loggedInUser) {
-                 // Simulate default user if not logged in for the sake of demo
-                 const user = { name: "Admin User", email: "admin@mockgym.com" };
-                 const userName = user.name;
-                 const userEmail = user.email;
-                 sidebarAdminName.textContent = userName;
-                 sidebarAdminEmail.textContent = userEmail;
-                 renderProfilePicture(); // Render default or saved picture
-                 return true; 
-            }
+    
+    function sortEquipment() {
+        const { key, direction } = currentSort;
+        currentEquipment.sort((a, b) => {
+            let aValue = a[key];
+            let bValue = b[key];
+            if (typeof aValue === 'string') { aValue = aValue.toLowerCase(); bValue = bValue.toLowerCase(); }
+            if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+            if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
 
-            try {
-                const user = JSON.parse(loggedInUser);
-                const userName = user.name || 'Admin User';
-                const userEmail = user.email || 'admin@mockgym.com';
+    function renderEquipment(equipment, searchTerm = '') {
+        equipmentTableBody.innerHTML = '';
+        sortEquipment();
 
-                sidebarAdminName.textContent = userName;
-                sidebarAdminEmail.textContent = userEmail;
-                
-                renderProfilePicture(); // Render the picture
-                return true;
-            } catch (error) {
-                console.error("Error parsing user data:", error);
-                // Fallback to default mock display
-                sidebarAdminName.textContent = 'Admin User';
-                sidebarAdminEmail.textContent = 'admin@mockgym.com';
-                renderProfilePicture(); 
-                return true;
-            }
-        }
+        const lowerSearchTerm = searchTerm.toLowerCase().trim();
+        const filteredEquipment = equipment.filter(item =>
+            item.name.toLowerCase().includes(lowerSearchTerm) ||
+            item.total_no.toString().includes(lowerSearchTerm) ||
+            item.status.toLowerCase().includes(lowerSearchTerm)
+        );
 
-        // --- Logout Logic ---
-        function handleLogout(event) {
-            event.preventDefault(); 
-            localStorage.removeItem(LOCAL_STORAGE_KEY);
-            localStorage.removeItem(PROFILE_PICTURE_KEY); // Optional: Clear the profile picture on logout
-            window.location.href = 'index.html';
-        }
-
-        // --- Data Loading (Simulated Local Storage) ---
-        function loadEquipmentData() {
-            const storedData = localStorage.getItem('equipmentData');
-            if (storedData) {
-                equipmentData = JSON.parse(storedData);
-            } else {
-                // Initialize with dummy data if none exists
-                equipmentData = [
-                    { id: 'eqp001', name: 'Treadmill Z10', totalNo: 3, status: 'Active' },
-                    { id: 'eqp002', name: 'Dumbbell Set (2-30kg)', totalNo: 5, status: 'Active' },
-                    { id: 'eqp003', name: 'Barbell Rack', totalNo: 1, status: 'Active' },
-                    { id: 'eqp004', name: 'Elliptical Trainer X5', totalNo: 2, status: 'Active' },
-                    { id: 'eqp005', name: 'Resistance Bands', totalNo: 15, status: 'Inactive' },
-                    { id: 'eqp006', name: 'Weight Plates', totalNo: 20, status: 'Active' },
-                    { id: 'eqp007', name: 'Cable Machine', totalNo: 1, status: 'Inactive' },
-                ];
-                localStorage.setItem('equipmentData', JSON.stringify(equipmentData));
-            }
-            currentEquipment = equipmentData;
-            renderEquipment(currentEquipment, searchInput.value);
-        }
-        
-        /**
-         * Sorts the currentEquipment array based on the currentSort settings.
-         */
-        function sortEquipment() {
-            const { key, direction } = currentSort;
-            
-            currentEquipment.sort((a, b) => {
-                let aValue = a[key];
-                let bValue = b[key];
-
-                if (typeof aValue === 'string') {
-                    aValue = aValue.toLowerCase();
-                    bValue = bValue.toLowerCase();
-                }
-
-                if (aValue < bValue) {
-                    return direction === 'asc' ? -1 : 1;
-                }
-                if (aValue > bValue) {
-                    return direction === 'asc' ? 1 : -1;
-                }
-                return 0;
-            });
+        if (filteredEquipment.length === 0) {
+            equipmentTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--color-table-header);">No equipment found matching search criteria.</td></tr>`;
+            return;
         }
 
-        // --- Data Rendering and Filtering ---
-        function renderEquipment(equipment, searchTerm = '') {
-            equipmentTableBody.innerHTML = '';
-            
-            sortEquipment(); // Apply current sort before filtering/rendering
+        const entriesToShow = parseInt(document.getElementById('show-entries').value || 10, 10);
+        filteredEquipment.slice(0, entriesToShow).forEach(item => {
+            const statusClass = item.status === 'Active' ? 'status-active' : 'status-inactive';
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.name}</td>
+                <td>${item.total_no}</td>
+                <td class="${statusClass}">${item.status}</td>
+                <td class="action-buttons">
+                    <button onclick="handleEditEquipment('${item.id}', '${item.name}')">Edit</button>
+                </td>
+            `;
+            equipmentTableBody.appendChild(row);
+        });
+    }
 
-            const lowerSearchTerm = searchTerm.toLowerCase().trim();
-            
-            const filteredEquipment = equipment.filter(item => 
-                item.name.toLowerCase().includes(lowerSearchTerm) ||
-                item.totalNo.toString().includes(lowerSearchTerm) ||
-                item.status.toLowerCase().includes(lowerSearchTerm)
-            );
+    window.handleEditEquipment = function(equipmentId, equipmentName) {
+        console.log("Editing Equipment ID:", equipmentId, "Name:", equipmentName);
+        showMessage(`Editing ${equipmentName} (Simulated)`);
+        // TODO: Redirect to Django edit view if needed
+        // window.location.href = `/inventory/edit/${equipmentId}/`;
+    }
 
-            if (filteredEquipment.length === 0) {
-                const row = `<tr><td colspan="4" style="text-align: center; color: var(--color-table-header);">No equipment found matching search criteria.</td></tr>`;
-                equipmentTableBody.innerHTML = row;
-                return;
-            }
-            
-            // NOTE: Added simulated limit from 'Show Entries' select (default 10)
-            const entriesToShow = parseInt(document.getElementById('show-entries').value || 10, 10);
-            
-            filteredEquipment.slice(0, entriesToShow).forEach(item => {
-                const statusClass = item.status === 'Active' ? 'status-active' : 'status-inactive';
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>${item.totalNo}</td>
-                    <td class="${statusClass}">${item.status}</td>
-                    <td class="action-buttons">
-                        <button onclick="handleEditEquipment('${item.id}', '${item.name}')">Edit</button>
-                    </td>
-                `;
-                equipmentTableBody.appendChild(row);
-            });
-        }
-        
-        // --- Global Handlers ---
-        
-        window.handleEditEquipment = function(equipmentId, equipmentName) {
-            console.log("Editing Equipment ID:", equipmentId, "Name:", equipmentName);
-            showMessage(`Editing ${equipmentName} (Simulated)`);
-            // Add actual modal or redirect logic here
-        }
-        
-        // --- Event Handlers ---
-        
-        function handleSearch() {
-            renderEquipment(currentEquipment, searchInput.value);
-        }
-        
-        function handleShowEntriesChange() {
-            renderEquipment(currentEquipment, searchInput.value);
-        }
-        
-        /**
-         * Handles table header clicks for sorting.
-         */
-        function handleSort(e) {
-            let targetHeader = e.currentTarget;
-            let key = targetHeader.dataset.sortKey;
-            
-            if (!key) return; // Not a sortable column
+    function handleSearch() { renderEquipment(currentEquipment, searchInput.value); }
+    function handleShowEntriesChange() { renderEquipment(currentEquipment, searchInput.value); }
 
-            let currentDirection = currentSort.key === key ? currentSort.direction : 'none';
-            let newDirection;
+    function handleSort(e) {
+        const targetHeader = e.currentTarget;
+        const key = targetHeader.dataset.sortKey;
+        if (!key) return;
 
-            // Determine the new sort direction
-            if (currentSort.key !== key) {
-                // Clicking a new column, default to ascending
-                newDirection = 'asc';
-            } else if (currentDirection === 'none' || currentDirection === 'desc') {
-                newDirection = 'asc';
-            } else {
-                newDirection = 'desc';
-            }
+        const currentDirection = currentSort.key === key ? currentSort.direction : 'none';
+        let newDirection;
+        if (currentSort.key !== key) newDirection = 'asc';
+        else newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
 
-            // Update global sort state
-            currentSort.key = key;
-            currentSort.direction = newDirection;
+        currentSort.key = key;
+        currentSort.direction = newDirection;
 
-            // Update header styles and icons
-            tableHeaders.forEach(th => {
-                th.classList.remove('sorted');
-                const icon = th.querySelector('.sort-icon');
-                if (icon) {
-                    icon.className = 'fas fa-sort sort-icon'; // Reset icon
-                }
-            });
-
-            // Set active header style and icon
-            targetHeader.classList.add('sorted');
-            const activeIcon = targetHeader.querySelector('.sort-icon');
-            if (activeIcon) {
-                if (newDirection === 'asc') {
-                    activeIcon.className = 'fas fa-sort-up sort-icon';
-                } else {
-                    activeIcon.className = 'fas fa-sort-down sort-icon';
-                }
-            }
-
-            // Re-render the table
-            renderEquipment(currentEquipment, searchInput.value);
-        }
-        
-        // 🌟 NEW: Listen for Local Storage changes in other tabs/windows 🌟
-        window.addEventListener('storage', (event) => {
-            // Check if the profile picture key was changed by another page (like pfp.html)
-            if (event.key === PROFILE_PICTURE_KEY) {
-                console.log('Profile picture key changed. Re-rendering avatar.');
-                renderProfilePicture();
-            }
-            // Optional: If name or email could change, you might want to re-check auth/profile too
-            if (event.key === LOCAL_STORAGE_KEY) {
-                 console.log('User session key changed. Reloading profile info.');
-                 checkAuthenticationAndLoadProfile();
-            }
+        tableHeaders.forEach(th => {
+            th.classList.remove('sorted');
+            const icon = th.querySelector('.sort-icon');
+            if (icon) icon.className = 'fas fa-sort sort-icon';
         });
 
-        function initApp() {
-            // 1. Check Auth and Load Profile (including the new renderProfilePicture call)
-            if (!checkAuthenticationAndLoadProfile()) {
-                return; 
-            }
-            
-            // 2. Load Equipment Data
-            loadEquipmentData();
-            
-            // Manually set initial visual sort indicator (Equipment Name is default asc)
-            const defaultHeader = document.querySelector(`[data-sort-key="${currentSort.key}"]`);
-            if (defaultHeader) {
-                defaultHeader.classList.add('sorted');
-                defaultHeader.querySelector('.sort-icon').className = 'fas fa-sort-up sort-icon';
-            }
-            
-            // 3. Setup Event Listeners
-            searchInput.addEventListener('input', handleSearch);
-            document.getElementById('show-entries').addEventListener('change', handleShowEntriesChange);
-            logoutButton.addEventListener('click', handleLogout);
-            tableHeaders.forEach(header => {
-                header.addEventListener('click', handleSort);
-            });
+        targetHeader.classList.add('sorted');
+        const activeIcon = targetHeader.querySelector('.sort-icon');
+        if (activeIcon) activeIcon.className = newDirection === 'asc' ? 'fas fa-sort-up sort-icon' : 'fas fa-sort-down sort-icon';
+
+        renderEquipment(currentEquipment, searchInput.value);
+    }
+
+    window.addEventListener('storage', (event) => {
+        if (event.key === PROFILE_PICTURE_KEY) renderProfilePicture();
+        if (event.key === LOCAL_STORAGE_KEY) checkAuthenticationAndLoadProfile();
+    });
+
+    function initApp() {
+        if (!checkAuthenticationAndLoadProfile()) return;
+        loadEquipmentData();
+
+        const defaultHeader = document.querySelector(`[data-sort-key="${currentSort.key}"]`);
+        if (defaultHeader) {
+            defaultHeader.classList.add('sorted');
+            defaultHeader.querySelector('.sort-icon').className = 'fas fa-sort-up sort-icon';
         }
 
-        window.onload = initApp;
+        searchInput.addEventListener('input', handleSearch);
+        document.getElementById('show-entries').addEventListener('change', handleShowEntriesChange);
+        logoutButton.addEventListener('click', handleLogout);
+        tableHeaders.forEach(header => header.addEventListener('click', handleSort));
+    }
 
-    </script>
+    window.onload = initApp;
+</script>
 </body>
 </html>

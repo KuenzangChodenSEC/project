@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -93,7 +94,7 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background-color: var(--color-accent); /* Changed to accent color for initials/fallback */
+            background-color: #333; /* Changed to accent color for initials/fallback */
             border: 2px solid #fff;
             margin-bottom: 10px;
             position: relative;
@@ -236,11 +237,13 @@
         /* ----------------------- */
         /* 2. Main Content (Existing Styles) */
         /* ----------------------- */
+
+    
         
         .members-container {
             max-width: 900px;
             background-color: var(--color-light-bg);
-            padding: 0;
+            padding: 0px;
             border-radius: 10px;
             display: flex;
             flex-direction: column;
@@ -557,34 +560,34 @@
         </div>
 
         <div class="nav-links-container">
-            <a class="nav-link" href="admin.html">
+            <a class="nav-link" href="{% url 'admin_page' %}">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="pfp.html">
+            <a class="nav-link" href="{% url 'pfp' %}">
                 <i class="fas fa-user-circle"></i>
                 <span>User Profile</span>
             </a>
-            <a class="nav-link" href="viewplan.html">
+            <a class="nav-link" href="{% url 'view_plan' %}">
                 <i class="fas fa-clipboard-list"></i>
                 <span>Plan</span>
             </a>
-            <a class="nav-link" href="viewpayment.html">
+            <a class="nav-link" href="{% url 'view_payment' %}">
                 <i class="fas fa-credit-card"></i>
                 <span>View Payment</span>
             </a>
-            <a class="nav-link" href="inventory.html"> 
+            <a class="nav-link" href="{% url 'inventory' %}"> 
                 <i class="fas fa-box-open"></i>
                 <span>Inventory</span>
             </a>
-            <a class="nav-link active" href="viewmembers.html"> 
+            <a class="nav-link active" href="{% url 'view_members' %}"> 
                 <i class="fas fa-users"></i>
                 <span>View Members</span>
             </a>
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" href="#" id="logout-button">
+            <a class="logout-link" href="{% url 'index' %}" id="logout-button">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -592,7 +595,7 @@
         </div>
     </aside>
 
-    <div class="main-content">
+   <div class="main-content">
         <h1 class="page-header">Active Members</h1>
         <div class="members-container">
             
@@ -601,7 +604,7 @@
                 
                 <div class="list-controls">
                     <div class="show-entries">
-                        <label for="show-entries">Show Entities</label>
+                        <label for="show-entries">Show Entries</label>
                         <select id="show-entries">
                             <option value="10">10</option>
                             <option value="25">25</option>
@@ -618,47 +621,58 @@
                     <table class="members-table">
                         <thead>
                             <tr>
-                                <th style="width: 20%;">Name <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 20%;">Member ID <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 20%;">Date Enrolled <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 20%;">Date Expiration <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 15%;">Actions</th>
+                                <th>Name <i class="fas fa-sort sort-icon"></i></th>
+                                <th>Member ID <i class="fas fa-sort sort-icon"></i></th>
+                                <th>Date Enrolled <i class="fas fa-sort sort-icon"></i></th>
+                                <th>Plan <i class="fas fa-sort sort-icon"></i></th>
+                                
                             </tr>
                         </thead>
                         <tbody id="members-table-body">
-                            <tr><td colspan="5" style="text-align: center;">Loading members...</td></tr>
+                            {% for member in members %}
+                            <tr>
+                                <td>{{ member.name }}</td>
+                                <td>{{ member.member_id }}</td>
+                                <td>{{ member.date_join|date:"M d, Y" }}</td>
+                                <td>{{ member.plan|capfirst }}</td>
+                                <td>
+                                    {% if member.plan == 'weekly' %}
+                                        {{ member.date_join|add:"7 days"|date:"M d, Y" }}
+                                    {% elif member.plan == 'monthly' %}
+                                        {{ member.date_join|add:"30 days"|date:"M d, Y" }}
+                                    {% elif member.plan == 'biannually' %}
+                                        {{ member.date_join|add:"182 days"|date:"M d, Y" }}
+                                    {% elif member.plan == 'yearly' %}
+                                        {{ member.date_join|add:"365 days"|date:"M d, Y" }}
+                                    {% endif %}
+                                </td>
+                               
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" style="text-align:center;">No members found.</td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 
                 <div class="table-footer">
-                    <button>Previous</button>
-                    <button>Next</button>
+                    <!-- Add Django pagination if needed -->
                 </div>
             </div>
 
         </div>
     </div>
 
+
     <script>
         // --- Key Constants ---
         const LOCAL_STORAGE_KEY = 'loggedInUser';
         const REGISTERED_USERS_KEY = 'registeredUsers'; 
-        const DUMMY_MEMBERS_KEY = 'gymMembersData'; 
+    
 
-        const defaultMembers = [
-            { id: 'mem1', name: 'John Doe', memberId: 'GM-1001', dateJoin: '2024-01-15', plan: 'yearly' },
-            { id: 'mem2', name: 'Jane Smith', memberId: 'GM-1002', dateJoin: '2024-05-20', plan: 'monthly' },
-            { id: 'mem3', name: 'Alex Johnson', memberId: 'GM-1003', dateJoin: '2024-02-28', plan: 'biannually' },
-            { id: 'mem4', name: 'Sarah Connor', memberId: 'GM-1004', dateJoin: '2024-11-01', plan: 'weekly' },
-            { id: 'mem5', name: 'Michael Lee', memberId: 'GM-1005', dateJoin: '2024-03-10', plan: 'monthly' },
-            { id: 'mem6', name: 'Emily Brown', memberId: 'GM-1006', dateJoin: '2024-08-01', plan: 'yearly' },
-        ];
-        
-        // Initialize dummy data in Local Storage if not present
-        if (!localStorage.getItem(DUMMY_MEMBERS_KEY)) {
-            localStorage.setItem(DUMMY_MEMBERS_KEY, JSON.stringify(defaultMembers));
-        }
+
 
         // --- UI Element References ---
         const membersTableBody = document.getElementById('members-table-body');
@@ -720,7 +734,7 @@
                 }
             } else {
                 // If no loggedInUser, redirect to index.html (or login)
-                window.location.href = 'index.html'; 
+                window.location.href = '{% url "index" %}';  
                 return;
             }
 
@@ -831,21 +845,9 @@
             });
         }
         
-        // --- Data Loading Function (Local Storage) ---
-
-        function loadMembersData() {
-            try {
-                const membersString = localStorage.getItem(DUMMY_MEMBERS_KEY);
-                currentMembers = membersString ? JSON.parse(membersString) : defaultMembers;
-                renderMembers(currentMembers, searchInput.value);
-            } catch (e) {
-                console.error("Error loading member data from Local Storage:", e);
-                showMessage("Failed to load member data from local storage.", true);
-                currentMembers = defaultMembers; // Fallback to dummy data
-                renderMembers(currentMembers, searchInput.value);
-            }
-        }
         
+
+    
         // --- Global Handlers ---
         
         window.handleEditMember = function(memberId, memberName) {
@@ -856,7 +858,7 @@
         function handleLogout(event) {
             event.preventDefault();
             localStorage.removeItem(LOCAL_STORAGE_KEY);
-            window.location.href = 'index.html'; // Redirect to login page
+            window.location.href = '{% url "index" %}'; // Redirect to login page
         }
 
         // --- Event Handlers ---
