@@ -12,7 +12,7 @@
             --color-dark-sidebar: #222;
             --color-light-bg: #f5f5f5;
             --color-card-bg: #fff;
-            --color-accent: #6f5f90; /* FIXED: Semicolon was missing here */
+            --color-accent: #6f5f90;
             --color-text-light: #aaa;
             --color-text-dark: #333;
             --color-active: #40384a; 
@@ -30,17 +30,16 @@
             font-family: 'Poppins', sans-serif;
         }
 
+        /* ------------------------------------- */
+        /* SCROLLABILITY & BASE LAYOUT UPDATES */
+        /* ------------------------------------- */
         body {
             display: flex;
-            min-height: 100vh;
             background-color: var(--color-light-bg);
             color: var(--color-text-dark);
-            overflow: hidden; 
+            min-height: 100vh;
+            width: 100%; 
         }
-
-        /* ----------------------- */
-        /* 1. Sidebar (Reused Styles) */
-        /* ----------------------- */
 
         .sidebar {
             width: 250px;
@@ -48,11 +47,31 @@
             color: var(--color-text-light);
             display: flex;
             flex-direction: column;
-            position: fixed;
-            height: 100%;
+            /* Changed position to sticky and set height to 100vh */
+            position: sticky;
+            top: 0; 
+            height: 100vh;
             padding: 20px 0;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            overflow-y: auto; /* Allow sidebar content to scroll if too tall */
+            flex-shrink: 0;
+            z-index: 100; /* Ensure sidebar is above main content on scroll */
         }
+
+        .main-content {
+            margin-left: 250px; 
+            flex-grow: 1;
+            padding: 40px;
+            /* The body handles the main scroll, but we ensure it takes calculated width */
+            width: calc(100% - 250px);
+            background-color: var(--color-light-bg); 
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            min-height: 100vh; /* Ensure it stretches down */
+        }
+        
+        /* ----------------------- */
+        /* 1. Sidebar (Existing Styles) */
+        /* ----------------------- */
 
         .dashboard-header {
             padding: 0 20px 30px;
@@ -74,10 +93,20 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background-color: #333; 
+            background-color: var(--color-accent); /* Changed to accent color for initials/fallback */
             border: 2px solid #fff;
             margin-bottom: 10px;
             position: relative;
+            /* Add overflow hidden to clip the image to the circle */
+            overflow: hidden; 
+        }
+        
+        /* NEW: Style for the image inside the avatar */
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* display: none; */ /* JS will manage display */
         }
 
         .avatar-inner {
@@ -87,6 +116,19 @@
             transform: translate(-50%, -50%);
             font-size: 30px;
             color: #fff;
+            font-weight: 700;
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            /* Ensure initials/icon is visible only when image is not */
+            transition: opacity 0.3s; 
+        }
+        
+        /* NEW: Hide the initials wrapper when an image is present (handled by JS) */
+        .avatar-inner.hidden {
+            display: none !important;
         }
 
         .admin-name {
@@ -118,6 +160,18 @@
             text-decoration: none; 
         }
 
+        .nav-link.active {
+            background-color: var(--color-active);
+            color: #fff;
+            border-left: 5px solid var(--color-accent);
+            padding-left: 15px;
+            transition: background-color 0.3s, color 0.3s, border-left 0.3s, padding 0.3s;
+        }
+        
+        .nav-links-container a:not(.active) {
+            padding-left: 20px;
+        }
+
         .nav-link i {
             width: 20px;
             text-align: center;
@@ -130,16 +184,11 @@
             color: #fff;
         }
 
-        .nav-link.active {
-            background-color: var(--color-active);
-            color: #fff;
-        }
-        
         .nav-link.active i {
             color: #fff;
         }
         
-        .nav-links-container > a:nth-child(2) { border-top: 1px solid var(--color-dark-sidebar); padding-top: 15px; }
+        .nav-links-container > a:nth-child(2) { border-top: 1px solid var(--color-dark-sidebar); padding-top: 15px; } 
         .nav-links-container > a:last-child { border-bottom: 1px solid var(--color-dark-sidebar); padding-bottom: 15px; margin-bottom: 20px; }
 
 
@@ -159,6 +208,7 @@
             color: var(--color-text-light);
             cursor: pointer;
             transition: color 0.3s;
+            text-decoration: none; 
         }
 
         .logout-link i {
@@ -184,18 +234,9 @@
         }
 
         /* ----------------------- */
-        /* 2. Main Content (View Members) */
+        /* 2. Main Content (Existing Styles) */
         /* ----------------------- */
         
-        .main-content {
-            margin-left: 250px; 
-            flex-grow: 1;
-            padding: 40px;
-            overflow-y: auto; 
-            background-color: var(--color-light-bg); 
-            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-        }
-
         .members-container {
             max-width: 900px;
             background-color: var(--color-light-bg);
@@ -227,7 +268,7 @@
             font-weight: 600;
             margin-bottom: 25px;
             padding-bottom: 5px;
-            color: #fff; /* Title inside dark card */
+            color: #fff; 
         }
 
 
@@ -264,7 +305,7 @@
         }
 
         .search-box input {
-            padding: 8px 40px 8px 15px; /* Padding for icon */
+            padding: 8px 40px 8px 15px; 
             border-radius: 6px;
             border: 1px solid var(--color-table-header);
             background-color: #333;
@@ -280,10 +321,17 @@
             transform: translateY(-50%);
             color: var(--color-table-header);
         }
+        
+        /* ADDED: Table responsiveness wrapper */
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+        }
 
         .members-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 600px; /* Ensure table doesn't compress too much on small screens */
         }
 
         .members-table thead th {
@@ -377,10 +425,20 @@
             transform: translateY(0);
         }
 
-        /* Responsive Design */
+        /* ------------------------------------- */
+        /* RESPONSIVE DESIGN (MEDIA QUERIES) */
+        /* ------------------------------------- */
         @media (max-width: 1024px) {
-            .sidebar { width: 70px; }
-            .main-content { margin-left: 70px; }
+            .sidebar { 
+                width: 70px; 
+                height: 100vh; /* Keep sticky height on narrow desktop view */
+                overflow-y: auto;
+            }
+            .main-content { 
+                margin-left: 70px; 
+                width: calc(100% - 70px);
+            }
+            /* Adjusted for initials display */
             .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span, .bottom-logo { display: none; }
             .admin-profile-sidebar { border-bottom: none; padding-bottom: 0; }
             .avatar { margin-bottom: 20px; }
@@ -388,13 +446,94 @@
             .nav-link i { margin-right: 0; }
             .logout-section { justify-content: center; }
             .logout-link i { margin-right: 0; }
+            
+            /* Responsive Active link highlight */
+            .nav-link.active {
+                border-left: none;
+                border-top: 5px solid var(--color-accent);
+                padding-top: 10px;
+                padding-bottom: 10px;
+                padding-left: 0;
+            }
+            .nav-links-container a:not(.active) {
+                padding-left: 0;
+            }
         }
         
         @media (max-width: 768px) {
-            .main-content { padding: 20px; }
-            .list-controls { flex-direction: column; gap: 15px; align-items: flex-start; }
-            .members-table th, .members-table td { padding: 10px; font-size: 12px; }
-            .search-box input { width: 100%; }
+            /* Full Mobile View: Stack layout */
+            body {
+                flex-direction: column; /* Stack sidebar and main content */
+            }
+            .sidebar {
+                width: 100%;
+                height: auto; /* Allow sidebar to collapse vertically */
+                position: relative; /* Remove sticky behavior in stacked mode */
+                padding: 10px 0;
+                margin-bottom: 0;
+            }
+            
+            /* Restore sidebar elements (horizontal menu style) */
+            .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span, .bottom-logo { display: block; }
+            .dashboard-header { display: none; } /* Usually hidden in stacked layout */
+            
+            .admin-profile-sidebar {
+                padding: 10px 20px;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+            }
+            .avatar { margin-bottom: 0; margin-right: 15px; }
+            
+            .nav-links-container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                border-bottom: 1px solid var(--color-dark-sidebar);
+            }
+            .nav-link {
+                width: 33%; /* Example for 3 columns on mobile */
+                justify-content: center;
+                padding: 10px 5px;
+            }
+            .nav-link span { display: none; } /* Hide text in compact horizontal menu */
+            .nav-link i { margin-right: 0; }
+
+            .nav-links-container > a:nth-child(2) { border-top: none; padding-top: 10px; } 
+            .nav-links-container > a:last-child { border-bottom: none; padding-bottom: 10px; margin-bottom: 0; }
+            
+            .nav-link.active {
+                border-left: none;
+                border-top: 3px solid var(--color-accent);
+                padding-top: 7px;
+                padding-bottom: 7px;
+            }
+
+            .logout-section {
+                justify-content: center;
+                padding: 10px 20px;
+            }
+            .logout-link { display: none; } /* Hide logout button in main content (redundant with profile) */
+            .bottom-logo { display: none; }
+
+            /* Main Content adjustments */
+            .main-content { 
+                margin-left: 0; 
+                width: 100%;
+                padding: 20px; 
+            }
+            .list-controls { 
+                flex-direction: column; 
+                gap: 15px; 
+                align-items: flex-start; 
+            }
+            .members-table th, .members-table td { 
+                padding: 10px; 
+                font-size: 12px; 
+            }
+            .search-box input { 
+                width: 100%; 
+            }
         }
     </style>
 </head>
@@ -406,11 +545,15 @@
         <div class="dashboard-header">Members</div>
         
         <div class="admin-profile-sidebar">
-            <div class="avatar">
-                <div class="avatar-inner"><i class="fas fa-user"></i></div>
+            <div class="avatar" id="sidebar-avatar-container">
+                <img id="sidebar-admin-avatar-img" src="" alt="Admin Avatar">
+                
+                <div class="avatar-inner" id="sidebar-admin-avatar-initials">
+                    <i class="fas fa-user"></i> 
+                </div>
             </div>
-            <div class="admin-name" id="sidebar-admin-name">Administrator Name</div>
-            <div class="admin-email" id="sidebar-admin-email">admin@example.com</div>
+            <div class="admin-name" id="sidebar-admin-name">Loading...</div>
+            <div class="admin-email" id="sidebar-admin-email">Loading...</div>
         </div>
 
         <div class="nav-links-container">
@@ -420,11 +563,7 @@
             </a>
             <a class="nav-link" href="pfp.html">
                 <i class="fas fa-user-circle"></i>
-                <span>Admin Profile</span>
-            </a>
-            <a class="nav-link" href="registration.html">
-                <i class="fas fa-registered"></i>
-                <span>Registration</span>
+                <span>User Profile</span>
             </a>
             <a class="nav-link" href="viewplan.html">
                 <i class="fas fa-clipboard-list"></i>
@@ -445,7 +584,7 @@
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" href="index.html">
+            <a class="logout-link" href="#" id="logout-button">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -501,25 +640,35 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <script>
+        // --- Key Constants ---
+        const LOCAL_STORAGE_KEY = 'loggedInUser';
+        const REGISTERED_USERS_KEY = 'registeredUsers'; 
+        const DUMMY_MEMBERS_KEY = 'gymMembersData'; 
 
-        // --- Global Firebase and Config ---
-        let db;
-        let auth;
-        let userId = '';
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const defaultMembers = [
+            { id: 'mem1', name: 'John Doe', memberId: 'GM-1001', dateJoin: '2024-01-15', plan: 'yearly' },
+            { id: 'mem2', name: 'Jane Smith', memberId: 'GM-1002', dateJoin: '2024-05-20', plan: 'monthly' },
+            { id: 'mem3', name: 'Alex Johnson', memberId: 'GM-1003', dateJoin: '2024-02-28', plan: 'biannually' },
+            { id: 'mem4', name: 'Sarah Connor', memberId: 'GM-1004', dateJoin: '2024-11-01', plan: 'weekly' },
+            { id: 'mem5', name: 'Michael Lee', memberId: 'GM-1005', dateJoin: '2024-03-10', plan: 'monthly' },
+            { id: 'mem6', name: 'Emily Brown', memberId: 'GM-1006', dateJoin: '2024-08-01', plan: 'yearly' },
+        ];
         
-        setLogLevel('Debug');
+        // Initialize dummy data in Local Storage if not present
+        if (!localStorage.getItem(DUMMY_MEMBERS_KEY)) {
+            localStorage.setItem(DUMMY_MEMBERS_KEY, JSON.stringify(defaultMembers));
+        }
 
         // --- UI Element References ---
         const membersTableBody = document.getElementById('members-table-body');
         const searchInput = document.getElementById('search-input');
-
+        const logoutButton = document.getElementById('logout-button');
+        const nameElement = document.getElementById('sidebar-admin-name');
+        const emailElement = document.getElementById('sidebar-admin-email');
+        const avatarInitialsElement = document.getElementById('sidebar-admin-avatar-initials'); 
+        const avatarImageElement = document.getElementById('sidebar-admin-avatar-img');
+        
         let currentMembers = []; 
 
         // --- Utility Function for Feedback ---
@@ -533,12 +682,75 @@
             }, 3000);
         }
         
-        // --- Firestore References ---
-        // Path: /artifacts/{appId}/public/data/members
-        function getMembersCollectionRef() {
-            return collection(db, 'artifacts', appId, 'public', 'data', 'members');
+        // --- Utility Function to get initials from a name ---
+        function getInitials(name) {
+            if (!name || typeof name !== 'string') {
+                return 'A'; 
+            }
+            const parts = name.trim().split(/\s+/).filter(Boolean);
+            
+            if (parts.length > 1) {
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            } else if (parts.length === 1) {
+                return parts[0][0].toUpperCase();
+            } else {
+                return 'A';
+            }
         }
 
+        // --- Authentication Check and Profile Load (FIXED) ---
+        function checkAuthenticationAndLoadProfile() {
+            const userString = localStorage.getItem(LOCAL_STORAGE_KEY);
+            let userName = 'Admin User';
+            let userEmail = 'admin@example.com';
+            let profilePicUrl = null;
+            let user = null;
+
+            if (userString) {
+                try {
+                    user = JSON.parse(userString);
+                    userName = user.name || userName;
+                    userEmail = user.email || userEmail;
+                    
+                    // FIXED: Get avatarUrl directly from the loggedInUser object
+                    profilePicUrl = user.avatarUrl; 
+                } catch (e) {
+                    console.error("Error parsing loggedInUser from localStorage:", e);
+                    localStorage.removeItem(LOCAL_STORAGE_KEY);
+                }
+            } else {
+                // If no loggedInUser, redirect to index.html (or login)
+                window.location.href = 'index.html'; 
+                return;
+            }
+
+            // Populate sidebar with user data
+            nameElement.textContent = userName;
+            emailElement.textContent = userEmail;
+            
+            // --- PROFILE PICTURE LOGIC (Using profilePicUrl from loggedInUser) ---
+            if (profilePicUrl) {
+                avatarImageElement.src = profilePicUrl;
+                avatarImageElement.style.display = 'block'; 
+                avatarInitialsElement.classList.add('hidden'); 
+                
+                // ADDED: Error handler in case the Data URI is invalid or corrupted
+                avatarImageElement.onerror = () => {
+                    console.error("Profile picture failed to load. Falling back to initials.");
+                    // Hide the broken image and show initials
+                    avatarImageElement.style.display = 'none'; 
+                    avatarInitialsElement.classList.remove('hidden'); 
+                    avatarInitialsElement.innerHTML = getInitials(userName); 
+                };
+            } else {
+                // Fallback to initials/icon
+                const initials = getInitials(userName);
+                avatarInitialsElement.innerHTML = initials; 
+                avatarImageElement.style.display = 'none'; 
+                avatarInitialsElement.classList.remove('hidden'); 
+            }
+        }
+        
         // --- Data Rendering and Filtering ---
 
         function renderMembers(members, searchTerm = '') {
@@ -550,7 +762,8 @@
             const filteredMembers = members.filter(member => 
                 member.name.toLowerCase().includes(lowerSearchTerm) ||
                 (member.memberId || '').toLowerCase().includes(lowerSearchTerm) ||
-                (member.dateJoin || '').toLowerCase().includes(lowerSearchTerm)
+                (member.dateJoin || '').toLowerCase().includes(lowerSearchTerm) ||
+                (member.plan || '').toLowerCase().includes(lowerSearchTerm)
             );
 
             if (filteredMembers.length === 0) {
@@ -563,38 +776,33 @@
             const formatDate = (dateString) => {
                 if (!dateString) return 'N/A';
                 try {
-                    // Try to parse as Firestore timestamp (Date object) or ISO string
                     const date = new Date(dateString); 
-                    if (isNaN(date.getTime())) return dateString; // Check if valid date
+                    if (isNaN(date.getTime())) return dateString;
                     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 } catch {
                     return dateString;
                 }
             };
             
-            // Calculate Expiration Date (Simulated: assuming 1 month for 'monthly' plan and hardcoding 1 year for 'yearly')
+            // Calculate Expiration Date 
             const calculateExpiration = (joinDate, plan) => {
                 try {
-                    if (!joinDate) return 'N/A';
+                    if (!joinDate || !plan) return 'N/A';
                     const date = new Date(joinDate);
                     if (isNaN(date.getTime())) return 'N/A';
 
-                    // Simplified logic for simulation
-                    switch (plan.toLowerCase()) {
-                        case 'weekly':
-                            date.setDate(date.getDate() + 7);
-                            break;
-                        case 'monthly':
-                            date.setMonth(date.getMonth() + 1);
-                            break;
-                        case 'biannually':
-                            date.setMonth(date.getMonth() + 6);
-                            break;
-                        case 'yearly':
-                            date.setFullYear(date.getFullYear() + 1);
-                            break;
-                        default:
-                            return 'N/A';
+                    // Logic for calculating expiration based on plan type
+                    const planLower = plan.toLowerCase();
+                    if (planLower.includes('weekly')) {
+                        date.setDate(date.getDate() + 7);
+                    } else if (planLower.includes('monthly')) {
+                        date.setMonth(date.getMonth() + 1);
+                    } else if (planLower.includes('biannually')) {
+                        date.setMonth(date.getMonth() + 6);
+                    } else if (planLower.includes('yearly') || planLower.includes('annual')) {
+                        date.setFullYear(date.getFullYear() + 1);
+                    } else {
+                        return 'N/A';
                     }
                     return formatDate(date);
                 } catch (e) {
@@ -603,8 +811,9 @@
             };
 
 
-            filteredMembers.forEach((member, index) => {
-                const memberId = member.memberId || `SFM${(index + 101).toString().slice(1)}N${index}`;
+            filteredMembers.forEach((member) => {
+                // Ensure default values are used if fields are missing in local storage data
+                const memberId = member.memberId || 'N/A'; 
                 const dateEnrolled = formatDate(member.dateJoin);
                 const dateExpiration = calculateExpiration(member.dateJoin, member.plan);
                 
@@ -622,99 +831,51 @@
             });
         }
         
+        // --- Data Loading Function (Local Storage) ---
+
+        function loadMembersData() {
+            try {
+                const membersString = localStorage.getItem(DUMMY_MEMBERS_KEY);
+                currentMembers = membersString ? JSON.parse(membersString) : defaultMembers;
+                renderMembers(currentMembers, searchInput.value);
+            } catch (e) {
+                console.error("Error loading member data from Local Storage:", e);
+                showMessage("Failed to load member data from local storage.", true);
+                currentMembers = defaultMembers; // Fallback to dummy data
+                renderMembers(currentMembers, searchInput.value);
+            }
+        }
+        
         // --- Global Handlers ---
         
         window.handleEditMember = function(memberId, memberName) {
-            // In a full application, this would open a modal pre-filled with the member data
             console.log("Editing Member ID:", memberId, "Name:", memberName);
             showMessage(`Editing ${memberName} profile (Simulated)`);
         }
 
-        
+        function handleLogout(event) {
+            event.preventDefault();
+            localStorage.removeItem(LOCAL_STORAGE_KEY);
+            window.location.href = 'index.html'; // Redirect to login page
+        }
+
         // --- Event Handlers ---
         
         function handleSearch() {
             renderMembers(currentMembers, searchInput.value);
         }
-
-        // --- Firebase Listener Setup ---
-
-        function setupMembersListener() {
-            if (!db) {
-                console.error("Firestore not initialized.");
-                return;
-            }
+        
+        function initApp() {
+            // Must run first to ensure profile data is loaded
+            checkAuthenticationAndLoadProfile(); 
             
-            // Listen to the members collection 
-            onSnapshot(getMembersCollectionRef(), (querySnapshot) => {
-                const members = [];
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    members.push({ 
-                        id: doc.id, 
-                        ...data,
-                        // Ensure required fields exist
-                        name: data.name || 'Unknown Member',
-                        dateJoin: data.dateJoin || new Date().toISOString().split('T')[0], // Default today if missing
-                        plan: data.plan || 'monthly'
-                    });
-                });
-                
-                currentMembers = members;
-                renderMembers(currentMembers, searchInput.value);
-
-                if (members.length === 0 && searchInput.value === '') {
-                    membersTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No members found in the database.</td></tr>';
-                }
-            }, (error) => {
-                console.error("Error listening to members data:", error);
-                showMessage("Failed to load member data.", true);
-            });
+            loadMembersData();
+            
+            searchInput.addEventListener('input', handleSearch);
+            logoutButton.addEventListener('click', handleLogout);
         }
         
-        // --- Firebase Initialization ---
-        async function initFirebaseAndAuth() {
-            if (Object.keys(firebaseConfig).length === 0) {
-                console.error("Firebase config is missing.");
-                membersTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">FIREBASE CONFIG MISSING. Cannot load data.</td></tr>';
-                return;
-            }
-            
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        document.getElementById('sidebar-admin-name').textContent = 'Admin ' + userId.substring(0, 5);
-                        document.getElementById('sidebar-admin-email').textContent = user.email || 'authenticated@user.com';
-                        setupMembersListener();
-                    } else {
-                        console.log("Not authenticated. Using anonymous/default data.");
-                        userId = crypto.randomUUID();
-                        document.getElementById('sidebar-admin-name').textContent = 'Guest Admin';
-                        setupMembersListener(); 
-                    }
-                });
-
-            } catch (error) {
-                console.error("Firebase initialization or authentication failed:", error);
-                showMessage("System Error: Failed to connect to database.", true);
-            }
-        }
-
-        // --- Setup Event Listeners ---
-        searchInput.addEventListener('input', handleSearch);
-        
-        window.onload = initFirebaseAndAuth;
+        window.onload = initApp;
 
     </script>
 </body>

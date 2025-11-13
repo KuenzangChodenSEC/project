@@ -12,11 +12,17 @@
             --color-dark-sidebar: #222;
             --color-light-bg: #f5f5f5;
             --color-card-bg: #fff;
-            --color-accent: #6f5f90; /* Purple accent color */
+            --color-accent: #6f5f90;
+            --color-avatar-bg: #222;
             --color-text-light: #aaa;
             --color-text-dark: #333;
-            --color-active: #40384a; /* Slightly lighter shade for active state */
+            --color-active: #40384a;
             --color-border: #e0e0e0;
+        }
+
+        /* Base setup for full-height and scroll */
+        html, body {
+            height: 100%;
         }
 
         * {
@@ -31,7 +37,7 @@
             min-height: 100vh;
             background-color: var(--color-light-bg);
             color: var(--color-text-dark);
-            overflow: hidden; /* Prevent body scroll */
+            overflow-x: hidden;
         }
 
         /* ----------------------- */
@@ -48,6 +54,9 @@
             height: 100%;
             padding: 20px 0;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            transition: width 0.3s ease;
+            overflow-y: auto;
         }
 
         .dashboard-header {
@@ -55,47 +64,56 @@
             font-size: 18px;
             font-weight: 600;
             color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            flex-shrink: 0;
         }
 
-        .user-profile-sidebar { /* Renamed class */
+        .user-profile-sidebar {
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px 0 30px;
             border-bottom: 1px solid var(--color-dark-sidebar);
             margin-bottom: 20px;
+            flex-shrink: 0;
         }
 
         .avatar {
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background-color: var(--color-accent); /* Use accent color for user avatar */
+            background-color: var(--color-avatar-bg);
             border: 2px solid #fff;
             margin-bottom: 10px;
             position: relative;
+            overflow: hidden; 
+            display: flex; 
+            align-items: center;
+            justify-content: center;
         }
 
         .avatar-inner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 30px;
-            color: #fff;
-            /* Changed to initials: */
-            font-size: 24px; 
+            /* Now used for initials only, when no image is loaded */
+            font-size: 24px;
             font-weight: 700;
+            color: #fff;
         }
 
-        .user-name { /* Renamed class */
+        .user-name, .user-email {
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .user-name {
             font-size: 16px;
             font-weight: 600;
-            color: #fff;
+            color: #f7f5f5;
             margin-bottom: 2px;
         }
 
-        .user-email { /* Renamed class */
+        .user-email {
             font-size: 12px;
             font-weight: 400;
             color: var(--color-text-light);
@@ -113,7 +131,7 @@
             font-weight: 500;
             color: var(--color-text-light);
             cursor: pointer;
-            text-decoration: none; 
+            text-decoration: none;
             transition: background-color 0.3s, color 0.3s;
         }
 
@@ -122,6 +140,13 @@
             text-align: center;
             margin-right: 15px;
             font-size: 16px;
+            transition: margin 0.3s ease;
+        }
+
+        .nav-link span {
+            white-space: nowrap;
+            overflow: hidden;
+            transition: opacity 0.3s ease;
         }
 
         .nav-link:hover {
@@ -133,20 +158,20 @@
             background-color: var(--color-active);
             color: #fff;
         }
-        
+
         .nav-link.active i {
             color: #fff;
         }
-        
+
         /* Sidebar link dividers to match admin.html layout */
-        .nav-links-container a:nth-child(4) { 
-            border-top: 1px solid var(--color-dark-sidebar); 
-            padding-top: 15px; 
+        .nav-links-container a:nth-child(4) {
+            border-top: 1px solid var(--color-dark-sidebar);
+            padding-top: 15px;
         }
-        .nav-links-container a:nth-child(8) { 
-            border-bottom: 1px solid var(--color-dark-sidebar); 
-            padding-bottom: 15px; 
-            margin-bottom: 20px; 
+        .nav-links-container a:nth-child(6) { 
+            border-bottom: 1px solid var(--color-dark-sidebar);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
         }
 
 
@@ -156,6 +181,8 @@
             justify-content: space-between;
             align-items: center;
             border-top: 1px solid var(--color-dark-sidebar);
+            transition: padding 0.3s ease;
+            flex-shrink: 0;
         }
 
         .logout-link {
@@ -182,7 +209,7 @@
             height: 30px;
             border: 1px solid #fff;
             border-radius: 50%;
-            background-color: #333; 
+            background-color: #333;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -195,18 +222,21 @@
         /* ----------------------- */
         /* 2. Main Content (Profile) */
         /* ----------------------- */
-        
+
         .main-content {
-            margin-left: 250px; 
+            margin-left: 250px;
             flex-grow: 1;
             padding: 40px;
-            overflow-y: auto; 
+            overflow-y: auto;
             background-color: var(--color-light-bg);
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
         }
 
         .profile-container {
             max-width: 1000px;
+            margin: 0 auto;
             background-color: var(--color-card-bg);
             padding: 30px;
             border-radius: 10px;
@@ -224,10 +254,10 @@
 
         .profile-grid {
             display: grid;
-            grid-template-columns: 1fr 1.5fr; /* Info card vs Forms */
+            grid-template-columns: 1fr 1.5fr;
             gap: 40px;
         }
-        
+
         /* User Information Card */
         .info-card {
             background-color: var(--color-light-bg);
@@ -243,7 +273,7 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background-color: var(--color-accent); /* Use accent color */
+            background-color: var(--color-avatar-bg);
             margin-bottom: 10px;
             display: flex;
             align-items: center;
@@ -251,14 +281,25 @@
             color: #fff;
             font-size: 36px;
             position: relative;
-            font-weight: 700; /* Added font weight for initials */
+            font-weight: 700;
+            overflow: hidden; 
         }
+
+        /* --- PROFILE PICTURE STYLING --- */
+        .profile-picture {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            border-radius: 50%; 
+        }
+        /* ----------------------------------- */
 
         .update-link {
             font-size: 12px;
-            color: #666;
+            color: var(--color-accent);
             margin-bottom: 25px;
             cursor: pointer;
+            text-decoration: underline;
         }
 
         .profile-details {
@@ -274,12 +315,6 @@
             font-weight: 600;
             color: #555;
         }
-
-        .register-button {
-            /* This button is hidden for users, only admins should see it */
-            display: none; 
-        }
-
 
         /* Forms Section */
         .forms-section {
@@ -320,7 +355,7 @@
             border-color: var(--color-accent);
             outline: none;
         }
-        
+
         .form-actions {
             display: flex;
             gap: 10px;
@@ -335,6 +370,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: opacity 0.3s;
+            border: none;
         }
 
         .form-actions button:hover {
@@ -342,10 +378,9 @@
         }
 
         /* Profile Update Buttons */
-        .btn-save {
+        .btn-save, .btn-change {
             background-color: var(--color-dark-bg);
             color: #fff;
-            border: none;
         }
 
         .btn-cancel {
@@ -353,14 +388,8 @@
             color: var(--color-dark-bg);
             border: 1px solid var(--color-dark-bg);
         }
-        
-        /* Password Change Buttons */
-        .btn-change {
-            background-color: var(--color-dark-bg);
-            color: #fff;
-            border: none;
-        }
 
+        /* Password Change Buttons */
         .btn-clear {
             background-color: #fff;
             color: var(--color-dark-bg);
@@ -392,7 +421,9 @@
         }
 
 
-        /* Responsive Design */
+        /* --------------------------------- */
+        /* Responsive Design (Tablet/Sidebar Collapse) */
+        /* --------------------------------- */
         @media (max-width: 1024px) {
             .sidebar {
                 width: 70px;
@@ -400,21 +431,29 @@
 
             .main-content {
                 margin-left: 70px;
+                padding: 20px;
             }
 
-            .dashboard-header, .user-email, .user-name, .nav-link span, .logout-link span { /* Adjusted visibility */
+            /* Hide full text elements in collapsed sidebar */
+            .dashboard-header,
+            .user-email,
+            .user-name,
+            .nav-link span,
+            .logout-link span {
                 display: none;
             }
 
-            .user-profile-sidebar { /* Adjusted class */
+            .user-profile-sidebar {
                 border-bottom: none;
                 padding-bottom: 0;
+                align-items: center;
             }
 
             .avatar {
                 margin-bottom: 20px;
             }
 
+            /* Center icons and remove text spacing in nav links */
             .nav-link {
                 justify-content: center;
                 padding: 15px 0;
@@ -422,10 +461,13 @@
 
             .nav-link i {
                 margin-right: 0;
+                font-size: 18px;
             }
 
+            /* Center logout content */
             .logout-section {
                 justify-content: center;
+                padding: 15px 0;
             }
 
             .logout-link i {
@@ -435,10 +477,66 @@
                 display: none;
             }
         }
-        
+
+        /* --------------------------------- */
+        /* Responsive Design (Mobile - Main Grid Stack) */
+        /* --------------------------------- */
         @media (max-width: 768px) {
+            .profile-container {
+                padding: 20px 15px;
+            }
+
             .profile-grid {
+                /* Stack the info card and forms vertically */
                 grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            /* Ensure Info Card and forms take full width */
+            .info-card, .forms-section {
+                width: 100%;
+            }
+
+            /* Reduce sidebar padding when icons only */
+            .sidebar {
+                padding: 10px 0;
+            }
+
+            /* Make main content full width and allow scrolling */
+            .main-content {
+                padding: 20px;
+            }
+        }
+
+        /* --------------------------------- */
+        /* Responsive Design (Very Small Mobile) */
+        /* --------------------------------- */
+        @media (max-width: 600px) {
+            /* Push main content to the side for the collapsed sidebar */
+            .main-content {
+                margin-left: 70px;
+                padding: 15px;
+            }
+
+            .page-title {
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
+
+            .profile-details {
+                /* Adjust the grid for profile details on smaller screens */
+                grid-template-columns: 80px 1fr;
+                font-size: 13px;
+            }
+
+            .form-actions {
+                /* Stack action buttons vertically if necessary, or ensure they don't overflow */
+                flex-wrap: wrap;
+            }
+
+            .form-actions button {
+                width: 100%; /* Full width buttons for small screens */
+                margin-bottom: 10px;
             }
         }
     </style>
@@ -448,11 +546,10 @@
     <div id="messageBox"></div>
 
     <aside class="sidebar">
-        <div class="dashboard-header">User Dashboard</div>
-        
+        <div class="dashboard-header">User Profile</div>
+
         <div class="user-profile-sidebar">
-            <div class="avatar">
-                 <div class="avatar-inner" id="sidebar-avatar-initials">US</div> 
+            <div class="avatar" id="sidebar-avatar-container">
             </div>
             <div class="user-name" id="sidebar-user-name">User Name</div>
             <div class="user-email" id="sidebar-user-email">user@example.com</div>
@@ -498,25 +595,28 @@
             <h1 class="page-title">My Profile</h1>
 
             <div class="profile-grid">
-                
+
                 <div class="info-card">
-                    <div class="info-avatar">
-                        <span id="info-avatar-initials">US</span> 
+                    <div class="info-avatar" id="info-avatar-container">
                     </div>
                     <div class="user-name" id="info-user-name">User Name</div>
-                    <div class="update-link">Update Profile Picture</div>
+                    
+                    <input type="file" id="profilePictureInput" accept="image/*" style="display: none;">
+                    
+                    <div class="update-link" id="updatePictureLink">Update Profile Picture</div>
 
                     <div class="profile-details">
                         <span>Member ID:</span><span id="display-id">N/A</span>
                         <span>Full Name:</span><span id="display-name">User Name</span>
-                        <span>Membership:</span><span id="display-membership">N/A</span> <span>Email:</span><span id="display-email">user@example.com</span>
+                        <span>Membership:</span><span id="display-membership">N/A</span>
+                        <span>Email:</span><span id="display-email">user@example.com</span>
                         <span>Join Date:</span><span id="display-join-date">N/A</span>
                     </div>
 
-                    </div>
+                </div>
 
                 <div class="forms-section">
-                    
+
                     <div class="form-group">
                         <h4>Update Personal Information</h4>
                         <form id="updateProfileForm">
@@ -560,179 +660,295 @@
             </div>
         </div>
     </div>
-    
-    <script>
-        // Message function (retained)
-        function showMessage(message, isError = false) {
-            const msgBox = document.getElementById('messageBox');
-            msgBox.textContent = message;
-            msgBox.className = 'show' + (isError ? ' error' : '');
+<script>
+    // Global Constants
+    const LOCAL_STORAGE_KEY = 'loggedInUser';
+    const REGISTERED_USERS_KEY = 'registeredUsers';
+    // Removed PROFILE_PICTURE_KEY: Relying only on user.avatarUrl in localStorage
 
-            setTimeout(() => {
-                msgBox.className = '';
-            }, 3000);
+    // --- Utility Functions ---
+    function getInitials(name) {
+        if (!name || typeof name !== 'string') return 'US';
+        
+        const parts = name.trim().split(/\s+/).filter(Boolean);
+        
+        if (parts.length > 1) {
+            // Use first letter of first name and last name
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        } else if (parts.length === 1) {
+            // Use first two letters if only one word
+            return parts[0].substring(0, 2).toUpperCase();
+        } else {
+            return 'US';
         }
+    }
 
-        // Helper function to get the current list of registered users
-        function getRegisteredUsers() {
-            const usersString = localStorage.getItem('registeredUsers');
-            return usersString ? JSON.parse(usersString) : [];
+    function showMessage(message, isError = false) {
+        const msgBox = document.getElementById('messageBox');
+        msgBox.textContent = message;
+        msgBox.className = 'show' + (isError ? ' error' : '');
+
+        setTimeout(() => {
+            msgBox.className = '';
+        }, 3000);
+    }
+
+    function getRegisteredUsers() {
+        const usersString = localStorage.getItem(REGISTERED_USERS_KEY);
+        return usersString ? JSON.parse(usersString) : [];
+    }
+
+    function saveRegisteredUsers(users) {
+        localStorage.setItem(REGISTERED_USERS_KEY, JSON.stringify(users));
+    }
+
+    // --- PROFILE PICTURE RENDERING (UPDATED to use user.avatarUrl) ---
+    function renderProfilePicture(containerId, userData) {
+        const container = document.getElementById(containerId);
+        if (!container) return; 
+        
+        container.innerHTML = ''; 
+
+        // Load from the user data's avatarUrl field
+        const avatarData = userData.avatarUrl;
+
+        if (avatarData) {
+            const img = document.createElement('img');
+            img.src = avatarData; 
+            img.alt = 'Profile Picture';
+            img.classList.add('profile-picture');
+            container.appendChild(img);
+            
+            container.style.fontSize = '0'; 
+            
+            img.onerror = () => {
+                // If the data URI is bad, clear it from user data and re-render
+                userData.avatarUrl = null;
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userData));
+                renderProfilePicture(containerId, userData); 
+            };
+        } else {
+            // Otherwise, render initials
+            const span = document.createElement('span');
+            span.textContent = getInitials(userData.name);
+            span.classList.add('avatar-inner');
+            container.appendChild(span);
+            
+            container.style.fontSize = containerId === 'sidebar-avatar-container' ? '24px' : '36px'; 
         }
+    }
 
-        // Helper function to save the updated list of registered users
-        function saveRegisteredUsers(users) {
-            localStorage.setItem('registeredUsers', JSON.stringify(users));
-        }
+    // --- PROFILE PICTURE HANDLER (Fixed to save only to user object) ---
+    function handleProfilePictureUpdate(user) {
+        const fileInput = document.getElementById('profilePictureInput');
+        fileInput.click(); 
 
-        // --- CORE USER DATA LOAD & CHECK ---
-        document.addEventListener('DOMContentLoaded', function() {
-            const loggedInUserString = localStorage.getItem('loggedInUser');
-            if (!loggedInUserString) {
-                // If no user is logged in, redirect to login page
-                window.location.href = "index.html"; 
+        fileInput.onchange = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) { 
+                showMessage('Error: Image size must be under 5MB.', true);
+                event.target.value = null;
                 return;
             }
 
-            const user = JSON.parse(loggedInUserString);
-            
-            // --- Populate Page Elements ---
-            
-            // Sidebar
-            document.getElementById('sidebar-user-name').textContent = user.name || 'User Name';
-            document.getElementById('sidebar-user-email').textContent = user.email || 'user@example.com';
-            document.getElementById('sidebar-avatar-initials').textContent = user.avatarInitials || 'US';
+            const reader = new FileReader();
 
-            // Info Card
-            document.getElementById('info-avatar-initials').textContent = user.avatarInitials || 'US';
+            reader.onload = function(e) {
+                const base64Image = e.target.result;
+                
+                // 1. Update session data
+                user.avatarUrl = base64Image;
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(user));
+
+                // 2. Update registeredUsers data
+                let registeredUsers = getRegisteredUsers();
+                const userIndex = registeredUsers.findIndex(u => u.email === user.email);
+                if (userIndex !== -1) {
+                    registeredUsers[userIndex].avatarUrl = base64Image;
+                    saveRegisteredUsers(registeredUsers);
+                }
+
+                // 3. Re-render the avatars on THIS page
+                renderProfilePicture('sidebar-avatar-container', user);
+                renderProfilePicture('info-avatar-container', user);
+                
+                showMessage('Profile picture updated!');
+
+                event.target.value = null; 
+            };
+
+            reader.readAsDataURL(file);
+        };
+    }
+
+    // --- CORE USER DATA LOAD & CHECK ---
+    function loadUserData() {
+        const loggedInUserString = localStorage.getItem(LOCAL_STORAGE_KEY);
+        
+        if (!loggedInUserString) {
+            window.location.href = "index.html";
+            return;
+        }
+
+        const user = JSON.parse(loggedInUserString);
+
+        // --- Populate Page Elements ---
+        
+        renderProfilePicture('sidebar-avatar-container', user);
+        renderProfilePicture('info-avatar-container', user);
+
+        // Sidebar Text
+        document.getElementById('sidebar-user-name').textContent = user.name || 'User Name';
+        document.getElementById('sidebar-user-email').textContent = user.email || 'user@example.com';
+
+        // Info Card Text (pfp.html specific)
+        if (document.getElementById('info-user-name')) {
             document.getElementById('info-user-name').textContent = user.name || 'User Name';
             document.getElementById('display-id').textContent = user.userID || 'N/A';
             document.getElementById('display-name').textContent = user.name || 'User Name';
-            document.getElementById('display-membership').textContent = user.membership || 'Basic'; // Updated field
+            document.getElementById('display-membership').textContent = user.membership || 'Basic';
             document.getElementById('display-email').textContent = user.email || 'user@example.com';
-            document.getElementById('display-join-date').textContent = user.joinDate || 'Today'; // Assuming you might add join date later
+            document.getElementById('display-join-date').textContent = user.joinDate || 'Today';
+        }
 
-            // Forms
+
+        // Forms (pfp.html specific)
+        if (document.getElementById('fullName')) {
             document.getElementById('fullName').value = user.name || '';
             document.getElementById('userEmail').value = user.email || '';
-        });
+        }
         
-        // --- LOGOUT FUNCTION ---
-        document.getElementById('logout-button').addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('loggedInUser');
-            window.location.href = "index.html";
-        });
-
-
-        // --- UPDATE PROFILE FORM ---
-        document.getElementById('updateProfileForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const newName = document.getElementById('fullName').value.trim();
-            const newEmail = document.getElementById('userEmail').value.trim();
-            
-            // Load current user data
-            let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-            const oldEmail = loggedInUser.email;
-
-            // 1. Update the local user session data
-            loggedInUser.name = newName;
-            loggedInUser.email = newEmail;
-            loggedInUser.avatarInitials = newName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) || 'US';
-            
-            localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-
-            // 2. Update the main 'registeredUsers' array in localStorage
-            let registeredUsers = getRegisteredUsers();
-            const userIndex = registeredUsers.findIndex(u => u.email === oldEmail);
-            
-            if (userIndex !== -1) {
-                // Create the updated user object with the password retained
-                const updatedUser = { 
-                    ...registeredUsers[userIndex], 
-                    name: newName, 
-                    email: newEmail,
-                    avatarInitials: loggedInUser.avatarInitials // Use the newly calculated initials
-                };
-
-                // Remove the old entry and add the updated entry
-                registeredUsers.splice(userIndex, 1, updatedUser);
-                saveRegisteredUsers(registeredUsers);
-            }
-
-            // 3. Update all displayed elements and show success message
-            document.getElementById('sidebar-user-name').textContent = newName;
-            document.getElementById('sidebar-user-email').textContent = newEmail;
-            document.getElementById('sidebar-avatar-initials').textContent = loggedInUser.avatarInitials;
-            document.getElementById('info-avatar-initials').textContent = loggedInUser.avatarInitials;
-            document.getElementById('info-user-name').textContent = newName;
-            document.getElementById('display-name').textContent = newName;
-            document.getElementById('display-email').textContent = newEmail;
-            
-            showMessage('Profile updated successfully!');
-        });
-
-        document.querySelector('.btn-cancel').addEventListener('click', function() {
-            // Revert profile inputs to the current session values
-            const user = JSON.parse(localStorage.getItem('loggedInUser'));
-            if (user) {
+        // --- Event Listeners for Dynamic Functionality ---
+        const updateLink = document.getElementById('updatePictureLink');
+        if (updateLink) {
+            updateLink.addEventListener('click', () => {
+                handleProfilePictureUpdate(user);
+            });
+        }
+        
+        // Logout listener (present in all files)
+        const logoutBtn = document.getElementById('logout-button');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem(LOCAL_STORAGE_KEY); 
+                window.location.href = "index.html";
+            });
+        }
+        
+        // pfp.html specific listeners
+        const btnCancel = document.querySelector('.btn-cancel');
+        if (btnCancel) {
+            btnCancel.addEventListener('click', function() {
                 document.getElementById('fullName').value = user.name || '';
                 document.getElementById('userEmail').value = user.email || '';
-            }
-        });
+            });
+        }
+
+        const btnClear = document.querySelector('.btn-clear');
+        if (btnClear) {
+            btnClear.addEventListener('click', function() {
+                document.getElementById('changePasswordForm').reset();
+            });
+        }
+    }
 
 
-        // --- CHANGE PASSWORD FORM ---
-        document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const currentPass = document.getElementById('currentPassword').value.trim();
-            const newPass = document.getElementById('newPassword').value.trim();
-            const confirmPass = document.getElementById('confirmPassword').value.trim();
+    // --- UPDATE PROFILE FORM SUBMISSION (Personal Info) ---
+    document.getElementById('updateProfileForm').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-            const userSession = JSON.parse(localStorage.getItem('loggedInUser'));
-            
-            if (!userSession) return; 
+        const newName = document.getElementById('fullName').value.trim();
+        const newEmail = document.getElementById('userEmail').value.trim();
 
-            // 1. Basic client-side validation
-            if (newPass !== confirmPass) {
-                showMessage('Error: New passwords do not match.', true);
-                return;
-            }
-            if (newPass.length < 6) {
-                showMessage('Error: Password must be at least 6 characters.', true);
-                return;
-            }
-            if (currentPass === newPass) {
-                showMessage('Error: New password cannot be the same as current password.', true);
-                return;
-            }
+        let loggedInUser = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+        const oldEmail = loggedInUser.email;
+        
+        if (!newEmail || newEmail.indexOf('@') === -1) {
+            showMessage('Error: Please enter a valid email address.', true);
+            return;
+        }
+        
+        const registeredUsers = getRegisteredUsers();
+        const emailExists = registeredUsers.some(u => u.email === newEmail && u.email !== oldEmail);
 
-            // 2. Load the full user list to check current password
-            let registeredUsers = getRegisteredUsers();
-            const userIndex = registeredUsers.findIndex(u => u.email === userSession.email);
+        if (emailExists) {
+            showMessage('Error: This email is already registered to another user.', true);
+            return;
+        }
 
-            if (userIndex === -1) {
-                showMessage('Error: User data missing from database.', true);
-                return;
-            }
 
-            // 3. Check Current Password
-            if (registeredUsers[userIndex].password !== currentPass) {
-                showMessage('Error: Incorrect current password.', true);
-                return;
-            }
-            
-            // 4. Update Password in registeredUsers list
-            registeredUsers[userIndex].password = newPass;
+        // Update user session data
+        loggedInUser.name = newName;
+        loggedInUser.email = newEmail;
+        
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(loggedInUser));
+
+        // Update the main 'registeredUsers' array
+        const userIndex = registeredUsers.findIndex(u => u.email === oldEmail);
+
+        if (userIndex !== -1) {
+            const updatedUser = {
+                ...registeredUsers[userIndex],
+                name: newName,
+                email: newEmail,
+            };
+            registeredUsers.splice(userIndex, 1, updatedUser);
             saveRegisteredUsers(registeredUsers);
-            
-            showMessage('Password changed successfully!');
-            this.reset(); // Clear the form fields
-        });
+        }
 
-        document.querySelector('.btn-clear').addEventListener('click', function() {
-            document.getElementById('changePasswordForm').reset();
-        });
-    </script>
+        loadUserData(); 
+        showMessage('Profile updated successfully!');
+    });
+
+
+    // --- CHANGE PASSWORD FORM SUBMISSION ---
+    document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const currentPass = document.getElementById('currentPassword').value.trim();
+        const newPass = document.getElementById('newPassword').value.trim();
+        const confirmPass = document.getElementById('confirmPassword').value.trim();
+
+        const userSession = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+
+        if (!userSession) return;
+
+        if (newPass !== confirmPass) {
+            showMessage('Error: New passwords do not match.', true);
+            return;
+        }
+        if (newPass.length < 6) {
+            showMessage('Error: Password must be at least 6 characters.', true);
+            return;
+        }
+        if (currentPass === newPass) {
+            showMessage('Error: New password cannot be the same as current password.', true);
+            return;
+        }
+
+        let registeredUsers = getRegisteredUsers();
+        const userIndex = registeredUsers.findIndex(u => u.email === userSession.email);
+
+        if (userIndex === -1) {
+            showMessage('Error: User data missing from database.', true);
+            return;
+        }
+
+        if (registeredUsers[userIndex].password !== currentPass) {
+            showMessage('Error: Incorrect current password.', true);
+            return;
+        }
+
+        registeredUsers[userIndex].password = newPass;
+        saveRegisteredUsers(registeredUsers);
+
+        showMessage('Password changed successfully!');
+        this.reset();
+    });
+
+    window.onload = loadUserData;
+</script>
 </body>
-</html>s
+</html>

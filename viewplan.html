@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plan Management</title>
+    <title>View Plans</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -17,13 +17,15 @@
             --color-text-dark: #333;
             --color-active: #40384a;
             --color-border: #e0e0e0;
-            --color-form-bg: #32353a; /* Dark background for Add Plan card */
+            --color-form-bg: #32353a;
             --color-form-text: #f0f0f0;
             --color-input-bg: #4c5056;
             --color-input-border: #60646b;
-            --color-table-bg: #40384a; /* Dark background for Table card */
+            --color-table-bg: #40384a;
             --color-table-header: #8a819b;
             --color-table-row: #f0f0f0;
+            --sidebar-width-full: 250px;
+            --sidebar-width-collapsed: 70px;
         }
 
         * {
@@ -34,34 +36,53 @@
         }
 
         body {
+            /* Use flex to separate sidebar and main content */
             display: flex;
             min-height: 100vh;
             background-color: var(--color-light-bg);
             color: var(--color-text-dark);
+            /* Prevent body scrolling, let main-content handle it */
             overflow: hidden;
         }
 
         /* ----------------------- */
-        /* 1. Sidebar (Reused Styles) */
+        /* 1. Sidebar */
         /* ----------------------- */
 
         .sidebar {
-            width: 250px;
+            width: var(--sidebar-width-full);
             background-color: var(--color-dark-bg);
             color: var(--color-text-light);
             display: flex;
             flex-direction: column;
-            position: fixed;
-            height: 100%;
+            /* Key styles for fixed, full-height, scrollable sidebar */
+            position: fixed; 
+            height: 100vh; /* Fixed height for the container */
             padding: 20px 0;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            overflow-y: auto; 
         }
+        
+        /* Optional: Scrollbar styling */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--color-active);
+            border-radius: 10px;
+        }
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--color-accent);
+        }
+
 
         .dashboard-header {
             padding: 0 20px 30px;
             font-size: 18px;
             font-weight: 600;
             color: #fff;
+            flex-shrink: 0;
         }
 
         .admin-profile-sidebar {
@@ -71,6 +92,7 @@
             padding: 20px 0 30px;
             border-bottom: 1px solid var(--color-dark-sidebar);
             margin-bottom: 20px;
+            flex-shrink: 0;
         }
 
         .avatar {
@@ -81,6 +103,15 @@
             border: 2px solid #fff;
             margin-bottom: 10px;
             position: relative;
+            overflow: hidden; /* Added for image clipping */
+        }
+        
+        /* NEW STYLE: For the profile picture image */
+        .profile-picture {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
         }
 
         .avatar-inner {
@@ -90,6 +121,11 @@
             transform: translate(-50%, -50%);
             font-size: 30px;
             color: #fff;
+        }
+        
+        .avatar-inner.initials {
+            font-size: 24px;
+            font-weight: 700;
         }
 
         .admin-name {
@@ -142,7 +178,7 @@
             color: #fff;
         }
 
-        /* Adjusting CSS for the removal of the third link */
+        /* Updated borders to match the new link count */
         .nav-links-container > a:nth-child(2) { border-top: 1px solid var(--color-dark-sidebar); padding-top: 15px; }
         .nav-links-container > a:last-child { border-bottom: 1px solid var(--color-dark-sidebar); padding-bottom: 15px; margin-bottom: 20px; }
 
@@ -153,6 +189,7 @@
             justify-content: space-between;
             align-items: center;
             border-top: 1px solid var(--color-dark-sidebar);
+            flex-shrink: 0; /* Prevents shrinking */
         }
 
         .logout-link {
@@ -189,26 +226,31 @@
         }
 
         /* ----------------------- */
-        /* 2. Main Content (Plan Management) */
+        /* 2. Main Content (Plan Management) - SCROLLABLE AREA */
         /* ----------------------- */
 
         .main-content {
-            margin-left: 250px;
-            flex-grow: 1;
+            /* Key styles for main content scrolling */
+            margin-left: var(--sidebar-width-full); 
+            width: calc(100% - var(--sidebar-width-full));
+            flex-grow: 1; 
             padding: 40px;
-            overflow-y: auto;
             background-color: var(--color-light-bg);
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            height: 100vh;
         }
 
         .plan-management-container {
             max-width: 900px;
+            margin: 0 auto; 
             background-color: var(--color-light-bg);
             padding: 0;
             border-radius: 10px;
             display: flex;
             flex-direction: column;
             gap: 30px;
+            min-height: 100%; 
         }
 
         .page-header {
@@ -218,17 +260,13 @@
             margin-bottom: 10px;
         }
 
-        /* --- Plan Card Styles --- */
-        .plan-card {
+        /* --- Table Card Styles --- */
+        .plan-list-card {
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Top Card: Add Plan */
-        .add-plan-card {
-            background-color: var(--color-form-bg);
-            color: var(--color-form-text);
+            background-color: var(--color-table-bg);
+            color: var(--color-table-row);
         }
 
         .card-title {
@@ -240,108 +278,11 @@
             display: inline-block;
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px 40px;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .input-group label {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .input-group input {
-            padding: 10px 15px;
-            border: 1px solid var(--color-input-border);
-            border-radius: 6px;
-            background-color: var(--color-input-bg);
-            color: var(--color-form-text);
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .input-group input:focus {
-            border-color: var(--color-accent);
-            outline: none;
-        }
-
-        /* Ensure amount spans full width below plan name/validity */
-        .input-group-amount {
-            grid-column: 1 / -1;
-        }
-
-        .form-actions {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .form-actions button {
-            padding: 10px 25px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .btn-save {
-            background-color: var(--color-accent);
-            color: #fff;
-            border: none;
-        }
-
-        .btn-save:hover {
-            background-color: #564c70;
-        }
-
-        .btn-cancel {
-            background-color: var(--color-form-text);
-            color: var(--color-dark-bg);
-            border: none;
-        }
-
-        /* --- Table Card Styles --- */
-        .plan-list-card {
-            background-color: var(--color-table-bg);
-            color: var(--color-table-row);
-        }
-
         .list-controls {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
             margin-bottom: 20px;
-        }
-
-        .show-entries label, .show-entries select {
-            color: var(--color-table-header);
-            font-size: 13px;
-        }
-
-        .show-entries select {
-            background-color: transparent;
-            border: 1px solid var(--color-table-header);
-            padding: 5px;
-            border-radius: 4px;
-            /* Fix for select background on dark theme */
-            color: var(--color-table-row);
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%238a819b%22%20d%3D%22M287%20188.7L146.4%2050.2%205.8%20188.7H287z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: right 8px top 50%;
-            background-size: 8px auto;
         }
 
         .search-box input {
@@ -365,6 +306,7 @@
             text-align: left;
             padding: 10px 15px;
             border-bottom: 1px solid #555;
+            cursor: pointer;
         }
 
         .plan-table tbody tr {
@@ -384,23 +326,11 @@
         .sort-icon {
             margin-left: 5px;
             color: var(--color-table-header);
+            font-size: 10px;
         }
-
-        .action-buttons button {
-            background-color: var(--color-accent);
+        
+        .plan-table thead th.sorted .sort-icon {
             color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-right: 5px;
-        }
-
-        .action-buttons button:hover {
-            background-color: #564c70;
         }
 
         /* Message/Modal styles */
@@ -427,26 +357,85 @@
             transform: translateY(0);
         }
 
-        /* Responsive Design */
+        /* ----------------------- */
+        /* 3. Responsive Design */
+        /* ----------------------- */
+
+        /* Tablet/Collapsed Sidebar View (Max 1024px) */
         @media (max-width: 1024px) {
-            .sidebar { width: 70px; }
-            .main-content { margin-left: 70px; }
-            .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span, .bottom-logo { display: none; }
-            .admin-profile-sidebar { border-bottom: none; padding-bottom: 0; }
-            .avatar { margin-bottom: 20px; }
-            .nav-link { justify-content: center; padding: 15px 0; }
-            .nav-link i { margin-right: 0; }
-            .logout-section { justify-content: center; }
-            .logout-link i { margin-right: 0; }
+            .sidebar { 
+                width: var(--sidebar-width-collapsed); 
+            }
+            .main-content { 
+                margin-left: var(--sidebar-width-collapsed); 
+                width: calc(100% - var(--sidebar-width-collapsed));
+            }
+            /* Hide text elements */
+            .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span, .bottom-logo { 
+                display: none; 
+            }
+            .admin-profile-sidebar { 
+                border-bottom: none; 
+                padding-bottom: 0; 
+            }
+            .avatar { 
+                margin-bottom: 20px; 
+            }
+            .nav-link { 
+                justify-content: center; 
+                padding: 15px 0; 
+            }
+            .nav-link i { 
+                margin-right: 0; 
+            }
+            .logout-section { 
+                justify-content: center; 
+                padding: 15px 0;
+            }
+            .logout-link i { 
+                margin-right: 0; 
+            }
         }
 
+        /* Mobile View (Max 768px) */
         @media (max-width: 768px) {
-            .main-content { padding: 20px; }
-            .form-grid { grid-template-columns: 1fr; gap: 20px; }
-            .input-group-amount { grid-column: 1 / 1; }
-            .form-actions { justify-content: center; }
-            .list-controls { flex-direction: column; gap: 15px; align-items: flex-start; }
-            .plan-table th, .plan-table td { padding: 10px; font-size: 13px; }
+            /* Hide the sidebar completely */
+            .sidebar { 
+                display: none; 
+            }
+            /* Main content takes full width */
+            .main-content { 
+                margin-left: 0; 
+                width: 100%;
+                padding: 20px; 
+            }
+            .plan-management-container {
+                min-height: auto;
+            }
+            
+            /* Table Control Stacking */
+            .list-controls { 
+                flex-direction: column; 
+                gap: 15px; 
+                align-items: stretch; /* Stretch search input */
+            }
+            .search-box {
+                width: 100%;
+            }
+            .search-box input {
+                width: 100%;
+            }
+            
+            /* Table Adjustments */
+            .plan-table th, .plan-table td { 
+                padding: 8px; 
+                font-size: 12px; 
+            }
+            .plan-table thead th:nth-child(2),
+            .plan-table tbody td:nth-child(2) {
+                /* Make validity column slightly narrower */
+                width: 25%;
+            }
         }
     </style>
 </head>
@@ -458,11 +447,10 @@
         <div class="dashboard-header">Plan</div>
 
         <div class="admin-profile-sidebar">
-            <div class="avatar">
-                <div class="avatar-inner"><i class="fas fa-user"></i></div>
-            </div>
-            <div class="admin-name" id="sidebar-admin-name">Administrator Name</div>
-            <div class="admin-email" id="sidebar-admin-email">admin@example.com</div>
+            <div class="avatar" id="sidebar-avatar-container">
+                </div>
+            <div class="admin-name" id="sidebar-admin-name">Loading...</div>
+            <div class="admin-email" id="sidebar-admin-email">checking authentication...</div>
         </div>
 
        <div class="nav-links-container">
@@ -493,7 +481,7 @@
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" href="index.html">
+            <a class="logout-link" href="#" id="logout-button">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -503,45 +491,14 @@
 
 
     <div class="main-content">
-        <h1 class="page-header">Plan</h1>
+        <h1 class="page-header">Plans List</h1>
         <div class="plan-management-container">
 
-            <div class="plan-card add-plan-card">
-                <div class="card-title">Add Plan</div>
-                <form id="add-plan-form">
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label for="plan-name">Plan Name</label>
-                            <input type="text" id="plan-name" required placeholder="e.g., Monthly Pro">
-                        </div>
-                        <div class="input-group">
-                            <label for="validity">Validity (Months)</label>
-                            <input type="number" id="validity" min="1" required placeholder="e.g., 1 or 6">
-                        </div>
-                        <div class="input-group input-group-amount">
-                            <label for="amount">Amount (Currency)</label>
-                            <input type="number" id="amount" min="0" required placeholder="e.g., 800">
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn-save">Save</button>
-                            <button type="button" class="btn-cancel" id="btn-cancel-add">Cancel</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
             <div class="plan-card plan-list-card">
+                <div class="card-title">Existing Plans</div>
                 <div class="list-controls">
-                    <div class="show-entries">
-                        <label for="show-entries">Show Entities</label>
-                        <select id="show-entries">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
                     <div class="search-box">
-                        <input type="text" id="search-input" placeholder="Search">
+                        <input type="text" id="search-input" placeholder="Search plans by name or amount">
                     </div>
                 </div>
 
@@ -549,14 +506,13 @@
                     <table class="plan-table">
                         <thead>
                             <tr>
-                                <th style="width: 25%;">Plan Name <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 20%;">Validity <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 20%;">Amount <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 15%;"></th>
+                                <th style="width: 35%;" data-sort-key="planName" data-sort-direction="asc">Plan Name <i class="fas fa-sort-up sort-icon"></i></th>
+                                <th style="width: 30%;" data-sort-key="validity" data-sort-direction="none">Validity <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 35%;" data-sort-key="amount" data-sort-direction="none">Amount <i class="fas fa-sort sort-icon"></i></th>
                             </tr>
                         </thead>
                         <tbody id="plans-table-body">
-                            <tr><td colspan="4" style="text-align: center;">Loading plans...</td></tr>
+                            <tr><td colspan="3" style="text-align: center;">Loading plans...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -566,9 +522,7 @@
     </div>
 
     <script>
-        // Global variables will be available here, but we need to pass db and appId from the module
-        let globalDb = null;
-        let globalAppId = null;
+        // --- Core Utility Functions ---
         function showMessage(message, isError = false) {
             const messageBox = document.getElementById('messageBox');
             messageBox.textContent = message;
@@ -578,242 +532,300 @@
                 messageBox.classList.remove('show');
             }, 3000);
         }
-
-        window.handleEdit = function(planId) {
-            // In a full application, this would open a modal pre-filled with the plan data
-            console.log("Editing Plan ID:", planId);
-            showMessage(`Editing Plan ID: ${planId} (Simulated)`);
-        }
-
-        window.handleDelete = async function(planId, planName) {
-            if (!globalDb) {
-                 showMessage("Database not initialized for deletion.", true);
-                 return;
-            }
-
-            if (!confirm(`Are you sure you want to delete the plan: ${planName}?`)) {
-                return;
+        
+        /**
+         * Generates initials (up to two letters) from a full name.
+         */
+        function getInitials(fullName) {
+            if (!fullName) return '';
+            const names = fullName.trim().split(/\s+/);
+            
+            if (names.length === 1) {
+                return names[0].charAt(0).toUpperCase();
             }
             
-            try {
-                if(window.deletePlanFromModule) {
-                     window.deletePlanFromModule(planId, planName);
-                } else {
-                     showMessage("Deletion function not ready.", true);
-                }
+            // Take the first letter of the first and last name
+            return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+        }
 
-            } catch (error) {
-                console.error("Error deleting plan:", error);
-                showMessage("Failed to delete plan. Check console.", true);
+        // --- NEW: Profile Picture Rendering Logic ---
+        function renderProfilePicture(containerId, userData) {
+            const container = document.getElementById(containerId);
+            if (!container) return; 
+            
+            container.innerHTML = ''; // Clear existing content (initials or old image)
+
+            // The key is 'avatarUrl' as established in pfp.html
+            if (userData.avatarUrl) {
+                // If Base64 image exists, render it as an <img>
+                const img = document.createElement('img');
+                img.src = userData.avatarUrl;
+                img.alt = 'Profile Picture';
+                img.classList.add('profile-picture');
+                container.appendChild(img);
+            } else {
+                // Otherwise, render initials
+                const span = document.createElement('span');
+                span.textContent = getInitials(userData.name) || 'US';
+                span.classList.add('avatar-inner', 'initials'); // Use 'initials' class for styling
+                container.appendChild(span);
             }
         }
-    </script>
 
-    <script type="module">
-        import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Global Firebase and Config ---
-        let db;
-        let auth;
-        let userId = '';
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // --- Authentication & Profile Logic (UPDATED) ---
+        function checkAuthenticationAndLoadProfile() {
+            const loggedInUserString = localStorage.getItem('loggedInUser');
+            let user = null;
+            
+            if (loggedInUserString) {
+                try {
+                    user = JSON.parse(loggedInUserString);
+                } catch (e) {
+                    console.error("Error parsing loggedInUser data:", e);
+                    user = null;
+                }
+            }
+            
+            if (!user) {
+                console.warn("User not authenticated. Redirecting to login.html");
+                // window.location.href = "login.html"; // Uncomment for actual redirection
+                return null;
+            }
+            
+            const adminName = user.name || 'User Name';
+            const adminEmail = user.email || 'authenticated@user.com';
+            
+            // --- UPDATED: Render Profile Picture ---
+            renderProfilePicture('sidebar-avatar-container', user);
 
-        // Set Firebase logging level to Debug
-        setLogLevel('Debug');
-
-        // --- UI Element References ---
-        const addPlanForm = document.getElementById('add-plan-form');
-        const planNameInput = document.getElementById('plan-name');
-        const validityInput = document.getElementById('validity');
-        const amountInput = document.getElementById('amount');
-        const plansTableBody = document.getElementById('plans-table-body');
-        const btnCancelAdd = document.getElementById('btn-cancel-add');
-        const searchInput = document.getElementById('search-input');
-
-        let currentPlans = []; // Local cache for filtering
-
-        // --- Utility Function for Feedback (using the global one) ---
-        const showMessage = window.showMessage;
-
-        // --- Firestore References ---
-        function getPlansCollectionRef() {
-            return collection(db, 'artifacts', appId, 'public', 'data', 'plans');
+            // Update Sidebar Text
+            document.getElementById('sidebar-admin-name').textContent = adminName;
+            document.getElementById('sidebar-admin-email').textContent = adminEmail;
+            
+            return user; 
         }
 
-        // --- Data Manipulation ---
+        // --- LocalStorage Plan Management Logic ---
+        
+        let currentPlans = []; 
+        let currentSort = { key: 'planName', direction: 'asc' }; // Default sort
+        const plansTableBody = document.getElementById('plans-table-body');
+        const searchInput = document.getElementById('search-input');
+        const logoutButton = document.getElementById('logout-button');
+        const tableHeaders = document.querySelectorAll('.plan-table thead th');
 
+        /**
+         * Loads plans from localStorage. If empty, initializes with defaults.
+         */
+        function loadPlansFromStorage() {
+            const plansString = localStorage.getItem('plansData');
+            
+            if (plansString) {
+                try {
+                    const storedPlans = JSON.parse(plansString);
+                    if (Array.isArray(storedPlans)) {
+                        return storedPlans; 
+                    } else {
+                        localStorage.removeItem('plansData');
+                        return [];
+                    }
+                } catch (e) {
+                    console.error("Error parsing plans data from localStorage. Data cleared. Returning empty array.", e);
+                    localStorage.removeItem('plansData');
+                    return [];
+                }
+            } else {
+                const defaultPlans = [
+                    { id: '101', planName: 'Weekly Lite', validity: 0.25, amount: 200.00 }, // 0.25 months is roughly 1 week
+                    { id: '102', planName: 'Monthly Pro', validity: 1, amount: 800.00 },
+                    { id: '103', planName: 'Yearly Premium', validity: 12, amount: 7500.00 },
+                    { id: '104', planName: 'Quarterly Standard', validity: 3, amount: 2200.00 },
+                    { id: '105', planName: 'Bi-Annual Pro', validity: 6, amount: 4200.00 },
+                    { id: '106', planName: 'Student Summer Pass', validity: 2, amount: 1500.00 },
+                    { id: '107', planName: 'Family Max Plan', validity: 12, amount: 12000.00 },
+                    { id: '108', planName: 'Trial Week', validity: 0.1, amount: 50.00 }
+                ];
+                savePlansToStorage(defaultPlans); // Save defaults so they persist
+                return defaultPlans;
+            }
+        }
+
+        function savePlansToStorage(plans) {
+            localStorage.setItem('plansData', JSON.stringify(plans));
+        }
+        
+        /**
+         * Sorts the currentPlans array based on the currentSort settings.
+         */
+        function sortPlans() {
+            const { key, direction } = currentSort;
+            
+            currentPlans.sort((a, b) => {
+                let aValue = a[key];
+                let bValue = b[key];
+
+                if (typeof aValue === 'string') {
+                    aValue = aValue.toLowerCase();
+                    bValue = bValue.toLowerCase();
+                }
+
+                if (aValue < bValue) {
+                    return direction === 'asc' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return direction === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+
+        /**
+         * Renders the plan table, applying search filter and current sort.
+         */
         function renderPlans(plans, searchTerm = '') {
             plansTableBody.innerHTML = '';
+            
+            sortPlans(); // Apply current sort before filtering/rendering
 
             const lowerSearchTerm = searchTerm.toLowerCase().trim();
             const filteredPlans = plans.filter(plan =>
-                plan.planName.toLowerCase().includes(lowerSearchTerm) ||
-                plan.validity.toString().includes(lowerSearchTerm) ||
-                plan.amount.toString().includes(lowerSearchTerm)
+                plan.planName && ( 
+                    plan.planName.toLowerCase().includes(lowerSearchTerm) ||
+                    (plan.validity && plan.validity.toString().includes(lowerSearchTerm)) ||
+                    (plan.amount && plan.amount.toString().includes(lowerSearchTerm))
+                )
             );
 
             if (filteredPlans.length === 0) {
-                const row = `<tr><td colspan="4" style="text-align: center; color: var(--color-table-header);">No plans found.</td></tr>`;
+                const row = `<tr><td colspan="3" style="text-align: center; color: var(--color-table-header);">No plans found.</td></tr>`;
                 plansTableBody.innerHTML = row;
                 return;
             }
 
             filteredPlans.forEach(plan => {
                 const row = document.createElement('tr');
-                // The onclick attributes now correctly call the functions defined in the global <script> block
+                
+                // Format amount to two decimal places and add currency prefix (Nu. for Bhutanese Ngultrum)
+                const amountDisplay = plan.amount ? `Nu.${parseFloat(plan.amount).toFixed(2)}` : 'N/A';
+                
+                // Display validity clearly
+                let validityText = 'N/A';
+                if (plan.validity) {
+                    if (plan.validity === 0.25) {
+                        validityText = '7 Days';
+                    } else if (plan.validity === 1) {
+                        validityText = '1 Month';
+                    } else if (plan.validity > 1 && plan.validity % 1 === 0) {
+                         validityText = `${plan.validity} Months`;
+                    } else {
+                        validityText = `${plan.validity} Month(s)`;
+                    }
+                }
+                
+                // Only showing Name, Validity, and Amount columns
                 row.innerHTML = `
-                    <td>${plan.planName}</td>
-                    <td>${plan.validity} ${plan.validity > 1 ? 'months' : 'month'}</td>
-                    <td>$${plan.amount.toFixed(2)}</td>
-                    <td class="action-buttons">
-                        <button onclick="handleEdit('${plan.id}')">Edit</button>
-                        <button onclick="handleDelete('${plan.id}', '${plan.planName}')">Delete</button>
-                    </td>
+                    <td>${plan.planName || 'No Name'}</td>
+                    <td>${validityText}</td>
+                    <td>${amountDisplay}</td>
                 `;
                 plansTableBody.appendChild(row);
             });
         }
-
-        // Expose a dedicated delete function to the global scope that has access to the imported functions
-        window.deletePlanFromModule = async function(planId, planName) {
-             try {
-                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'plans', planId));
-                 showMessage(`Plan '${planName}' deleted successfully!`);
-             } catch (error) {
-                 console.error("Error deleting plan:", error);
-                 showMessage("Failed to delete plan. Check console.", true);
-             }
-        }
-
+        
         // --- Event Handlers ---
-
-        async function handleAddPlan(event) {
-            event.preventDefault();
-
-            if (!userId) {
-                showMessage("Authentication not ready. Cannot add plan.", true);
-                return;
-            }
-
-            const newPlan = {
-                planName: planNameInput.value.trim(),
-                validity: parseInt(validityInput.value.trim()),
-                amount: parseFloat(amountInput.value.trim()),
-            };
-
-            if (isNaN(newPlan.validity) || newPlan.validity <= 0) {
-                showMessage("Validity must be a positive number.", true);
-                return;
-            }
-            if (isNaN(newPlan.amount) || newPlan.amount < 0) {
-                showMessage("Amount must be a non-negative number.", true);
-                return;
-            }
-
-            try {
-                await addDoc(getPlansCollectionRef(), newPlan);
-                showMessage(`Plan '${newPlan.planName}' added successfully!`);
-                addPlanForm.reset();
-            } catch (error) {
-                console.error("Error adding plan:", error);
-                showMessage("Failed to add plan. Check console for details.", true);
-            }
-        }
-
-        function handleCancelAdd() {
-            addPlanForm.reset();
-        }
 
         function handleSearch() {
             renderPlans(currentPlans, searchInput.value);
         }
+        
+        function handleLogout(e) {
+            e.preventDefault();
+            localStorage.removeItem('loggedInUser'); 
+            showMessage("Logged out successfully. Redirecting...", false);
+            // window.location.href = "login.html"; // Uncomment for actual redirection
+        }
+        
+        /**
+         * Handles table header clicks for sorting.
+         */
+        function handleSort(e) {
+            let targetHeader = e.currentTarget;
+            let key = targetHeader.dataset.sortKey;
+            
+            if (!key) return; // Not a sortable column
 
-        // --- Firebase Listener Setup ---
+            let currentDirection = targetHeader.dataset.sortDirection || 'none';
+            let newDirection;
 
-        function setupPlanListener() {
-            if (!db) {
-                console.error("Firestore not initialized.");
-                return;
+            // Determine the new sort direction
+            if (currentSort.key !== key) {
+                // Clicking a new column, default to ascending
+                newDirection = 'asc';
+            } else if (currentDirection === 'none' || currentDirection === 'desc') {
+                newDirection = 'asc';
+            } else {
+                newDirection = 'desc';
             }
 
-            onSnapshot(getPlansCollectionRef(), (querySnapshot) => {
-                const plans = [];
-                querySnapshot.forEach((doc) => {
-                    plans.push({ id: doc.id, ...doc.data() });
-                });
+            // Update global sort state
+            currentSort.key = key;
+            currentSort.direction = newDirection;
 
-                // Sort by validity (ascending) for better readability
-                plans.sort((a, b) => a.validity - b.validity);
-
-                currentPlans = plans;
-                renderPlans(currentPlans, searchInput.value);
-
-                if (plans.length === 0) {
-                    showMessage("No plans found in the database. Add one now!", false);
+            // Update header styles and icons
+            tableHeaders.forEach(th => {
+                th.classList.remove('sorted');
+                th.dataset.sortDirection = 'none';
+                const icon = th.querySelector('.sort-icon');
+                if (icon) {
+                    icon.className = 'fas fa-sort sort-icon'; // Reset icon
                 }
-            }, (error) => {
-                console.error("Error listening to plans data:", error);
-                showMessage("Failed to load plans data.", true);
+            });
+
+            // Set active header style and icon
+            targetHeader.classList.add('sorted');
+            targetHeader.dataset.sortDirection = newDirection;
+            const activeIcon = targetHeader.querySelector('.sort-icon');
+            if (activeIcon) {
+                if (newDirection === 'asc') {
+                    activeIcon.className = 'fas fa-sort-up sort-icon';
+                } else {
+                    activeIcon.className = 'fas fa-sort-down sort-icon';
+                }
+            }
+
+            // Re-render the table
+            renderPlans(currentPlans, searchInput.value);
+        }
+
+        // --- Initialization ---
+
+        function initApp() {
+            // 1. Check Auth and Load Profile (Now includes PFP render)
+            checkAuthenticationAndLoadProfile();
+            
+            // 2. Load Plans and Render
+            currentPlans = loadPlansFromStorage();
+            
+            // Manually set initial visual sort indicator (Plan Name is default asc)
+            const defaultHeader = document.querySelector(`[data-sort-key="${currentSort.key}"]`);
+            if (defaultHeader) {
+                defaultHeader.classList.add('sorted');
+                defaultHeader.dataset.sortDirection = currentSort.direction;
+                defaultHeader.querySelector('.sort-icon').className = 'fas fa-sort-up sort-icon';
+            }
+
+            renderPlans(currentPlans);
+            
+            // 3. Setup Listeners
+            searchInput.addEventListener('input', handleSearch);
+            logoutButton.addEventListener('click', handleLogout); 
+            tableHeaders.forEach(header => {
+                header.addEventListener('click', handleSort);
             });
         }
 
-        // --- Firebase Initialization ---
-        async function initFirebaseAndAuth() {
-            if (Object.keys(firebaseConfig).length === 0) {
-                console.error("Firebase config is missing.");
-                // Use a default state for display purposes if config is missing
-                document.getElementById('plans-table-body').innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">FIREBASE CONFIG MISSING. Cannot load data.</td></tr>';
-                return;
-            }
-
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                // Make db available to global scope for deletion (used by the global <script> block)
-                window.globalDb = db;
-                window.globalAppId = appId;
-
-
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        // Update sidebar for context
-                        document.getElementById('sidebar-admin-name').textContent = 'Admin ' + userId.substring(0, 5);
-                        document.getElementById('sidebar-admin-email').textContent = user.email || 'authenticated@user.com';
-                        setupPlanListener();
-                    } else {
-                        console.log("Not authenticated. Using anonymous/default data.");
-                        userId = crypto.randomUUID();
-                        document.getElementById('sidebar-admin-name').textContent = 'Guest Admin';
-                        // Still run listener even if anonymous, as plan data is public
-                        setupPlanListener();
-                    }
-                });
-
-            } catch (error) {
-                console.error("Firebase initialization or authentication failed:", error);
-                showMessage("System Error: Failed to connect to database.", true);
-            }
-        }
-
-        // --- Setup Event Listeners ---
-        addPlanForm.addEventListener('submit', handleAddPlan);
-        btnCancelAdd.addEventListener('click', handleCancelAdd);
-        searchInput.addEventListener('input', handleSearch);
-
-        window.onload = initFirebaseAndAuth;
+        window.onload = initApp;
 
     </script>
 </body>

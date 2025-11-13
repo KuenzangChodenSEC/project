@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Payment</title>
+    <title>View Payments</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -12,15 +12,17 @@
             --color-dark-sidebar: #222;
             --color-light-bg: #f5f5f5;
             --color-card-bg: #fff;
-            --color-accent: #6f5f90; 
+            --color-accent: #6f5f90;
             --color-text-light: #aaa;
             --color-text-dark: #333;
-            --color-active: #40384a; 
+            --color-active: #40384a;
             --color-border: #e0e0e0;
             --color-table-bg: #40384a; /* Dark background for Table card */
             --color-table-header: #8a819b;
             --color-table-row: #f0f0f0;
             --color-paid-button: #5cb85c; /* Green for Paid */
+            --color-unpaid-button: #d9534f; /* Red for Unpaid/Pending */
+            --color-confirm-button: #6f5f90;
         }
 
         * {
@@ -35,7 +37,7 @@
             min-height: 100vh;
             background-color: var(--color-light-bg);
             color: var(--color-text-dark);
-            overflow: hidden; 
+            /* MODIFICATION: Removed overflow: hidden; to allow page scrolling */
         }
 
         /* ----------------------- */
@@ -52,6 +54,8 @@
             height: 100%;
             padding: 20px 0;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            z-index: 50;
+            overflow-y: auto; /* Allow sidebar content to scroll if too long */
         }
 
         .dashboard-header {
@@ -74,7 +78,7 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background-color: #333; 
+            background-color:#333 ; /* Accent color for avatar bg */
             border: 2px solid #fff;
             margin-bottom: 10px;
             position: relative;
@@ -87,6 +91,12 @@
             transform: translate(-50%, -50%);
             font-size: 30px;
             color: #fff;
+            font-weight: 700;
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
         }
 
         .admin-name {
@@ -106,7 +116,6 @@
             flex-grow: 1;
         }
 
-        /* Removed underline from links */
         .nav-link {
             display: flex;
             align-items: center;
@@ -116,13 +125,13 @@
             color: var(--color-text-light);
             cursor: pointer;
             transition: background-color 0.3s, color 0.3s;
-            text-decoration: none; /* Fixed */
+            text-decoration: none;
         }
 
         .nav-links-container a:not(.active) {
-            padding-left: 20px; 
+            padding-left: 20px;
         }
-        
+
         .nav-link i {
             width: 20px;
             text-align: center;
@@ -135,20 +144,18 @@
             color: #fff;
         }
 
-        /* Smooth Active State */
         .nav-link.active {
             background-color: var(--color-active);
             color: #fff;
-            border-left: 5px solid var(--color-accent); 
-            padding-left: 15px; /* Compensate for the border-left */
-            transition: background-color 0.3s, color 0.3s, border-left 0.3s, padding 0.3s; /* Fixed */
+            border-left: 5px solid var(--color-accent);
+            padding-left: 15px;
+            transition: background-color 0.3s, color 0.3s, border-left 0.3s, padding 0.3s;
         }
-        
+
         .nav-link.active i {
             color: #fff;
         }
-        
-        /* Adjusted the border for the second link since registration is removed */
+
         .nav-links-container > a:nth-child(2) { border-top: 1px solid var(--color-dark-sidebar); padding-top: 15px; }
         .nav-links-container > a:last-child { border-bottom: 1px solid var(--color-dark-sidebar); padding-bottom: 15px; margin-bottom: 20px; }
 
@@ -161,7 +168,6 @@
             border-top: 1px solid var(--color-dark-sidebar);
         }
 
-        /* Removed underline from logout link */
         .logout-link {
             display: flex;
             align-items: center;
@@ -170,7 +176,7 @@
             color: var(--color-text-light);
             cursor: pointer;
             transition: color 0.3s;
-            text-decoration: none; /* Fixed */
+            text-decoration: none;
         }
 
         .logout-link i {
@@ -186,7 +192,7 @@
             height: 30px;
             border: 1px solid #fff;
             border-radius: 50%;
-            background-color: #333; 
+            background-color: #333;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -198,14 +204,15 @@
         /* ----------------------- */
         /* 2. Main Content (Payment View) */
         /* ----------------------- */
-        
+
         .main-content {
-            margin-left: 250px; 
+            margin-left: 250px;
             flex-grow: 1;
             padding: 40px;
-            overflow-y: auto; 
-            background-color: var(--color-light-bg); 
+            /* MODIFICATION: Remove overflow-y: auto; here to allow body/html to scroll instead */
+            background-color: var(--color-light-bg);
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            min-height: 100vh; /* Ensure it takes up full viewport height */
         }
 
         .payment-container {
@@ -231,7 +238,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .payment-list-card {
             background-color: var(--color-table-bg);
             color: var(--color-table-row);
@@ -266,8 +273,15 @@
             padding: 5px;
             border-radius: 4px;
             color: var(--color-table-row);
+            /* FIX 1: Remove default dropdown arrow for better dark mode look */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding-right: 25px; /* Make space for the icon if needed */
         }
-        
+        /* Optional: Add custom arrow indicator if appearance: none is used (not implemented here for simplicity) */
+
+
         .search-box {
             position: relative;
         }
@@ -277,7 +291,7 @@
             border-radius: 6px;
             border: 1px solid var(--color-table-header);
             background-color: #333;
-            color: var(--color-form-text);
+            color: var(--color-table-row);
             font-size: 14px;
             width: 250px;
         }
@@ -303,7 +317,7 @@
             padding: 10px 15px;
             border-bottom: 1px solid #555;
         }
-        
+
         .payment-table tbody tr {
             border-bottom: 1px solid #3d3d3d;
             transition: background-color 0.2s;
@@ -324,7 +338,6 @@
         }
 
         .action-button {
-            background-color: var(--color-paid-button);
             color: #fff;
             border: none;
             padding: 6px 15px;
@@ -334,11 +347,15 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-        
-        .action-button.unpaid {
-            background-color: #d9534f; /* Red for Unpaid/Pending */
+
+        .action-button.paid {
+            background-color: var(--color-paid-button);
         }
-        
+
+        .action-button.unpaid {
+            background-color: var(--color-unpaid-button);
+        }
+
         .action-button:hover {
             opacity: 0.9;
         }
@@ -368,10 +385,75 @@
             transform: translateY(0);
         }
 
+        /* Custom Confirmation Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 90%;
+            color: var(--color-text-dark);
+            text-align: center;
+        }
+
+        .modal-content h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--color-accent);
+        }
+
+        .modal-content p {
+            margin-bottom: 25px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .modal-actions button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .modal-actions .confirm-btn {
+            background-color: var(--color-confirm-button);
+            color: #fff;
+        }
+        .modal-actions .confirm-btn:hover {
+            background-color: #5d4f79;
+        }
+
+        .modal-actions .cancel-btn {
+            background-color: var(--color-border);
+            color: var(--color-text-dark);
+        }
+        .modal-actions .cancel-btn:hover {
+            background-color: #ccc;
+        }
+
+
         /* Responsive Design */
         @media (max-width: 1024px) {
             .sidebar { width: 70px; }
-            .main-content { margin-left: 70px; }
+            .main-content { margin-left: 70px; padding: 30px 20px; }
+            /* Hide non-essential text elements */
             .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span, .bottom-logo { display: none; }
             .admin-profile-sidebar { border-bottom: none; padding-bottom: 0; }
             .avatar { margin-bottom: 20px; }
@@ -383,36 +465,80 @@
             /* Adjust mobile active link */
             .nav-link.active {
                 border-left: none;
-                border-top: 5px solid var(--color-accent);
+                /* MODIFICATION: Use border-right on small screens when fixed sidebar is on the left */
+                border-top: 5px solid var(--color-accent); 
                 padding-top: 10px;
                 padding-bottom: 10px;
+                padding-left: 0; /* Reset padding-left from desktop active style */
             }
             .nav-links-container a:not(.active) {
-                padding-left: 0; 
+                padding-left: 0;
             }
         }
-        
+
         @media (max-width: 768px) {
-            .main-content { padding: 20px; }
+            .main-content { padding: 20px; margin-left: 0; }
+            .sidebar { 
+                width: 100%; 
+                height: auto; 
+                position: relative; /* Sidebar is no longer fixed on top */
+                flex-direction: row; 
+                justify-content: space-around;
+                padding: 10px 0;
+                border-bottom: 1px solid var(--color-dark-sidebar);
+            }
+            .dashboard-header, .admin-profile-sidebar, .logout-section, .nav-links-container > a:nth-child(2), .nav-links-container > a:last-child {
+                display: none; /* Hide profile and text links in mobile-style bottom/top bar */
+            }
+
+            .nav-links-container {
+                display: flex;
+                flex-direction: row;
+                flex-grow: 1;
+                justify-content: space-around;
+            }
+            
+            .nav-link {
+                padding: 10px 0;
+                width: 20%; /* Distribute space among links */
+            }
+
             .list-controls { flex-direction: column; gap: 15px; align-items: flex-start; }
             .payment-table th, .payment-table td { padding: 10px; font-size: 12px; }
             .search-box input { width: 100%; }
+            
+            /* Allow table content to scroll horizontally if needed - IMPORTANT for responsiveness */
+            .table-responsive { overflow-x: auto; }
+            .payment-table { min-width: 550px; } /* Ensure minimum width for scrolling */
         }
     </style>
 </head>
-<body>
+
+<body onload="loadUserData()">
 
     <div id="messageBox"></div>
 
+    <div id="confirmationModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Confirm Action</h3>
+            <p id="modalMessage">Are you sure you want to perform this action?</p>
+            <div class="modal-actions">
+                <button class="cancel-btn">Cancel</button>
+                <button class="confirm-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
     <aside class="sidebar">
         <div class="dashboard-header">Payment</div>
-        
+
         <div class="admin-profile-sidebar">
             <div class="avatar">
-                <div class="avatar-inner"><i class="fas fa-user"></i></div>
+                <div class="avatar-inner" id="sidebar-admin-avatar-inner">
+                    <i class="fas fa-user"></i> </div>
             </div>
-            <div class="admin-name" id="sidebar-admin-name">User Name</div>
-            <div class="admin-email" id="sidebar-admin-email">user@example.com</div>
+            <div class="admin-name" id="sidebar-admin-name">Loading...</div>
+            <div class="admin-email" id="sidebar-admin-email">Loading...</div>
         </div>
 
         <div class="nav-links-container">
@@ -424,7 +550,7 @@
                 <i class="fas fa-user-circle"></i>
                 <span>User Profile</span>
             </a>
-            
+
             <a class="nav-link" href="viewplan.html">
                 <i class="fas fa-clipboard-list"></i>
                 <span>Plan</span>
@@ -444,7 +570,7 @@
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" href="index.html">
+            <a class="logout-link" href="index.html" id="logout-button"> 
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -455,10 +581,10 @@
     <div class="main-content">
         <h1 class="page-header">View Payments</h1>
         <div class="payment-container">
-            
+
             <div class="plan-card payment-list-card">
                 <div class="card-title">User Payments</div>
-                
+
                 <div class="list-controls">
                     <div class="show-entries">
                         <label for="show-entries">Show Entities</label>
@@ -495,26 +621,35 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- Global Firebase and Config ---
-        let db;
-        let auth;
-        let userId = '';
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+    <script>
+        // --- Mock Data Setup (Used to initialize LocalStorage if empty) ---
+        const MOCK_MEMBERS_DATA = [
+            { id: '1a2b3c4d5e', name: 'Jigme Tenzin', plan: 'monthly', price: 1500.00, paymentStatus: 'Paid' },
+            { id: '2b3c4d5e6f', name: 'Dechen Wangmo', plan: 'yearly', price: 15000.00, paymentStatus: 'Pending' },
+            { id: '3c4d5e6f7g', name: 'Tashi Phuntsho', plan: 'weekly', price: 400.00, paymentStatus: 'Paid' },
+            { id: '4d5e6f7g8h', name: 'Kinley Dorji', plan: 'biannually', price: 7500.00, paymentStatus: 'Pending' },
+            { id: '5e6f7g8h9i', name: 'Sonam Choden', plan: 'monthly', price: 1500.00, paymentStatus: 'Paid' },
+            { id: '6f7g8h9i0j', name: 'Pema Lhaki', plan: 'weekly', price: 400.00, paymentStatus: 'Pending' },
+            { id: '7g8h9i0j1k', name: 'Dema Yangzom', plan: 'yearly', price: 15000.00, paymentStatus: 'Paid' },
+            { id: '8h9i0j1k2l', name: 'Chimi Dema', plan: 'monthly', price: 1500.00, paymentStatus: 'Pending' }
+        ];
         
-        setLogLevel('Debug');
-
         // --- UI Element References ---
         const paymentTableBody = document.getElementById('payment-table-body');
         const searchInput = document.getElementById('search-input');
+        const showEntriesSelect = document.getElementById('show-entries');
+        const modalOverlay = document.getElementById('confirmationModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalConfirmBtn = modalOverlay.querySelector('.confirm-btn');
+        const modalCancelBtn = modalOverlay.querySelector('.cancel-btn');
+        const nameElement = document.getElementById('sidebar-admin-name');
+        const emailElement = document.getElementById('sidebar-admin-email');
+        // UPDATED: Use the new ID for the avatar container
+        const avatarInnerElement = document.getElementById('sidebar-admin-avatar-inner'); 
+        const logoutButton = document.getElementById('logout-button');
 
-        let currentPayments = []; // Local cache for filtering/sorting
+        let currentPayments = []; 
+        let modalResolver = null; 
 
         // --- Utility Function for Feedback ---
         function showMessage(message, isError = false) {
@@ -526,57 +661,172 @@
                 messageBox.classList.remove('show');
             }, 3000);
         }
+
+        // --- Custom Modal Handler (Replaces confirm()) ---
+        function showConfirmationModal(message) {
+            modalMessage.innerHTML = message;
+            modalOverlay.style.display = 'flex';
+
+            return new Promise((resolve) => {
+                modalResolver = resolve;
+            });
+        }
+
+
+        // --- LOCAL STORAGE DATA HANDLING ---
+        function loadMemberData() {
+            const storedData = localStorage.getItem('mockGymMembers');
+            if (!storedData) {
+                // Initialize local storage with mock data if not present
+                localStorage.setItem('mockGymMembers', JSON.stringify(MOCK_MEMBERS_DATA));
+                return MOCK_MEMBERS_DATA;
+            } else {
+                return JSON.parse(storedData);
+            }
+        }
+
+        function updateMemberPayment(memberId, newStatus) {
+            const members = loadMemberData();
+            const memberIndex = members.findIndex(m => m.id === memberId);
+
+            if (memberIndex > -1) {
+                members[memberIndex].paymentStatus = newStatus;
+                localStorage.setItem('mockGymMembers', JSON.stringify(members));
+                return true;
+            } else {
+                throw new Error("Member not found in local storage.");
+            }
+        }
         
-        // --- Firestore References ---
-        // Path: /artifacts/{appId}/public/data/members (Reusing member data for payment view)
-        function getMembersCollectionRef() {
-            return collection(db, 'artifacts', appId, 'public', 'data', 'members');
+        // --- AUTHENTICATION & PROFILE FUNCTIONS ---
+
+        function getInitials(name) {
+            if (!name || typeof name !== 'string') {
+                return 'A'; 
+            }
+            const parts = name.trim().split(/\s+/).filter(Boolean);
+            
+            if (parts.length > 1) {
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            } else if (parts.length === 1) {
+                return parts[0][0].toUpperCase();
+            } else {
+                return 'A';
+            }
+        }
+
+        function checkAuthenticationAndLoadProfile() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            // NEW: Retrieve the stored profile picture data
+            const profilePictureData = localStorage.getItem('profilePictureData');
+
+            if (!loggedInUser) {
+                alert("You must be logged in to view this page.");
+                window.location.href = 'login.html'; 
+                return false;
+            }
+
+            try {
+                const user = JSON.parse(loggedInUser);
+                const userName = user.name || 'Admin User';
+                const userEmail = user.email || 'admin@mockgym.com';
+
+                // Update text elements
+                nameElement.textContent = userName;
+                emailElement.textContent = userEmail;
+
+                // NEW: Logic to display either the image or the initials
+                if (profilePictureData) {
+                    // Use the stored image (Data URI or URL)
+                    avatarInnerElement.innerHTML = `<img src="${profilePictureData}" alt="${userName[0]}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                    avatarInnerElement.style.fontSize = '0'; // Hide text initials size
+                    avatarInnerElement.style.padding = '0';
+                } else {
+                    // Fallback to initials
+                    const initials = getInitials(userName);
+                    avatarInnerElement.innerHTML = initials; 
+                    avatarInnerElement.style.fontSize = '30px'; 
+                    avatarInnerElement.style.padding = '5px';
+                }
+
+                return true;
+            } catch (error) {
+                console.error("Error parsing user data:", error);
+                localStorage.removeItem('loggedInUser'); 
+                alert("Session data invalid. Please log in again.");
+                window.location.href = 'login.html';
+                return false;
+            }
+        }
+        
+        function handleLogout(event) {
+            event.preventDefault();
+            localStorage.removeItem('loggedInUser');
+            // OPTIONAL: Also remove the profile picture data on logout
+            localStorage.removeItem('profilePictureData'); 
+            window.location.href = 'login.html'; 
         }
 
         // --- Data Rendering and Filtering ---
-
-        function renderPayments(members, searchTerm = '') {
+        function renderPayments(members, searchTerm = '', entryLimit = Infinity) {
             paymentTableBody.innerHTML = '';
-            
+
             const lowerSearchTerm = searchTerm.toLowerCase().trim();
-            
-            const filteredMembers = members.filter(member => 
+            const limit = parseInt(entryLimit, 10);
+
+            // 1. Filter: Apply search filter
+            const filteredMembers = members.filter(member =>
                 member.name.toLowerCase().includes(lowerSearchTerm) ||
-                member.id.toLowerCase().includes(lowerSearchTerm) ||
-                member.plan.toLowerCase().includes(lowerSearchTerm)
+                (member.id || '').toLowerCase().includes(lowerSearchTerm) ||
+                (member.plan || '').toLowerCase().includes(lowerSearchTerm) ||
+                (member.paymentStatus || '').toLowerCase().includes(lowerSearchTerm)
             );
 
-            if (filteredMembers.length === 0) {
+            // 2. Sort: Apply sort by paymentStatus (Pending first), then Name
+            filteredMembers.sort((a, b) => {
+                const statusA = a.paymentStatus || 'Pending';
+                const statusB = b.paymentStatus || 'Pending';
+                // Custom sort: Pending comes before Paid
+                if (statusA === 'Pending' && statusB !== 'Pending') return -1;
+                if (statusA !== 'Pending' && statusB === 'Pending') return 1;
+                // Secondary sort by name
+                return a.name.localeCompare(b.name);
+            });
+            
+            // 3. Limit: Apply entry limit
+            const finalMembers = limit !== Infinity ? filteredMembers.slice(0, limit) : filteredMembers;
+
+
+            if (finalMembers.length === 0) {
                 const row = `<tr><td colspan="5" style="text-align: center; color: var(--color-table-header);">No members found matching search criteria.</td></tr>`;
                 paymentTableBody.innerHTML = row;
                 return;
             }
-            
-            // Map plan names to display names and currency (e.g., 'monthly' -> '1 month')
+
             const planDisplayMap = {
-                'weekly': '1 week', 
+                'weekly': '1 week',
                 'monthly': '1 month',
                 'biannually': '6 months',
                 'yearly': '1 year'
             };
 
 
-            filteredMembers.forEach((member, index) => {
-                // Generate a unique, consistent Member ID for display
-                const memberId = member.id ? member.id.substring(0, 8).toUpperCase() : `SFM${(index + 101).toString().slice(1)}`;
+            finalMembers.forEach((member) => {
+                const memberIdDisplay = (member.id ? member.id.substring(0, 8).toUpperCase() : 'N/A').padEnd(8, '0');
                 const planDisplay = planDisplayMap[member.plan] || member.plan;
-                const isPaid = member.paymentStatus === 'Paid';
-                const buttonClass = isPaid ? 'action-button' : 'action-button unpaid';
-                const buttonText = isPaid ? 'Paid' : 'Unpaid';
-                
+                const isPaid = (member.paymentStatus || 'Pending') === 'Paid';
+                const buttonClass = isPaid ? 'action-button paid' : 'action-button unpaid';
+                const buttonText = isPaid ? 'Paid' : 'Pending';
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${member.name}</td>
-                    <td>${memberId}</td>
+                    <td>${memberIdDisplay}</td>
                     <td>${planDisplay}</td>
                     <td>Nu. ${member.price ? member.price.toFixed(2) : 'N/A'}</td>
                     <td>
-                        <button class="${buttonClass}" onclick="togglePaymentStatus('${member.id}', '${member.name}', ${isPaid})">
+                        <button class="${buttonClass}"
+                                onclick="window.handlePaymentToggle('${member.id}', '${member.name}', ${isPaid})">
                             ${buttonText}
                         </button>
                     </td>
@@ -584,119 +834,92 @@
                 paymentTableBody.appendChild(row);
             });
         }
-        
-        // Define global handler for table button
-        window.togglePaymentStatus = async function(memberId, memberName, isCurrentlyPaid) {
-            if (!db) {
-                showMessage("Database connection error.", true);
-                return;
-            }
-            
-            // Toggle the status
-            const newStatus = isCurrentlyPaid ? 'Pending' : 'Paid';
-            const confirmationMessage = `Are you sure you want to set ${memberName}'s status to '${newStatus}'?`;
 
-            // IMPORTANT: Replace confirm() with a custom modal in a production app
-            if (!confirm(confirmationMessage)) {
+        // Define global handler for table button
+        window.handlePaymentToggle = async function(memberId, memberName, isCurrentlyPaid) {
+            const newStatus = isCurrentlyPaid ? 'Pending' : 'Paid';
+            const confirmationMessage = `Are you sure you want to set **${memberName}**'s payment status to **'${newStatus}'**?`;
+
+            const confirmed = await showConfirmationModal(confirmationMessage);
+
+            if (!confirmed) {
+                showMessage(`Action canceled for ${memberName}.`, true);
                 return;
             }
 
             try {
-                const memberRef = doc(db, 'artifacts', appId, 'public', 'data', 'members', memberId);
-                await updateDoc(memberRef, {
-                    paymentStatus: newStatus
-                });
-                showMessage(`Payment status for ${memberName} updated to ${newStatus}.`);
+                updateMemberPayment(memberId, newStatus);
+                showMessage(`Payment status for ${memberName} successfully updated to ${newStatus}.`);
+                
+                // Re-render table after update
+                const updatedMembers = loadMemberData();
+                currentPayments = updatedMembers;
+                handleSearch(); 
+
             } catch (error) {
                 console.error("Error updating payment status:", error);
-                showMessage("Failed to update payment status.", true);
+                showMessage(`Failed to update payment status: ${error.message}`, true);
             }
         }
-
 
         // --- Event Handlers ---
-        
         function handleSearch() {
-            renderPayments(currentPayments, searchInput.value);
+            const limit = showEntriesSelect.value;
+            renderPayments(currentPayments, searchInput.value, limit);
         }
 
-        // --- Firebase Listener Setup ---
-
-        function setupPaymentListener() {
-            if (!db) {
-                console.error("Firestore not initialized.");
-                return;
+        modalConfirmBtn.addEventListener('click', () => {
+            if (modalResolver) {
+                modalResolver(true);
+                modalOverlay.style.display = 'none';
             }
-            
-            // Listen to the members collection (where registration data is stored)
-            onSnapshot(getMembersCollectionRef(), (querySnapshot) => {
-                const members = [];
-                querySnapshot.forEach((doc) => {
-                    // Combine document ID with data and default paymentStatus if missing
-                    const data = doc.data();
-                    members.push({ 
-                        id: doc.id, 
-                        ...data,
-                        // Ensure paymentStatus exists, default to 'Pending'
-                        paymentStatus: data.paymentStatus || 'Pending' 
-                    });
-                });
-                
+        });
+
+        modalCancelBtn.addEventListener('click', () => {
+            if (modalResolver) {
+                modalResolver(false);
+                modalOverlay.style.display = 'none';
+            }
+        });
+
+        // --- Initialization ---
+        function initApp() {
+            // 1. Check Auth and Load Profile (including the new image/initials logic)
+            if (!checkAuthenticationAndLoadProfile()) {
+                return; 
+            }
+
+            // 2. Load and render payment data
+            try {
+                const members = loadMemberData();
                 currentPayments = members;
-                renderPayments(currentPayments, searchInput.value);
+                renderPayments(currentPayments, searchInput.value, showEntriesSelect.value); 
 
                 if (members.length === 0) {
-                    paymentTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No members found in the database.</td></tr>';
+                    paymentTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--color-table-header);">No members found in the database.</td></tr>';
                 }
-            }, (error) => {
-                console.error("Error listening to members data:", error);
-                showMessage("Failed to load payment data.", true);
-            });
-        }
-        
-        // --- Firebase Initialization ---
-        async function initFirebaseAndAuth() {
-            if (Object.keys(firebaseConfig).length === 0) {
-                console.error("Firebase config is missing.");
-                paymentTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">FIREBASE CONFIG MISSING. Cannot load data.</td></tr>';
-                return;
+            } catch (error) {
+                console.error("Error loading payment data:", error);
+                showMessage("System Error: Failed to load data from local storage.", true);
+                paymentTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Failed to load data.</td></tr>';
             }
             
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
+            // 3. Setup event listeners
+            searchInput.addEventListener('input', handleSearch);
+            logoutButton.addEventListener('click', handleLogout); 
+            showEntriesSelect.addEventListener('change', handleSearch);
+            
+            // NEW: Add storage event listener for cross-page updates
+            window.addEventListener('storage', (event) => {
+                // If the profile picture data changes in another tab/window
+                if (event.key === 'profilePictureData') {
+                    // Re-run the profile loading function to update the sidebar avatar
+                    checkAuthenticationAndLoadProfile();
                 }
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        document.getElementById('sidebar-admin-name').textContent = 'User ' + userId.substring(0, 5);
-                        document.getElementById('sidebar-admin-email').textContent = user.email || 'authenticated@user.com';
-                        setupPaymentListener();
-                    } else {
-                        console.log("Not authenticated. Using anonymous/default data.");
-                        userId = crypto.randomUUID();
-                        document.getElementById('sidebar-admin-name').textContent = 'Guest User';
-                        setupPaymentListener(); 
-                    }
-                });
-
-            } catch (error) {
-                console.error("Firebase initialization or authentication failed:", error);
-                showMessage("System Error: Failed to connect to database.", true);
-            }
+            });
         }
 
-        // --- Setup Event Listeners ---
-        searchInput.addEventListener('input', handleSearch);
-        
-        window.onload = initFirebaseAndAuth;
+        window.onload = initApp;
 
     </script>
 </body>

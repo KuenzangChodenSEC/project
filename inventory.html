@@ -21,6 +21,8 @@
             --color-table-header: #8a819b;
             --color-table-row: #f0f0f0;
             --color-edit-button: #6f5f90;
+            --sidebar-width-full: 250px; /* Added Variable */
+            --sidebar-width-collapsed: 70px; /* Added Variable */
         }
 
         * {
@@ -31,27 +33,44 @@
         }
 
         body {
+            /* Use flex to separate sidebar and main content */
             display: flex;
             min-height: 100vh;
             background-color: var(--color-light-bg);
             color: var(--color-text-dark);
+            /* CRUCIAL: Prevent body scrolling, let main-content handle it */
             overflow: hidden; 
         }
 
         /* ----------------------- */
-        /* 1. Sidebar (Reused Styles) */
+        /* 1. Sidebar */
         /* ----------------------- */
 
         .sidebar {
-            width: 250px;
+            width: var(--sidebar-width-full); /* Use variable */
             background-color: var(--color-dark-bg);
             color: var(--color-text-light);
             display: flex;
             flex-direction: column;
+            /* Key styles for fixed, full-height, scrollable sidebar */
             position: fixed;
-            height: 100%;
+            height: 100vh; /* Fixed height for the container */
             padding: 20px 0;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            overflow-y: auto; /* Scrollable if nav links overflow */
+        }
+        
+        /* Optional: Scrollbar styling */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--color-active);
+            border-radius: 10px;
+        }
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--color-accent);
         }
 
         .dashboard-header {
@@ -59,6 +78,7 @@
             font-size: 18px;
             font-weight: 600;
             color: #fff;
+            flex-shrink: 0;
         }
 
         .admin-profile-sidebar {
@@ -68,6 +88,7 @@
             padding: 20px 0 30px;
             border-bottom: 1px solid var(--color-dark-sidebar);
             margin-bottom: 20px;
+            flex-shrink: 0;
         }
 
         .avatar {
@@ -78,15 +99,30 @@
             border: 2px solid #fff;
             margin-bottom: 10px;
             position: relative;
+            overflow: hidden; /* Crucial for clipping the profile image */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* New: Style for the actual profile image */
+        .profile-picture {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
         }
 
         .avatar-inner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            /* Used for initials when no image is present */
             font-size: 30px;
             color: #fff;
+            font-weight: 700; 
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
         }
 
         .admin-name {
@@ -106,7 +142,6 @@
             flex-grow: 1;
         }
 
-        /* --- START: Custom modifications for smooth transition and no underline --- */
         .nav-link {
             display: flex;
             align-items: center;
@@ -115,10 +150,9 @@
             font-weight: 500;
             color: var(--color-text-light);
             cursor: pointer;
-            text-decoration: none; /* Removed underline */
-            transition: background-color 0.3s ease, color 0.3s; /* Added smooth transition for background */
+            text-decoration: none; 
+            transition: background-color 0.3s ease, color 0.3s; 
         }
-        /* --- END: Custom modifications --- */
 
         .nav-link i {
             width: 20px;
@@ -141,9 +175,9 @@
             color: #fff;
         }
         
-        /* Adjusted the border for the second link since registration is removed */
+        /* Updated: Adjusting borders based on the current 6 links */
         .nav-links-container > a:nth-child(2) { border-top: 1px solid var(--color-dark-sidebar); padding-top: 15px; }
-        .nav-links-container > a:last-child { border-bottom: 1px solid var(--color-dark-sidebar); padding-bottom: 15px; margin-bottom: 20px; }
+        .nav-links-container > a:nth-child(6) { border-bottom: 1px solid var(--color-dark-sidebar); padding-bottom: 15px; margin-bottom: 20px; }
 
 
         .logout-section {
@@ -152,9 +186,9 @@
             justify-content: space-between;
             align-items: center;
             border-top: 1px solid var(--color-dark-sidebar);
+            flex-shrink: 0;
         }
 
-        /* --- START: Custom modifications for logout link --- */
         .logout-link {
             display: flex;
             align-items: center;
@@ -162,10 +196,9 @@
             font-weight: 500;
             color: var(--color-text-light);
             cursor: pointer;
-            text-decoration: none; /* Removed underline */
+            text-decoration: none; 
             transition: color 0.3s;
         }
-        /* --- END: Custom modifications for logout link --- */
 
         .logout-link i {
             margin-right: 10px;
@@ -190,28 +223,32 @@
         }
 
         /* ----------------------- */
-        /* 2. Main Content (Inventory) */
+        /* 2. Main Content (Inventory) - SCROLLABLE AREA */
         /* ----------------------- */
         
         .main-content {
-            margin-left: 250px; 
+            /* Key styles for main content scrolling */
+            margin-left: var(--sidebar-width-full); 
+            width: calc(100% - var(--sidebar-width-full));
             flex-grow: 1;
             padding: 40px;
-            overflow-y: auto; 
             background-color: var(--color-light-bg); 
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto; 
+            height: 100vh; /* Fixed height for the container to enable scrolling */
         }
 
         .inventory-container {
             max-width: 900px;
+            margin: 0 auto; /* Centering content within the main area */
+            width: 100%;
             background-color: var(--color-light-bg);
             padding: 0;
             border-radius: 10px;
             display: flex;
             flex-direction: column;
             gap: 30px;
-            position: relative; /* For the fixed button */
-            min-height: calc(100vh - 80px); /* Adjust height for scrolling content */
+            position: relative; 
         }
 
         .page-header {
@@ -268,6 +305,8 @@
         
         .search-box {
             position: relative;
+            display: flex; 
+            align-items: center;
         }
 
         .search-box label {
@@ -277,7 +316,7 @@
         }
 
         .search-box input {
-            padding: 8px 40px 8px 15px; /* Padding for icon */
+            padding: 8px 40px 8px 15px; 
             border-radius: 6px;
             border: 1px solid var(--color-table-header);
             background-color: #333;
@@ -293,9 +332,15 @@
             transform: translateY(-50%);
             color: var(--color-table-header);
         }
+        
+        .table-responsive {
+            overflow-x: auto; 
+            max-width: 100%;
+        }
 
         .equipment-table {
             width: 100%;
+            min-width: 600px; 
             border-collapse: collapse;
         }
 
@@ -306,6 +351,7 @@
             text-align: left;
             padding: 10px 15px;
             border-bottom: 1px solid #555;
+            cursor: pointer; /* Added for simulated sorting */
         }
         
         .equipment-table tbody tr {
@@ -325,6 +371,10 @@
         .sort-icon {
             margin-left: 5px;
             color: var(--color-table-header);
+        }
+        
+        .equipment-table thead th.sorted .sort-icon {
+            color: #fff;
         }
 
         .status-active {
@@ -352,26 +402,6 @@
             background-color: #564c70;
         }
 
-        /* Add Equipment Button (Floating) */
-        #add-equipment-btn {
-            position: absolute;
-            bottom: 0px; 
-            right: 0px; 
-            background-color: var(--color-accent);
-            color: #fff;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s;
-        }
-
-        #add-equipment-btn:hover {
-            background-color: #564c70;
-        }
 
         /* Message/Modal styles */
         #messageBox {
@@ -398,27 +428,117 @@
         }
 
 
-        /* Responsive Design */
+        /* ----------------------- */
+        /* 3. Responsive Design */
+        /* ----------------------- */
+
+        /* Tablet/Collapsed Sidebar View (Max 1024px) */
         @media (max-width: 1024px) {
-            .sidebar { width: 70px; }
-            .main-content { margin-left: 70px; }
-            .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span, .bottom-logo { display: none; }
-            .admin-profile-sidebar { border-bottom: none; padding-bottom: 0; }
-            .avatar { margin-bottom: 20px; }
-            .nav-link { justify-content: center; padding: 15px 0; }
-            .nav-link i { margin-right: 0; }
-            .logout-section { justify-content: center; }
-            .logout-link i { margin-right: 0; }
+            .sidebar { 
+                width: var(--sidebar-width-collapsed); 
+            }
+            .main-content { 
+                margin-left: var(--sidebar-width-collapsed); 
+                width: calc(100% - var(--sidebar-width-collapsed));
+                padding: 30px;
+            }
+            /* Hide text elements */
+            .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span, .bottom-logo { 
+                display: none; 
+            }
+            .admin-profile-sidebar { 
+                border-bottom: none; 
+                padding-bottom: 0; 
+            }
+            .avatar { 
+                margin-bottom: 20px; 
+            }
+            .nav-link { 
+                justify-content: center; 
+                padding: 15px 0; 
+            }
+            .nav-link i { 
+                margin-right: 0; 
+            }
+            .logout-section { 
+                justify-content: center; 
+                padding: 15px 0;
+            }
+            .logout-link i { 
+                margin-right: 0; 
+            }
         }
         
+        /* Mobile View (Max 768px) */
         @media (max-width: 768px) {
-            .main-content { padding: 20px; }
-            .list-controls { flex-direction: column; gap: 15px; align-items: flex-start; }
-            .equipment-table th, .equipment-table td { padding: 10px; font-size: 12px; }
-            .search-box input { width: 100%; }
-            #add-equipment-btn {
-                right: 20px;
-                bottom: 20px;
+            /* Keep sidebar collapsed but ensure main content takes most of the screen */
+            .main-content { 
+                margin-left: var(--sidebar-width-collapsed); 
+                width: calc(100% - var(--sidebar-width-collapsed));
+                padding: 20px 15px; 
+            }
+            
+            .page-header {
+                font-size: 28px;
+            }
+            
+            .equipment-list-card {
+                padding: 15px;
+            }
+
+            .list-controls { 
+                flex-direction: column; 
+                gap: 15px; 
+                align-items: flex-start; 
+                width: 100%;
+            }
+            
+            .show-entries {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .search-box {
+                width: 100%;
+                flex-direction: column; 
+                align-items: flex-start;
+                position: static; /* Remove relative positioning for vertical stack */
+            }
+            
+            .search-box label {
+                margin-bottom: 5px;
+            }
+
+            .search-box input { 
+                width: 100%; 
+                padding-right: 15px; /* Adjust padding since icon is gone/moved */
+            }
+            
+            /* Hiding the icon to prevent awkward positioning: */
+            .search-box i {
+                display: none; 
+            }
+            
+            .equipment-table th, .equipment-table td { 
+                padding: 10px; 
+                font-size: 12px; 
+            }
+            
+            /* Adjust message box position so it's not too close to the screen edge */
+            #messageBox {
+                top: 15px;
+                right: 15px;
+            }
+        }
+
+        /* Very Small Screens - Hide Sidebar */
+        @media (max-width: 500px) {
+            .sidebar { 
+                display: none; 
+            }
+            .main-content { 
+                margin-left: 0; 
+                width: 100%;
             }
         }
     </style>
@@ -431,11 +551,10 @@
         <div class="dashboard-header">Equipment</div>
         
         <div class="admin-profile-sidebar">
-            <div class="avatar">
-                <div class="avatar-inner"><i class="fas fa-user"></i></div>
-            </div>
-            <div class="admin-name" id="sidebar-admin-name">User Name</div>
-            <div class="admin-email" id="sidebar-admin-email">user@example.com</div>
+            <div class="avatar" id="sidebar-avatar-container">
+                </div>
+            <div class="admin-name" id="sidebar-admin-name">Loading...</div>
+            <div class="admin-email" id="sidebar-admin-email">loading@example.com</div>
         </div>
 
         <div class="nav-links-container">
@@ -467,7 +586,7 @@
         </div>
 
         <div class="logout-section">
-            <a class="logout-link" href="index.html">
+            <a class="logout-link" href="#" id="logout-button">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -503,9 +622,9 @@
                     <table class="equipment-table">
                         <thead>
                             <tr>
-                                <th style="width: 40%;">Equipment Name <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 20%;">Total No. <i class="fas fa-sort sort-icon"></i></th>
-                                <th style="width: 20%;">Status <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 40%;" data-sort-key="name">Equipment Name <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 20%;" data-sort-key="totalNo">Total No. <i class="fas fa-sort sort-icon"></i></th>
+                                <th style="width: 20%;" data-sort-key="status">Status <i class="fas fa-sort sort-icon"></i></th>
                                 <th style="width: 15%;"></th>
                             </tr>
                         </thead>
@@ -516,31 +635,26 @@
                 </div>
             </div>
             
-            <button id="add-equipment-btn" onclick="simulateAddEquipment()">Add Equipment</button>
-
-        </div>
+            </div>
     </div>
 
-    <script type="module">
-        import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- Global Firebase and Config ---
-        let db;
-        let auth;
-        let userId = '';
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
-        setLogLevel('Debug');
+    <script>
+        // --- Global Constants ---
+        const LOCAL_STORAGE_KEY = 'loggedInUser';
+        const PROFILE_PICTURE_KEY = 'profilePictureData'; // 🌟 The key that holds the Base64 image data 🌟
 
         // --- UI Element References ---
         const equipmentTableBody = document.getElementById('equipment-table-body');
         const searchInput = document.getElementById('search-input');
-
+        const logoutButton = document.getElementById('logout-button');
+        const sidebarAdminName = document.getElementById('sidebar-admin-name');
+        const sidebarAdminEmail = document.getElementById('sidebar-admin-email');
+        const sidebarAvatarContainer = document.getElementById('sidebar-avatar-container');
+        const tableHeaders = document.querySelectorAll('.equipment-table thead th');
+        
         let currentEquipment = []; 
+        let equipmentData = []; // Data array for local storage simulation
+        let currentSort = { key: 'name', direction: 'asc' }; // Default sort state
 
         // --- Utility Function for Feedback ---
         function showMessage(message, isError = false) {
@@ -553,17 +667,148 @@
             }, 3000);
         }
         
-        // --- Firestore References ---
-        // Path: /artifacts/{appId}/public/data/equipment
-        function getEquipmentCollectionRef() {
-            return collection(db, 'artifacts', appId, 'public', 'data', 'equipment');
+        // --- PROFILE PICTURE RENDERING FUNCTION ---
+        function renderProfilePicture() {
+            const loggedInUserString = localStorage.getItem(LOCAL_STORAGE_KEY);
+            const user = loggedInUserString ? JSON.parse(loggedInUserString) : {};
+            const userName = user.name || 'Admin User';
+            
+            // 1. Get the profile picture data from the shared key
+            const avatarData = localStorage.getItem(PROFILE_PICTURE_KEY);
+
+            // 2. Clear existing content (image or initials)
+            sidebarAvatarContainer.innerHTML = ''; 
+
+            if (avatarData) {
+                // If Base64 image exists, render it as an <img>
+                const img = document.createElement('img');
+                img.src = avatarData; 
+                img.alt = 'Profile Picture';
+                img.classList.add('profile-picture');
+                sidebarAvatarContainer.appendChild(img);
+                
+                // For proper display when image is present
+                sidebarAvatarContainer.style.fontSize = '0'; 
+            } else {
+                // Otherwise, render initials
+                const span = document.createElement('div'); // Using div to contain initials
+                span.textContent = getInitials(userName);
+                span.classList.add('avatar-inner');
+                sidebarAvatarContainer.appendChild(span);
+                
+                // For proper display when initials are present
+                sidebarAvatarContainer.style.fontSize = '30px'; 
+            }
+        }
+
+        // --- AUTHENTICATION & PROFILE FUNCTIONS ---
+
+        function getInitials(name) {
+            if (!name || typeof name !== 'string') return 'A';
+            const parts = name.trim().split(/\s+/).filter(Boolean);
+            if (parts.length > 1) {
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            } else if (parts.length === 1) {
+                return parts[0][0].toUpperCase();
+            }
+            return 'A';
+        }
+
+        function checkAuthenticationAndLoadProfile() {
+            const loggedInUser = localStorage.getItem(LOCAL_STORAGE_KEY);
+
+            if (!loggedInUser) {
+                 // Simulate default user if not logged in for the sake of demo
+                 const user = { name: "Admin User", email: "admin@mockgym.com" };
+                 const userName = user.name;
+                 const userEmail = user.email;
+                 sidebarAdminName.textContent = userName;
+                 sidebarAdminEmail.textContent = userEmail;
+                 renderProfilePicture(); // Render default or saved picture
+                 return true; 
+            }
+
+            try {
+                const user = JSON.parse(loggedInUser);
+                const userName = user.name || 'Admin User';
+                const userEmail = user.email || 'admin@mockgym.com';
+
+                sidebarAdminName.textContent = userName;
+                sidebarAdminEmail.textContent = userEmail;
+                
+                renderProfilePicture(); // Render the picture
+                return true;
+            } catch (error) {
+                console.error("Error parsing user data:", error);
+                // Fallback to default mock display
+                sidebarAdminName.textContent = 'Admin User';
+                sidebarAdminEmail.textContent = 'admin@mockgym.com';
+                renderProfilePicture(); 
+                return true;
+            }
+        }
+
+        // --- Logout Logic ---
+        function handleLogout(event) {
+            event.preventDefault(); 
+            localStorage.removeItem(LOCAL_STORAGE_KEY);
+            localStorage.removeItem(PROFILE_PICTURE_KEY); // Optional: Clear the profile picture on logout
+            window.location.href = 'index.html';
+        }
+
+        // --- Data Loading (Simulated Local Storage) ---
+        function loadEquipmentData() {
+            const storedData = localStorage.getItem('equipmentData');
+            if (storedData) {
+                equipmentData = JSON.parse(storedData);
+            } else {
+                // Initialize with dummy data if none exists
+                equipmentData = [
+                    { id: 'eqp001', name: 'Treadmill Z10', totalNo: 3, status: 'Active' },
+                    { id: 'eqp002', name: 'Dumbbell Set (2-30kg)', totalNo: 5, status: 'Active' },
+                    { id: 'eqp003', name: 'Barbell Rack', totalNo: 1, status: 'Active' },
+                    { id: 'eqp004', name: 'Elliptical Trainer X5', totalNo: 2, status: 'Active' },
+                    { id: 'eqp005', name: 'Resistance Bands', totalNo: 15, status: 'Inactive' },
+                    { id: 'eqp006', name: 'Weight Plates', totalNo: 20, status: 'Active' },
+                    { id: 'eqp007', name: 'Cable Machine', totalNo: 1, status: 'Inactive' },
+                ];
+                localStorage.setItem('equipmentData', JSON.stringify(equipmentData));
+            }
+            currentEquipment = equipmentData;
+            renderEquipment(currentEquipment, searchInput.value);
+        }
+        
+        /**
+         * Sorts the currentEquipment array based on the currentSort settings.
+         */
+        function sortEquipment() {
+            const { key, direction } = currentSort;
+            
+            currentEquipment.sort((a, b) => {
+                let aValue = a[key];
+                let bValue = b[key];
+
+                if (typeof aValue === 'string') {
+                    aValue = aValue.toLowerCase();
+                    bValue = bValue.toLowerCase();
+                }
+
+                if (aValue < bValue) {
+                    return direction === 'asc' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return direction === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
         }
 
         // --- Data Rendering and Filtering ---
-
         function renderEquipment(equipment, searchTerm = '') {
             equipmentTableBody.innerHTML = '';
             
+            sortEquipment(); // Apply current sort before filtering/rendering
+
             const lowerSearchTerm = searchTerm.toLowerCase().trim();
             
             const filteredEquipment = equipment.filter(item => 
@@ -578,7 +823,10 @@
                 return;
             }
             
-            filteredEquipment.forEach(item => {
+            // NOTE: Added simulated limit from 'Show Entries' select (default 10)
+            const entriesToShow = parseInt(document.getElementById('show-entries').value || 10, 10);
+            
+            filteredEquipment.slice(0, entriesToShow).forEach(item => {
                 const statusClass = item.status === 'Active' ? 'status-active' : 'status-inactive';
                 
                 const row = document.createElement('tr');
@@ -597,15 +845,9 @@
         // --- Global Handlers ---
         
         window.handleEditEquipment = function(equipmentId, equipmentName) {
-            // In a full application, this would open a modal pre-filled with the equipment data
             console.log("Editing Equipment ID:", equipmentId, "Name:", equipmentName);
             showMessage(`Editing ${equipmentName} (Simulated)`);
-        }
-
-        window.simulateAddEquipment = function() {
-            // In a full application, this would open an 'Add Equipment' form/modal
-            console.log("Simulating 'Add Equipment' button click.");
-            showMessage("Opening 'Add Equipment' form (Simulated)");
+            // Add actual modal or redirect logic here
         }
         
         // --- Event Handlers ---
@@ -613,87 +855,101 @@
         function handleSearch() {
             renderEquipment(currentEquipment, searchInput.value);
         }
+        
+        function handleShowEntriesChange() {
+            renderEquipment(currentEquipment, searchInput.value);
+        }
+        
+        /**
+         * Handles table header clicks for sorting.
+         */
+        function handleSort(e) {
+            let targetHeader = e.currentTarget;
+            let key = targetHeader.dataset.sortKey;
+            
+            if (!key) return; // Not a sortable column
 
-        // --- Firebase Listener Setup ---
+            let currentDirection = currentSort.key === key ? currentSort.direction : 'none';
+            let newDirection;
 
-        function setupEquipmentListener() {
-            if (!db) {
-                console.error("Firestore not initialized.");
-                return;
+            // Determine the new sort direction
+            if (currentSort.key !== key) {
+                // Clicking a new column, default to ascending
+                newDirection = 'asc';
+            } else if (currentDirection === 'none' || currentDirection === 'desc') {
+                newDirection = 'asc';
+            } else {
+                newDirection = 'desc';
+            }
+
+            // Update global sort state
+            currentSort.key = key;
+            currentSort.direction = newDirection;
+
+            // Update header styles and icons
+            tableHeaders.forEach(th => {
+                th.classList.remove('sorted');
+                const icon = th.querySelector('.sort-icon');
+                if (icon) {
+                    icon.className = 'fas fa-sort sort-icon'; // Reset icon
+                }
+            });
+
+            // Set active header style and icon
+            targetHeader.classList.add('sorted');
+            const activeIcon = targetHeader.querySelector('.sort-icon');
+            if (activeIcon) {
+                if (newDirection === 'asc') {
+                    activeIcon.className = 'fas fa-sort-up sort-icon';
+                } else {
+                    activeIcon.className = 'fas fa-sort-down sort-icon';
+                }
+            }
+
+            // Re-render the table
+            renderEquipment(currentEquipment, searchInput.value);
+        }
+        
+        // 🌟 NEW: Listen for Local Storage changes in other tabs/windows 🌟
+        window.addEventListener('storage', (event) => {
+            // Check if the profile picture key was changed by another page (like pfp.html)
+            if (event.key === PROFILE_PICTURE_KEY) {
+                console.log('Profile picture key changed. Re-rendering avatar.');
+                renderProfilePicture();
+            }
+            // Optional: If name or email could change, you might want to re-check auth/profile too
+            if (event.key === LOCAL_STORAGE_KEY) {
+                 console.log('User session key changed. Reloading profile info.');
+                 checkAuthenticationAndLoadProfile();
+            }
+        });
+
+        function initApp() {
+            // 1. Check Auth and Load Profile (including the new renderProfilePicture call)
+            if (!checkAuthenticationAndLoadProfile()) {
+                return; 
             }
             
-            // Listen to the equipment collection 
-            onSnapshot(getEquipmentCollectionRef(), (querySnapshot) => {
-                const equipment = [];
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    equipment.push({ 
-                        id: doc.id, 
-                        ...data,
-                        // Ensure required fields exist, use defaults if necessary for stability
-                        name: data.name || 'Untitled Equipment',
-                        totalNo: data.totalNo || 0,
-                        status: data.status || 'Active'
-                    });
-                });
-                
-                currentEquipment = equipment;
-                renderEquipment(currentEquipment, searchInput.value);
-
-                if (equipment.length === 0) {
-                    equipmentTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No equipment found in the database. Add one now!</td></tr>';
-                }
-            }, (error) => {
-                console.error("Error listening to equipment data:", error);
-                showMessage("Failed to load equipment data.", true);
+            // 2. Load Equipment Data
+            loadEquipmentData();
+            
+            // Manually set initial visual sort indicator (Equipment Name is default asc)
+            const defaultHeader = document.querySelector(`[data-sort-key="${currentSort.key}"]`);
+            if (defaultHeader) {
+                defaultHeader.classList.add('sorted');
+                defaultHeader.querySelector('.sort-icon').className = 'fas fa-sort-up sort-icon';
+            }
+            
+            // 3. Setup Event Listeners
+            searchInput.addEventListener('input', handleSearch);
+            document.getElementById('show-entries').addEventListener('change', handleShowEntriesChange);
+            logoutButton.addEventListener('click', handleLogout);
+            tableHeaders.forEach(header => {
+                header.addEventListener('click', handleSort);
             });
         }
-        
-        // --- Firebase Initialization ---
-        async function initFirebaseAndAuth() {
-            if (Object.keys(firebaseConfig).length === 0) {
-                console.error("Firebase config is missing.");
-                equipmentTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">FIREBASE CONFIG MISSING. Cannot load data.</td></tr>';
-                return;
-            }
-            
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
 
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        // Changed 'Admin' to 'User'
-                        document.getElementById('sidebar-admin-name').textContent = 'User ' + userId.substring(0, 5);
-                        document.getElementById('sidebar-admin-email').textContent = user.email || 'authenticated@user.com';
-                        setupEquipmentListener();
-                    } else {
-                        console.log("Not authenticated. Using anonymous/default data.");
-                        userId = crypto.randomUUID();
-                        // Changed 'Guest Admin' to 'Guest User'
-                        document.getElementById('sidebar-admin-name').textContent = 'Guest User';
-                        setupEquipmentListener(); 
-                    }
-                });
-
-            } catch (error) {
-                console.error("Firebase initialization or authentication failed:", error);
-                showMessage("System Error: Failed to connect to database.", true);
-            }
-        }
-
-        // --- Setup Event Listeners ---
-        searchInput.addEventListener('input', handleSearch);
-        
-        window.onload = initFirebaseAndAuth;
+        window.onload = initApp;
 
     </script>
 </body>
