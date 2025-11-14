@@ -590,24 +590,24 @@
             <div class="card calendar-card">
     <h3>Calendar</h3>
 
-    {% if events %}
-        <ul class="text-sm text-gray-700 space-y-2">
-            {% for event in events %}
-                <li class="border-b border-gray-200 pb-2">
-                    <strong>{{ event.title }}</strong>
-                    <div class="text-xs text-gray-500">
-                        {{ event.start_date|date:"M d, Y" }}
-                        {% if event.end_date %}–{{ event.end_date|date:"M d, Y" }}{% endif %}
-                    </div>
-                    {% if event.description %}
-                        <p class="text-xs text-gray-600 mt-1">{{ event.description }}</p>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p class="text-xs text-gray-500">No upcoming events.</p>
-    {% endif %}
+    {% if events %}
+        <ul class="text-sm text-gray-700 space-y-2">
+            {% for event in events %}
+                <li class="border-b border-gray-200 pb-2">
+                    <strong>{{ event.title }}</strong>
+                    <div class="text-xs text-gray-500">
+                        {{ event.start_date|date:"M d, Y" }}
+                        {% if event.end_date %}–{{ event.end_date|date:"M d, Y" }}{% endif %}
+                    </div>
+                    {% if event.description %}
+                        <p class="text-xs text-gray-600 mt-1">{{ event.description }}</p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-xs text-gray-500">No upcoming events.</p>
+    {% endif %}
 </div>
 
             

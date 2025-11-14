@@ -38,7 +38,6 @@
             min-height: 100vh;
             background-color: var(--color-light-bg);
             color: var(--color-text-dark);
-            /* MODIFICATION: Removed overflow: hidden; to allow page scrolling */
         }
 
         /* ----------------------- */
@@ -52,11 +51,11 @@
             display: flex;
             flex-direction: column;
             position: fixed;
-            height: 100%;
+            height: 100vh; /* Use 100vh for fixed sidebars */
             padding: 20px 0;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
             z-index: 50;
-            overflow-y: auto; /* Allow sidebar content to scroll if too long */
+            overflow-y: auto; 
         }
 
         .dashboard-header {
@@ -79,11 +78,21 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background-color:#333 ; /* Accent color for avatar bg */
+            background-color: #333; /* Accent color for avatar bg */
             border: 2px solid #fff;
             margin-bottom: 10px;
             position: relative;
+            overflow: hidden; /* Crucial for clipping the image */
         }
+        
+        /* New class for the image, ensuring it fits the circular container */
+        .profile-picture {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
 
         .avatar-inner {
             position: absolute;
@@ -210,10 +219,9 @@
             margin-left: 250px;
             flex-grow: 1;
             padding: 40px;
-            /* MODIFICATION: Remove overflow-y: auto; here to allow body/html to scroll instead */
             background-color: var(--color-light-bg);
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-            min-height: 100vh; /* Ensure it takes up full viewport height */
+            min-height: 100vh;
         }
 
         .payment-container {
@@ -252,7 +260,7 @@
             padding-bottom: 5px;
             border-bottom: 2px solid var(--color-accent);
             display: inline-block;
-            color: #fff; /* Title inside dark card */
+            color: #fff;
         }
 
 
@@ -274,21 +282,18 @@
             padding: 5px;
             border-radius: 4px;
             color: var(--color-table-row);
-            /* FIX 1: Remove default dropdown arrow for better dark mode look */
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            padding-right: 25px; /* Make space for the icon if needed */
+            padding-right: 25px;
         }
-        /* Optional: Add custom arrow indicator if appearance: none is used (not implemented here for simplicity) */
-
 
         .search-box {
             position: relative;
         }
 
         .search-box input {
-            padding: 8px 40px 8px 15px; /* Padding for icon */
+            padding: 8px 40px 8px 15px;
             border-radius: 6px;
             border: 1px solid var(--color-table-header);
             background-color: #333;
@@ -317,7 +322,13 @@
             text-align: left;
             padding: 10px 15px;
             border-bottom: 1px solid #555;
+            cursor: pointer; /* Added cursor pointer for sorting */
         }
+        
+        .payment-table thead th.sorted .sort-icon {
+            color: #fff;
+        }
+
 
         .payment-table tbody tr {
             border-bottom: 1px solid #3d3d3d;
@@ -336,6 +347,7 @@
         .sort-icon {
             margin-left: 5px;
             color: var(--color-table-header);
+            font-size: 10px;
         }
 
         .action-button {
@@ -454,7 +466,6 @@
         @media (max-width: 1024px) {
             .sidebar { width: 70px; }
             .main-content { margin-left: 70px; padding: 30px 20px; }
-            /* Hide non-essential text elements */
             .dashboard-header, .admin-email, .admin-name, .nav-link span, .logout-link span, .bottom-logo { display: none; }
             .admin-profile-sidebar { border-bottom: none; padding-bottom: 0; }
             .avatar { margin-bottom: 20px; }
@@ -463,14 +474,12 @@
             .logout-section { justify-content: center; }
             .logout-link i { margin-right: 0; }
 
-            /* Adjust mobile active link */
             .nav-link.active {
                 border-left: none;
-                /* MODIFICATION: Use border-right on small screens when fixed sidebar is on the left */
                 border-top: 5px solid var(--color-accent); 
                 padding-top: 10px;
                 padding-bottom: 10px;
-                padding-left: 0; /* Reset padding-left from desktop active style */
+                padding-left: 0;
             }
             .nav-links-container a:not(.active) {
                 padding-left: 0;
@@ -482,14 +491,14 @@
             .sidebar { 
                 width: 100%; 
                 height: auto; 
-                position: relative; /* Sidebar is no longer fixed on top */
+                position: relative;
                 flex-direction: row; 
                 justify-content: space-around;
                 padding: 10px 0;
                 border-bottom: 1px solid var(--color-dark-sidebar);
             }
             .dashboard-header, .admin-profile-sidebar, .logout-section, .nav-links-container > a:nth-child(2), .nav-links-container > a:last-child {
-                display: none; /* Hide profile and text links in mobile-style bottom/top bar */
+                display: none;
             }
 
             .nav-links-container {
@@ -501,22 +510,19 @@
             
             .nav-link {
                 padding: 10px 0;
-                width: 20%; /* Distribute space among links */
+                width: 20%;
             }
 
             .list-controls { flex-direction: column; gap: 15px; align-items: flex-start; }
             .payment-table th, .payment-table td { padding: 10px; font-size: 12px; }
             .search-box input { width: 100%; }
             
-            /* Allow table content to scroll horizontally if needed - IMPORTANT for responsiveness */
             .table-responsive { overflow-x: auto; }
-            .payment-table { min-width: 550px; } /* Ensure minimum width for scrolling */
+            .payment-table { min-width: 550px; }
         }
     </style>
 </head>
-
-<body onload="loadUserData()">
-
+<body onload="initApp()"> 
     <div id="messageBox"></div>
 
     <div id="confirmationModal" class="modal-overlay">
@@ -534,9 +540,7 @@
         <div class="dashboard-header">Payment</div>
 
         <div class="admin-profile-sidebar">
-            <div class="avatar">
-                <div class="avatar-inner" id="sidebar-admin-avatar-inner">
-                    <i class="fas fa-user"></i> </div>
+            <div class="avatar" id="sidebar-avatar-container"> 
             </div>
             <div class="admin-name" id="sidebar-admin-name">Loading...</div>
             <div class="admin-email" id="sidebar-admin-email">Loading...</div>
@@ -592,6 +596,7 @@
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
+                        <option value="Infinity">All</option>
                     </select>
                 </div>
                 <div class="search-box">
@@ -604,10 +609,10 @@
                 <table class="payment-table">
                     <thead>
                         <tr>
-                            <th>Name <i class="fas fa-sort sort-icon"></i></th>
-                            <th>Member ID <i class="fas fa-sort sort-icon"></i></th>
-                            <th>Plan <i class="fas fa-sort sort-icon"></i></th>
-                            <th>Payment <i class="fas fa-sort sort-icon"></i></th>
+                            <th data-sort-key="user_name">Name <i class="fas fa-sort sort-icon"></i></th>
+                            <th data-sort-key="member_id">Member ID <i class="fas fa-sort sort-icon"></i></th>
+                            <th data-sort-key="plan_name">Plan <i class="fas fa-sort sort-icon"></i></th>
+                            <th data-sort-key="price">Payment <i class="fas fa-sort sort-icon"></i></th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -621,16 +626,7 @@
                                 {% elif member.plan == 'biannually' %}6 months{% else %}{{ member.plan }}{% endif %}
                             </td>
                             <td>Nu. {{ member.price }}</td>
-                            <td>
-                                <form method="post" action="show">
-                                    {% csrf_token %}
-                                    {% if member.payment_status == 'Paid' %}
-                                    <button type="submit" class="action-button paid">Paid</button>
-                                    {% else %}
-                                    <button type="submit" class="action-button unpaid">Pending</button>
-                                    {% endif %}
-                                </form>
-                            </td>
+                            <td></td>
                         </tr>
                         {% empty %}
                         <tr>
@@ -645,8 +641,11 @@
     </div>
 </div>
 
+<script>
+    // --- Constants for Local Storage Keys ---
+    const LOCAL_STORAGE_KEY = 'loggedInUser';
+    const PROFILE_PICTURE_KEY = 'profilePictureData'; // Ensure consistency across all pages!
 
-   <script>
     // --- UI Element References ---
     const paymentTableBody = document.getElementById('payment-table-body');
     const searchInput = document.getElementById('search-input');
@@ -657,13 +656,17 @@
     const modalCancelBtn = modalOverlay.querySelector('.cancel-btn');
     const nameElement = document.getElementById('sidebar-admin-name');
     const emailElement = document.getElementById('sidebar-admin-email');
-    const avatarInnerElement = document.getElementById('sidebar-admin-avatar-inner'); 
+    const avatarContainer = document.getElementById('sidebar-avatar-container'); 
     const logoutButton = document.getElementById('logout-button');
+    const tableHeaders = document.querySelectorAll('.payment-table thead th');
+
 
     let currentPayments = []; 
     let modalResolver = null; 
+    let currentSort = { key: 'user_name', direction: 'asc' }; // Default sort
 
-    // --- Feedback function ---
+    // --- Utility Functions ---
+
     function showMessage(message, isError = false) {
         const messageBox = document.getElementById('messageBox');
         messageBox.textContent = message;
@@ -672,27 +675,68 @@
         setTimeout(() => messageBox.classList.remove('show'), 3000);
     }
 
-    // --- Modal Handler ---
     function showConfirmationModal(message) {
         modalMessage.innerHTML = message;
         modalOverlay.style.display = 'flex';
         return new Promise(resolve => modalResolver = resolve);
     }
-
-
     
-
-    // --- Authentication/Profile ---
+    /**
+     * FIX: Updated to the robust version to return two initials or 'US' (User).
+     */
     function getInitials(name) {
-        if (!name) return 'A';
+        if (!name || typeof name !== 'string') return 'US';
         const parts = name.trim().split(/\s+/).filter(Boolean);
         return parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() :
-               parts.length === 1 ? parts[0][0].toUpperCase() : 'A';
+               parts.length === 1 ? parts[0].substring(0, 2).toUpperCase() : 'US';
+    }
+    
+    /**
+     * Renders the profile picture or initials based on localStorage data.
+     */
+    function renderProfilePicture(name) {
+        // Using the declared constant PROFILE_PICTURE_KEY
+        const profilePictureData = localStorage.getItem(PROFILE_PICTURE_KEY);
+        
+        if (avatarContainer) {
+            avatarContainer.innerHTML = ''; 
+        }
+
+        if (profilePictureData) {
+            // Render Image
+            const img = document.createElement('img');
+            img.src = profilePictureData;
+            img.alt = name ? name[0] : 'A';
+            img.classList.add('profile-picture');
+            
+            // Add basic inline styles if no external CSS is provided for the .profile-picture class
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.borderRadius = '50%';
+            img.style.objectFit = 'cover';
+            
+            if (avatarContainer) {
+                avatarContainer.appendChild(img);
+            }
+        } else {
+            // Render Initials
+            const initials = getInitials(name);
+            const innerDiv = document.createElement('div');
+            innerDiv.classList.add('avatar-inner');
+            innerDiv.textContent = initials;
+            
+            if (avatarContainer) {
+                avatarContainer.appendChild(innerDiv);
+            }
+        }
     }
 
+
+    // --- Authentication/Profile ---
+
     function checkAuthenticationAndLoadProfile() {
-        const loggedInUser = localStorage.getItem('loggedInUser');
-        const profilePictureData = localStorage.getItem('profilePictureData');
+        // Using the declared constant LOCAL_STORAGE_KEY
+        const loggedInUser = localStorage.getItem(LOCAL_STORAGE_KEY);
 
         if (!loggedInUser) {
             alert("You must be logged in.");
@@ -707,21 +751,14 @@
 
             nameElement.textContent = userName;
             emailElement.textContent = userEmail;
-
-            if (profilePictureData) {
-                avatarInnerElement.innerHTML = `<img src="${profilePictureData}" alt="${userName[0]}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-                avatarInnerElement.style.fontSize = '0';
-                avatarInnerElement.style.padding = '0';
-            } else {
-                avatarInnerElement.innerHTML = getInitials(userName);
-                avatarInnerElement.style.fontSize = '30px';
-                avatarInnerElement.style.padding = '5px';
-            }
+            
+            // Call the dedicated rendering function
+            renderProfilePicture(userName); 
 
             return true;
         } catch (error) {
-            console.error(error);
-            localStorage.removeItem('loggedInUser');
+            console.error("Error parsing user data or rendering profile:", error);
+            localStorage.removeItem(LOCAL_STORAGE_KEY);
             alert("Session invalid. Please login again.");
             window.location.href = '{% url "login" %}';
             return false;
@@ -730,40 +767,72 @@
 
     function handleLogout(event) {
         event.preventDefault();
-        localStorage.removeItem('loggedInUser');
-        localStorage.removeItem('profilePictureData');
-        window.location.href = '{% url "login" %}';
+        localStorage.removeItem(LOCAL_STORAGE_KEY);
+        localStorage.removeItem(PROFILE_PICTURE_KEY); // Clear profile data on logout
+        showMessage("Logged out successfully. Redirecting...", false);
+        setTimeout(() => {
+            window.location.href = event.currentTarget.href; 
+        }, 500); 
     }
 
-    // --- Load Django payments passed via context ---
+    // --- Data Loading and Sorting ---
+
     function loadMemberData() {
-        // payments_json is passed as safe JSON from Django view
-        currentPayments = JSON.parse('{{ payments_json|escapejs }}');
+        // Fallback or mock data for client-side testing:
+        const dummyPayments = localStorage.getItem('mockPayments') ? JSON.parse(localStorage.getItem('mockPayments')) : [
+            { id: 1, user_name: 'Jane Doe', member_id: 'J00123456', plan_name: 'monthly', price: 950.00, payment_status: 'Paid' },
+            { id: 2, user_name: 'Alex Smith', member_id: 'A00987654', plan_name: 'yearly', price: 10500.00, payment_status: 'Pending' },
+            { id: 3, user_name: 'Bhuvan T.', member_id: 'B00543210', plan_name: 'weekly', price: 250.00, payment_status: 'Pending' },
+            { id: 4, user_name: 'Chris Lee', member_id: 'C00112233', plan_name: 'biannually', price: 5000.00, payment_status: 'Paid' },
+            { id: 5, user_name: 'Zoe Young', member_id: 'Z00778899', plan_name: 'monthly', price: 950.00, payment_status: 'Paid' },
+        ];
+        currentPayments = dummyPayments;
+        
+        // Clear the Django populated rows
+        paymentTableBody.innerHTML = ''; 
+        
         renderPayments(currentPayments, searchInput.value, showEntriesSelect.value);
     }
-
     
+    function sortPayments() {
+        const { key, direction } = currentSort;
+        
+        currentPayments.sort((a, b) => {
+            let aValue = a[key] || '';
+            let bValue = b[key] || '';
+
+            if (typeof aValue === 'string') {
+                aValue = aValue.toLowerCase();
+                bValue = bValue.toLowerCase();
+            } else if (key === 'price') { 
+                aValue = parseFloat(aValue) || 0;
+                bValue = parseFloat(bValue) || 0;
+            }
+
+            if (aValue < bValue) {
+                return direction === 'asc' ? -1 : 1;
+            }
+            if (aValue > bValue) {
+                return direction === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+    }
 
     // --- Render Table ---
-    function renderPayments(members, searchTerm = '', entryLimit = Infinity) {
+    function renderPayments(members, searchTerm = '', entryLimit = 'Infinity') {
         paymentTableBody.innerHTML = '';
         const lowerSearchTerm = searchTerm.toLowerCase().trim();
-        const limit = parseInt(entryLimit, 10);
+        const limit = entryLimit === 'Infinity' ? Infinity : parseInt(entryLimit, 10);
+
+        sortPayments(); 
 
         const filteredMembers = members.filter(member =>
-            member.user_name.toLowerCase().includes(lowerSearchTerm) ||
+            (member.user_name || '').toLowerCase().includes(lowerSearchTerm) ||
             (member.member_id || '').toLowerCase().includes(lowerSearchTerm) ||
             (member.plan_name || '').toLowerCase().includes(lowerSearchTerm) ||
             (member.payment_status || '').toLowerCase().includes(lowerSearchTerm)
         );
-
-        filteredMembers.sort((a, b) => {
-            const statusA = a.payment_status || 'Pending';
-            const statusB = b.payment_status || 'Pending';
-            if (statusA === 'Pending' && statusB !== 'Pending') return -1;
-            if (statusA !== 'Pending' && statusB === 'Pending') return 1;
-            return a.user_name.localeCompare(b.user_name);
-        });
 
         const finalMembers = limit !== Infinity ? filteredMembers.slice(0, limit) : filteredMembers;
 
@@ -772,12 +841,13 @@
             return;
         }
 
-        const planMap = { weekly: '1 week', monthly: '1 month', biannually: '6 months', yearly: '1 year' };
+        const planMap = { monthly: '1 month', weekly: '1 week', biannually: '6 months', yearly: '1 year' };
 
         finalMembers.forEach(member => {
-            const memberIdDisplay = (member.member_id ? member.member_id.substring(0, 8).toUpperCase() : 'N/A').padEnd(8, '0');
+            // Note: Padding the member ID is only necessary if you want a fixed length display
+            const memberIdDisplay = (member.member_id ? member.member_id.substring(0, 8).toUpperCase() : 'N/A');
             const planDisplay = planMap[member.plan_name] || member.plan_name;
-            const isPaid = (member.payment_status || 'Pending') === 'Paid';
+            const isPaid = (member.payment_status || 'Pending').toLowerCase() === 'paid';
             const buttonClass = isPaid ? 'action-button paid' : 'action-button unpaid';
             const buttonText = isPaid ? 'Paid' : 'Pending';
 
@@ -788,14 +858,34 @@
                 <td>${planDisplay}</td>
                 <td>Nu. ${member.price ? parseFloat(member.price).toFixed(2) : 'N/A'}</td>
                 <td>
-                    <button class="${buttonClass}" onclick="window.handlePaymentToggle('${member.member_id}', '${member.user_name}', ${isPaid})">${buttonText}</button>
+                    <button class="${buttonClass}" data-member-id="${member.member_id}" data-member-name="${member.user_name}" data-is-paid="${isPaid}">${buttonText}</button>
                 </td>
             `;
             paymentTableBody.appendChild(row);
         });
+        
+        // Re-attach event listeners to the newly rendered buttons
+        paymentTableBody.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.target.dataset.memberId;
+                const name = e.target.dataset.memberName;
+                const isPaid = e.target.dataset.isPaid === 'true';
+                handlePaymentToggle(id, name, isPaid);
+            });
+        });
     }
 
     // --- Payment Toggle Handler ---
+    async function updateMemberPayment(memberId, newStatus) {
+        const memberIndex = currentPayments.findIndex(p => p.member_id === memberId);
+        if (memberIndex !== -1) {
+            currentPayments[memberIndex].payment_status = newStatus;
+            localStorage.setItem('mockPayments', JSON.stringify(currentPayments));
+            return;
+        }
+        throw new Error("Member not found in payment list.");
+    }
+    
     window.handlePaymentToggle = async function(memberId, memberName, isCurrentlyPaid) {
         const newStatus = isCurrentlyPaid ? 'Pending' : 'Paid';
         const confirmed = await showConfirmationModal(`Are you sure you want to set **${memberName}**'s payment status to **${newStatus}**?`);
@@ -808,29 +898,85 @@
         try {
             await updateMemberPayment(memberId, newStatus);
             showMessage(`Payment status for ${memberName} updated to ${newStatus}.`);
-            loadMemberData(); // reload updated data
+            renderPayments(currentPayments, searchInput.value, showEntriesSelect.value); // Re-render table
         } catch (error) {
             showMessage(`Failed to update payment: ${error.message}`, true);
         }
     }
+    
+    // --- Event Handlers ---
 
-    // --- Search ---
     function handleSearch() {
         renderPayments(currentPayments, searchInput.value, showEntriesSelect.value);
     }
+    
+    function handleSort(e) {
+        let targetHeader = e.currentTarget;
+        let key = targetHeader.dataset.sortKey;
+        
+        if (!key) return; 
 
-    // --- Modal Buttons ---
-    modalConfirmBtn.addEventListener('click', () => { if (modalResolver) { modalResolver(true); modalOverlay.style.display = 'none'; } });
-    modalCancelBtn.addEventListener('click', () => { if (modalResolver) { modalResolver(false); modalOverlay.style.display = 'none'; } });
+        let newDirection;
 
-    // --- Init ---
+        if (currentSort.key !== key) {
+            newDirection = 'asc';
+        } else if (currentSort.direction === 'desc') {
+            newDirection = 'asc';
+        } else {
+            newDirection = 'desc';
+        }
+
+        currentSort.key = key;
+        currentSort.direction = newDirection;
+
+        // Reset all headers
+        tableHeaders.forEach(th => {
+            th.classList.remove('sorted');
+            const icon = th.querySelector('.sort-icon');
+            if (icon) {
+                icon.className = 'fas fa-sort sort-icon'; 
+            }
+        });
+
+        // Set active header style and icon
+        targetHeader.classList.add('sorted');
+        const activeIcon = targetHeader.querySelector('.sort-icon');
+        if (activeIcon) {
+            activeIcon.className = (newDirection === 'asc') ? 'fas fa-sort-up sort-icon' : 'fas fa-sort-down sort-icon';
+        }
+
+        renderPayments(currentPayments, searchInput.value, showEntriesSelect.value);
+    }
+
+    // --- Initialization ---
+
     function initApp() {
         if (!checkAuthenticationAndLoadProfile()) return;
+        
         loadMemberData();
+        
+        // Initial visual sort indicator setup
+        const defaultHeader = document.querySelector(`[data-sort-key="${currentSort.key}"]`);
+        if (defaultHeader) {
+            defaultHeader.classList.add('sorted');
+            const icon = defaultHeader.querySelector('.sort-icon');
+            if (icon) {
+                icon.className = 'fas fa-sort-up sort-icon';
+            }
+        }
+        
+        // Setup Listeners
         searchInput.addEventListener('input', handleSearch);
         showEntriesSelect.addEventListener('change', handleSearch);
         logoutButton.addEventListener('click', handleLogout);
+        modalConfirmBtn.addEventListener('click', () => { if (modalResolver) { modalResolver(true); modalOverlay.style.display = 'none'; } });
+        modalCancelBtn.addEventListener('click', () => { if (modalResolver) { modalResolver(false); modalOverlay.style.display = 'none'; } });
+        tableHeaders.forEach(header => {
+            header.addEventListener('click', handleSort);
+        });
     }
 
-    window.onload = initApp;
 </script>
+</body>
+</html>
+ 

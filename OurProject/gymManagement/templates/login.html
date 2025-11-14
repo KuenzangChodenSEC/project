@@ -117,16 +117,17 @@
         <div class="login-card">
             <h1 class="text-4xl font-bold mb-8 text-white">Sign-in</h1>
             
-            <form onsubmit="handleLogin(event)" class="space-y-6">
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-6">
+                {% csrf_token %} 
 
                 <div>
                     <label for="email" class="block text-left text-sm font-medium text-white mb-1">Email<span class="text-red-500">*</span></label>
-                    <input type="email" id="email" class="custom-input" placeholder="Enter your email" required>
+                    <input type="email" id="email" class="custom-input" name="email" placeholder="Enter your email" required>
                 </div>
 
                 <div>
                     <label for="password" class="block text-left text-sm font-medium text-white mb-1">Password<span class="text-red-500">*</span></label>
-                    <input type="password" id="password" class="custom-input" placeholder="Enter your password" required>
+                    <input type="password" id="password" class="custom-input" name="password" placeholder="Enter your password" required>
                 </div>
                 
                 <div class="flex justify-between items-center text-sm">
@@ -156,78 +157,82 @@
     <div id="message-box" class="fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-xl hidden transition-all duration-300"></div>
 
     <script>
+        // --- Utility Functions ---
+
         function showMessage(message, isError = false) {
             const msgBox = document.getElementById('message-box');
             msgBox.textContent = message;
             
-            // Set styles based on whether it's an error or success message
-            msgBox.style.backgroundColor = isError ? '#dc3545' : '#28a745'; // Red for error, Green for success
+            msgBox.style.backgroundColor = isError ? '#dc3545' : '#28a745'; 
             msgBox.style.color = 'white';
             
-            // Remove the 'hidden' class to make the box appear
             msgBox.classList.remove('hidden');
 
-            // Hide after a delay
             setTimeout(() => {
-                // Add the 'hidden' class back to hide the box
                 msgBox.classList.add('hidden');
             }, 4000);
         }
 
-        // Helper function to get the current list of registered users
-        function getRegisteredUsers() {
-            const usersString = localStorage.getItem('registeredUsers');
-            // If the key is missing or empty, return an empty array
-            return usersString ? JSON.parse(usersString) : [];
-        }
+        // --- Core Login Logic ---
 
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault(); 
             
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
+            const loginButton = event.submitter;
 
             if (email.length < 5 || password.length < 4) {
                 showMessage("Please enter a valid email and password.", true);
                 return;
             }
-
-            // 1. Load the list of all registered users
-            const registeredUsers = getRegisteredUsers();
-
-            // 2. Find the user with the matching email
-            const user = registeredUsers.find(u => u.email === email);
-
-            // --- Authentication Logic ---
-
-            if (!user) {
-                // Case 1: Email not registered
-                showMessage("🚫 Error: Email address is not registered.", true);
-                return;
-            }
-
-            if (user.password !== password) {
-                // Case 2: Email found, but password is incorrect
-                showMessage("❌ Error: Incorrect password.", true);
-                return;
-            }
-
-            // Case 3: Authentication Successful! (Email found AND password matches)
             
-            // CRUCIAL: Save the specific user data to the active session key
-            // NOTE: We strip the password before saving to the active session for security
-            const { password: _, ...userDataForSession } = user;
-            localStorage.setItem('loggedInUser', JSON.stringify(userDataForSession));
+            // Disable button during process
+            loginButton.disabled = true;
+            loginButton.textContent = "Logging in...";
 
-            showMessage("✅ Login successful! Redirecting to dashboard...", false);
+            try {
+                // --- SIMULATED SERVER REQUEST (REPLACE WITH REAL DJANGO FETCH) ---
 
-            // Redirect to admin.html (User Dashboard)
-            setTimeout(() => {
-                window.location.href = "{% url 'admin_page' %}"; 
-            }, 1500);
+                // 1. Get the list of ALL users from the central source (Simulated using localStorage as central source for now)
+                const allUsersString = localStorage.getItem('registeredUsers');
+                const registeredUsers = allUsersString ? JSON.parse(allUsersString) : [];
+                const user = registeredUsers.find(u => u.email === email);
+                
+                // 2. Simulate server response delay
+                await new Promise(resolve => setTimeout(resolve, 500)); 
+
+                if (!user) {
+                    throw new Error("Email address is not registered.");
+                }
+
+                if (user.password !== password) {
+                    throw new Error("Incorrect password.");
+                }
+
+                // 3. Successful Login: Save user data to the session key on this device
+                const { password: _, ...userDataForSession } = user;
+                localStorage.setItem('loggedInUser', JSON.stringify(userDataForSession));
+
+                // 4. Handle success and redirect
+                showMessage("✅ Login successful! Redirecting to dashboard...", false);
+                setTimeout(() => {
+                    window.location.href = "{% url 'admin_page' %}"; 
+                }, 1500);
+
+            } catch (error) {
+                // Handle all errors (user not found, wrong password, network error)
+                const errorMessage = error.message.includes('registered') ? "🚫 Error: Email address is not registered." :
+                                   error.message.includes('password') ? "❌ Error: Incorrect password." :
+                                   "🚨 Login failed. Please try again.";
+                
+                showMessage(errorMessage, true);
+            } finally {
+                // Re-enable button
+                loginButton.disabled = false;
+                loginButton.textContent = "Login";
+            }
         }
-
-        
     </script>
 </body>
 </html>

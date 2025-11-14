@@ -665,7 +665,8 @@
     // Global Constants
     const LOCAL_STORAGE_KEY = 'loggedInUser';
     const REGISTERED_USERS_KEY = 'registeredUsers';
-    // Removed PROFILE_PICTURE_KEY: Relying only on user.avatarUrl in localStorage
+    // ADDED: This new constant represents the dedicated key for the PFP data URL.
+    const PROFILE_PICTURE_KEY = 'profilePictureData'; 
 
     // --- Utility Functions ---
     function getInitials(name) {
@@ -703,15 +704,15 @@
         localStorage.setItem(REGISTERED_USERS_KEY, JSON.stringify(users));
     }
 
-    // --- PROFILE PICTURE RENDERING (UPDATED to use user.avatarUrl) ---
+    // --- PROFILE PICTURE RENDERING (UPDATED to prioritize PROFILE_PICTURE_KEY) ---
     function renderProfilePicture(containerId, userData) {
         const container = document.getElementById(containerId);
         if (!container) return; 
         
         container.innerHTML = ''; 
 
-        // Load from the user data's avatarUrl field
-        const avatarData = userData.avatarUrl;
+        // 1. Check the dedicated profile picture key first (for cross-page sync)
+        const avatarData = localStorage.getItem(PROFILE_PICTURE_KEY);
 
         if (avatarData) {
             const img = document.createElement('img');
@@ -723,13 +724,12 @@
             container.style.fontSize = '0'; 
             
             img.onerror = () => {
-                // If the data URI is bad, clear it from user data and re-render
-                userData.avatarUrl = null;
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userData));
+                // If the data URI is bad, clear the dedicated key and re-render
+                localStorage.removeItem(PROFILE_PICTURE_KEY);
                 renderProfilePicture(containerId, userData); 
             };
         } else {
-            // Otherwise, render initials
+            // If the dedicated key is empty, render initials
             const span = document.createElement('span');
             span.textContent = getInitials(userData.name);
             span.classList.add('avatar-inner');
@@ -739,7 +739,7 @@
         }
     }
 
-    // --- PROFILE PICTURE HANDLER (Fixed to save only to user object) ---
+    // --- PROFILE PICTURE HANDLER (FIXED: Added PROFILE_PICTURE_KEY save) ---
     function handleProfilePictureUpdate(user) {
         const fileInput = document.getElementById('profilePictureInput');
         fileInput.click(); 
@@ -759,11 +759,14 @@
             reader.onload = function(e) {
                 const base64Image = e.target.result;
                 
-                // 1. Update session data
+                // 1. CRITICAL FIX: Save to the dedicated key for cross-page sync
+                localStorage.setItem(PROFILE_PICTURE_KEY, base64Image); 
+
+                // 2. Update session data (keep avatarUrl for backward/redundancy)
                 user.avatarUrl = base64Image;
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(user));
 
-                // 2. Update registeredUsers data
+                // 3. Update registeredUsers data (keep for database sync simulation)
                 let registeredUsers = getRegisteredUsers();
                 const userIndex = registeredUsers.findIndex(u => u.email === user.email);
                 if (userIndex !== -1) {
@@ -771,7 +774,7 @@
                     saveRegisteredUsers(registeredUsers);
                 }
 
-                // 3. Re-render the avatars on THIS page
+                // 4. Re-render the avatars on THIS page
                 renderProfilePicture('sidebar-avatar-container', user);
                 renderProfilePicture('info-avatar-container', user);
                 
@@ -784,7 +787,7 @@
         };
     }
 
-    // --- CORE USER DATA LOAD & CHECK ---
+    // --- CORE USER DATA LOAD & CHECK (Simplified logic) ---
     function loadUserData() {
         const loggedInUserString = localStorage.getItem(LOCAL_STORAGE_KEY);
         
@@ -797,6 +800,7 @@
 
         // --- Populate Page Elements ---
         
+        // IMPORTANT: renderProfilePicture will now use PROFILE_PICTURE_KEY
         renderProfilePicture('sidebar-avatar-container', user);
         renderProfilePicture('info-avatar-container', user);
 
@@ -824,8 +828,9 @@
         // --- Event Listeners for Dynamic Functionality ---
         const updateLink = document.getElementById('updatePictureLink');
         if (updateLink) {
+            // Pass the mutable user object reference
             updateLink.addEventListener('click', () => {
-                handleProfilePictureUpdate(user);
+                handleProfilePictureUpdate(user); 
             });
         }
         
@@ -835,6 +840,8 @@
             logoutBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 localStorage.removeItem(LOCAL_STORAGE_KEY); 
+                // ALSO REMOVE THE DEDICATED PFP KEY on logout
+                localStorage.removeItem(PROFILE_PICTURE_KEY); 
                 window.location.href = "{% url 'index' %}";
             });
         }

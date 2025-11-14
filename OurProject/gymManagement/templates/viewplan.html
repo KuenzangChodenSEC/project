@@ -442,21 +442,17 @@
 </head>
 <body>
 
-      <div id="messageBox"></div>
+    <div id="messageBox"></div>
 
     <aside class="sidebar">
         <div class="dashboard-header">Plan</div>
 
         <div class="admin-profile-sidebar">
             <div class="avatar" id="sidebar-avatar-container">
-                {% if user.profile.avatar %}
-                    <img src="{{ user.profile.avatar.url }}" class="profile-picture">
-                {% else %}
-                    <span class="avatar-inner initials">{{ user.get_initials }}</span>
-                {% endif %}
+                <span class="avatar-inner initials"></span>
             </div>
-            <div class="admin-name">{{ user.get_full_name }}</div>
-            <div class="admin-email">{{ user.email }}</div>
+            <div class="admin-name" id="sidebar-admin-name">Loading Name...</div>
+            <div class="admin-email" id="sidebar-admin-email">Loading Email...</div>
         </div>
 
         <div class="nav-links-container">
@@ -536,6 +532,7 @@
 
         </div>
     </div>
+    
     <script>
         // --- Core Utility Functions ---
         function showMessage(message, isError = false) {
@@ -563,14 +560,14 @@
             return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
         }
 
-        // --- NEW: Profile Picture Rendering Logic ---
+        // --- Profile Picture Rendering Logic ---
         function renderProfilePicture(containerId, userData) {
             const container = document.getElementById(containerId);
             if (!container) return; 
             
-            container.innerHTML = ''; // Clear existing content (initials or old image)
+            // Clear existing static content before rendering new data
+            container.innerHTML = ''; 
 
-            // The key is 'avatarUrl' as established in pfp.html
             if (userData.avatarUrl) {
                 // If Base64 image exists, render it as an <img>
                 const img = document.createElement('img');
@@ -581,14 +578,15 @@
             } else {
                 // Otherwise, render initials
                 const span = document.createElement('span');
-                span.textContent = getInitials(userData.name) || 'US';
-                span.classList.add('avatar-inner', 'initials'); // Use 'initials' class for styling
+                // Use the user name for initials, falling back to 'US'
+                span.textContent = getInitials(userData.name || 'Unknown User') || 'US';
+                span.classList.add('avatar-inner', 'initials');
                 container.appendChild(span);
             }
         }
 
 
-        // --- Authentication & Profile Logic (UPDATED) ---
+        // --- Authentication & Profile Logic (Client-Side) ---
         function checkAuthenticationAndLoadProfile() {
             const loggedInUserString = localStorage.getItem('loggedInUser');
             let user = null;
@@ -603,20 +601,27 @@
             }
             
             if (!user) {
-                console.warn("User not authenticated. Redirecting to login.html");
+                // Keep the default "Loading..." text if no user is found
+                console.warn("User not authenticated from local storage.");
                 // window.location.href = "login.html"; // Uncomment for actual redirection
                 return null;
             }
             
-            const adminName = user.name || 'User Name';
-            const adminEmail = user.email || 'authenticated@user.com';
+            // Safely retrieve name and email, providing functional defaults
+            const adminName = user.name || 'Authenticated User';
+            const adminEmail = user.email || 'user@localstorage.com';
             
-            // --- UPDATED: Render Profile Picture ---
+            // Render Profile Picture/Initials
             renderProfilePicture('sidebar-avatar-container', user);
 
             // Update Sidebar Text
-            document.getElementById('sidebar-admin-name').textContent = adminName;
-            document.getElementById('sidebar-admin-email').textContent = adminEmail;
+            const nameElement = document.getElementById('sidebar-admin-name');
+            const emailElement = document.getElementById('sidebar-admin-email');
+
+            // --- THIS IS THE KEY PART ---
+            // Update the text content of the HTML elements with IDs
+            if (nameElement) nameElement.textContent = adminName;
+            if (emailElement) emailElement.textContent = adminEmail;
             
             return user; 
         }
@@ -651,8 +656,9 @@
                     return [];
                 }
             } else {
+                // Default plans to initialize localStorage
                 const defaultPlans = [
-                    { id: '101', planName: 'Weekly Lite', validity: 0.25, amount: 200.00 }, // 0.25 months is roughly 1 week
+                    { id: '101', planName: 'Weekly Lite', validity: 0.25, amount: 200.00 }, // ~1 week
                     { id: '102', planName: 'Monthly Pro', validity: 1, amount: 800.00 },
                     { id: '103', planName: 'Yearly Premium', validity: 12, amount: 7500.00 },
                     { id: '104', planName: 'Quarterly Standard', validity: 3, amount: 2200.00 },
@@ -680,9 +686,15 @@
                 let aValue = a[key];
                 let bValue = b[key];
 
+                // Handle string comparison (case-insensitive)
                 if (typeof aValue === 'string') {
                     aValue = aValue.toLowerCase();
                     bValue = bValue.toLowerCase();
+                } 
+                // Handle numeric comparison for amount and validity
+                else if (key === 'amount' || key === 'validity') {
+                    aValue = parseFloat(aValue) || 0; // Use 0 for null/undefined to ensure stable sort
+                    bValue = parseFloat(bValue) || 0;
                 }
 
                 if (aValue < bValue) {
@@ -704,13 +716,21 @@
             sortPlans(); // Apply current sort before filtering/rendering
 
             const lowerSearchTerm = searchTerm.toLowerCase().trim();
-            const filteredPlans = plans.filter(plan =>
-                plan.planName && ( 
-                    plan.planName.toLowerCase().includes(lowerSearchTerm) ||
-                    (plan.validity && plan.validity.toString().includes(lowerSearchTerm)) ||
-                    (plan.amount && plan.amount.toString().includes(lowerSearchTerm))
-                )
-            );
+            const filteredPlans = plans.filter(plan => {
+                const nameMatch = plan.planName && plan.planName.toLowerCase().includes(lowerSearchTerm);
+                const amountMatch = plan.amount && plan.amount.toString().includes(lowerSearchTerm);
+                
+                // Add search for validity text (e.g., searching for "month" finds '1 Month')
+                let validityText = '';
+                if (plan.validity != null) {
+                     if (plan.validity === 0.25) validityText = '7 days';
+                     else if (plan.validity === 1) validityText = '1 month';
+                     else validityText = `${plan.validity} months`;
+                }
+                const validityMatch = validityText.toLowerCase().includes(lowerSearchTerm);
+                
+                return nameMatch || amountMatch || validityMatch;
+            });
 
             if (filteredPlans.length === 0) {
                 const row = `<tr><td colspan="3" style="text-align: center; color: var(--color-table-header);">No plans found.</td></tr>`;
@@ -721,12 +741,12 @@
             filteredPlans.forEach(plan => {
                 const row = document.createElement('tr');
                 
-                // Format amount to two decimal places and add currency prefix (Nu. for Bhutanese Ngultrum)
+                // Format amount
                 const amountDisplay = plan.amount ? `Nu.${parseFloat(plan.amount).toFixed(2)}` : 'N/A';
                 
                 // Display validity clearly
                 let validityText = 'N/A';
-                if (plan.validity) {
+                if (plan.validity != null) {
                     if (plan.validity === 0.25) {
                         validityText = '7 Days';
                     } else if (plan.validity === 1) {
@@ -738,7 +758,6 @@
                     }
                 }
                 
-                // Only showing Name, Validity, and Amount columns
                 row.innerHTML = `
                     <td>${plan.planName || 'No Name'}</td>
                     <td>${validityText}</td>
@@ -751,6 +770,7 @@
         // --- Event Handlers ---
 
         function handleSearch() {
+            // Debounce might be useful here for large data sets, but for simplicity, direct call is fine.
             renderPlans(currentPlans, searchInput.value);
         }
         
@@ -758,7 +778,12 @@
             e.preventDefault();
             localStorage.removeItem('loggedInUser'); 
             showMessage("Logged out successfully. Redirecting...", false);
-            // window.location.href = "login.html"; // Uncomment for actual redirection
+            
+            // Wait 0.5 seconds before redirecting to allow the user to see the message
+            setTimeout(() => {
+                // Use the actual URL from the anchor tag (Django URL)
+                window.location.href = e.currentTarget.href; 
+            }, 500); 
         }
         
         /**
@@ -768,14 +793,13 @@
             let targetHeader = e.currentTarget;
             let key = targetHeader.dataset.sortKey;
             
-            if (!key) return; // Not a sortable column
+            if (!key) return; 
 
             let currentDirection = targetHeader.dataset.sortDirection || 'none';
             let newDirection;
 
-            // Determine the new sort direction
+            // Logic to cycle through 'asc', 'desc', then reset/start 'asc' on a new column
             if (currentSort.key !== key) {
-                // Clicking a new column, default to ascending
                 newDirection = 'asc';
             } else if (currentDirection === 'none' || currentDirection === 'desc') {
                 newDirection = 'asc';
@@ -783,11 +807,10 @@
                 newDirection = 'desc';
             }
 
-            // Update global sort state
             currentSort.key = key;
             currentSort.direction = newDirection;
 
-            // Update header styles and icons
+            // Reset all headers
             tableHeaders.forEach(th => {
                 th.classList.remove('sorted');
                 th.dataset.sortDirection = 'none';
@@ -802,11 +825,7 @@
             targetHeader.dataset.sortDirection = newDirection;
             const activeIcon = targetHeader.querySelector('.sort-icon');
             if (activeIcon) {
-                if (newDirection === 'asc') {
-                    activeIcon.className = 'fas fa-sort-up sort-icon';
-                } else {
-                    activeIcon.className = 'fas fa-sort-down sort-icon';
-                }
+                activeIcon.className = (newDirection === 'asc') ? 'fas fa-sort-up sort-icon' : 'fas fa-sort-down sort-icon';
             }
 
             // Re-render the table
@@ -816,7 +835,7 @@
         // --- Initialization ---
 
         function initApp() {
-            // 1. Check Auth and Load Profile (Now includes PFP render)
+            // 1. Check Auth and Load Profile 
             checkAuthenticationAndLoadProfile();
             
             // 2. Load Plans and Render
@@ -827,14 +846,19 @@
             if (defaultHeader) {
                 defaultHeader.classList.add('sorted');
                 defaultHeader.dataset.sortDirection = currentSort.direction;
-                defaultHeader.querySelector('.sort-icon').className = 'fas fa-sort-up sort-icon';
+                const icon = defaultHeader.querySelector('.sort-icon');
+                if (icon) {
+                    icon.className = 'fas fa-sort-up sort-icon';
+                }
             }
 
             renderPlans(currentPlans);
             
             // 3. Setup Listeners
             searchInput.addEventListener('input', handleSearch);
-            logoutButton.addEventListener('click', handleLogout); 
+            if (logoutButton) {
+                logoutButton.addEventListener('click', handleLogout); 
+            }
             tableHeaders.forEach(header => {
                 header.addEventListener('click', handleSort);
             });
