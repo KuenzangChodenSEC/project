@@ -14,4 +14,6 @@ urlpatterns = [
     path('viewpayment/', views.view_payment, name='view_payment'),
     path('viewmembers/', views.view_members, name='view_members'),
     path('inventory/', views.inventory, name='inventory'),
+    path('update_payment_status/', views.update_payment_status, name='update_payment_status'),
+
 ]

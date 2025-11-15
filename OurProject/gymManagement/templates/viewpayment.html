@@ -249,7 +249,7 @@
         }
 
         .payment-list-card {
-            background-color: var(--color-table-bg);
+            background-color: #222;
             color: var(--color-table-row);
         }
 
@@ -617,23 +617,40 @@
                         </tr>
                     </thead>
                     <tbody id="payment-table-body">
-                        {% for member in members %}
-                        <tr>
-                            <td>{{ member.name }}</td>
-                            <td>{{ member.member_id }}</td>
-                            <td>
-                                {% if member.plan == 'weekly' %}1 week{% elif member.plan == 'monthly' %}1 month
-                                {% elif member.plan == 'biannually' %}6 months{% else %}{{ member.plan }}{% endif %}
-                            </td>
-                            <td>Nu. {{ member.price }}</td>
-                            <td></td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="5" style="text-align:center;">No members found.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
+    {% for member in members %}
+    <tr data-member-id="{{ member.member_id }}">
+        {# RESTORE: Get Name from the model #}
+        <td>{{ member.user_name }}</td> 
+        
+        {# RESTORE: Get Member ID from the model #}
+        <td>{{ member.member_id }}</td> 
+        
+        <td>
+            {# Plan display logic remains the same #}
+            {% if member.plan == 'weekly' %}1 week
+            {% elif member.plan == 'monthly' %}1 month
+            {% elif member.plan == 'biannually' %}6 months
+            {% elif member.plan == 'yearly' %}1 year
+            {% else %}{{ member.plan }}{% endif %}
+        </td>
+        <td>Nu. {{ member.price|floatformat:2 }}</td>
+        <td>
+            {# Action button logic remains the same (using the final, correct syntax) #}
+            <button 
+                class="action-button {% if member.payment_status|lower == 'paid' %}paid{% else %}unpaid{% endif %}" 
+                data-member-id="{{ member.member_id }}" 
+                data-member-name="{{ member.user_name }}" 
+                data-is-paid="{% if member.payment_status|lower == 'paid' %}true{% else %}false{% endif %}">
+                {% if member.payment_status|lower == 'paid' %}Paid{% else %}Pending{% endif %}
+            </button>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5" style="text-align:center;">No members found.</td>
+    </tr>
+    {% endfor %}
+</tbody>
                 </table>
             </div>
 
@@ -777,22 +794,35 @@
 
     // --- Data Loading and Sorting ---
 
-    function loadMemberData() {
-        // Fallback or mock data for client-side testing:
-        const dummyPayments = localStorage.getItem('mockPayments') ? JSON.parse(localStorage.getItem('mockPayments')) : [
-            { id: 1, user_name: 'Jane Doe', member_id: 'J00123456', plan_name: 'monthly', price: 950.00, payment_status: 'Paid' },
-            { id: 2, user_name: 'Alex Smith', member_id: 'A00987654', plan_name: 'yearly', price: 10500.00, payment_status: 'Pending' },
-            { id: 3, user_name: 'Bhuvan T.', member_id: 'B00543210', plan_name: 'weekly', price: 250.00, payment_status: 'Pending' },
-            { id: 4, user_name: 'Chris Lee', member_id: 'C00112233', plan_name: 'biannually', price: 5000.00, payment_status: 'Paid' },
-            { id: 5, user_name: 'Zoe Young', member_id: 'Z00778899', plan_name: 'monthly', price: 950.00, payment_status: 'Paid' },
-        ];
-        currentPayments = dummyPayments;
+   // --- Data Loading and Sorting ---
+
+function loadMemberData() {
+    // 1. Get the data initially rendered by Django template tags
+    const rows = paymentTableBody.querySelectorAll('tr[data-member-id]');
+    
+    currentPayments = Array.from(rows).map(row => {
+        const button = row.querySelector('button');
+        const cells = row.querySelectorAll('td');
         
-        // Clear the Django populated rows
-        paymentTableBody.innerHTML = ''; 
-        
-        renderPayments(currentPayments, searchInput.value, showEntriesSelect.value);
-    }
+        // --- KEY CHANGE: Extract Name and Member ID from the HTML cells ---
+        return {
+            id: row.dataset.memberId, 
+            user_name: cells[0].textContent.trim(), // Get Name from first cell
+            member_id: cells[1].textContent.trim(), // Get Member ID from second cell
+            
+            // Re-normalize plan_name for sorting consistency
+            plan_name: row.cells[2].textContent.trim().toLowerCase().replace(/ /g, '').replace('1week', 'weekly').replace('1month', 'monthly').replace('6months', 'biannually').replace('1year', 'yearly'),
+            price: parseFloat(cells[3].textContent.trim().replace('Nu.', '').replace(/,/g, '')),
+            payment_status: button.dataset.isPaid === 'true' ? 'Paid' : 'Pending',
+        };
+    });
+    
+    // 2. Clear the Django populated rows so renderPayments can take over
+    paymentTableBody.innerHTML = ''; 
+    
+    // 3. Render the data using current sort/filter/limit settings
+    renderPayments(currentPayments, searchInput.value, showEntriesSelect.value);
+}
     
     function sortPayments() {
         const { key, direction } = currentSort;
@@ -876,33 +906,71 @@
     }
 
     // --- Payment Toggle Handler ---
-    async function updateMemberPayment(memberId, newStatus) {
-        const memberIndex = currentPayments.findIndex(p => p.member_id === memberId);
-        if (memberIndex !== -1) {
-            currentPayments[memberIndex].payment_status = newStatus;
-            localStorage.setItem('mockPayments', JSON.stringify(currentPayments));
-            return;
+    // Function to get the CSRF token from Django's cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
         }
-        throw new Error("Member not found in payment list.");
+    }
+    return cookieValue;
+}
+const CSRF_TOKEN = getCookie('csrftoken');
+
+
+async function updateMemberPayment(memberId, newStatus) {
+    const url = '{% url "update_payment_status" %}'; // Django URL
+    
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': CSRF_TOKEN, // Include CSRF token for security
+        },
+        body: JSON.stringify({
+            member_id: memberId,
+            new_status: newStatus.toLowerCase(),
+        })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
     }
     
-    window.handlePaymentToggle = async function(memberId, memberName, isCurrentlyPaid) {
-        const newStatus = isCurrentlyPaid ? 'Pending' : 'Paid';
-        const confirmed = await showConfirmationModal(`Are you sure you want to set **${memberName}**'s payment status to **${newStatus}**?`);
-
-        if (!confirmed) {
-            showMessage(`Action canceled for ${memberName}.`, true);
-            return;
-        }
-
-        try {
-            await updateMemberPayment(memberId, newStatus);
-            showMessage(`Payment status for ${memberName} updated to ${newStatus}.`);
-            renderPayments(currentPayments, searchInput.value, showEntriesSelect.value); // Re-render table
-        } catch (error) {
-            showMessage(`Failed to update payment: ${error.message}`, true);
-        }
+    // If successful, update the client-side list to reflect the change
+    const memberIndex = currentPayments.findIndex(p => p.member_id === memberId);
+    if (memberIndex !== -1) {
+        currentPayments[memberIndex].payment_status = newStatus;
     }
+    
+    return response.json();
+}
+
+window.handlePaymentToggle = async function(memberId, memberName, isCurrentlyPaid) {
+    const newStatus = isCurrentlyPaid ? 'Pending' : 'Paid';
+    const confirmed = await showConfirmationModal(`Are you sure you want to set **${memberName}**'s payment status to **${newStatus}**?`);
+
+    if (!confirmed) {
+        showMessage(`Action canceled for ${memberName}.`, true);
+        return;
+    }
+
+    try {
+        await updateMemberPayment(memberId, newStatus);
+        showMessage(`Payment status for ${memberName} updated to ${newStatus}.`);
+        renderPayments(currentPayments, searchInput.value, showEntriesSelect.value); // Re-render table
+    } catch (error) {
+        showMessage(`Failed to update payment: ${error.message}`, true);
+    }
+}
     
     // --- Event Handlers ---
 

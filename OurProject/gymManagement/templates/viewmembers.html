@@ -636,16 +636,16 @@
                                 <td>{{ member.date_join|date:"M d, Y" }}</td>
                                 <td>{{ member.plan|capfirst }}</td>
                                 <td>
-                                    {% if member.plan == 'weekly' %}
-                                        {{ member.date_join|add:"7 days"|date:"M d, Y" }}
-                                    {% elif member.plan == 'monthly' %}
-                                        {{ member.date_join|add:"30 days"|date:"M d, Y" }}
-                                    {% elif member.plan == 'biannually' %}
-                                        {{ member.date_join|add:"182 days"|date:"M d, Y" }}
-                                    {% elif member.plan == 'yearly' %}
-                                        {{ member.date_join|add:"365 days"|date:"M d, Y" }}
-                                    {% endif %}
-                                </td>
+    {% if member.plan == 'weekly' %}
+        {{ member.date_join|add:"7 days"|date:"M d, Y" }}
+    {% elif member.plan == 'monthly' %}
+        {{ member.date_join|add:"30 days"|date:"M d, Y" }}
+    {% elif member.plan == 'biannually' %}
+        {{ member.date_join|add:"182 days"|date:"M d, Y" }}
+    {% elif member.plan == 'yearly' %}
+        {{ member.date_join|add:"365 days"|date:"M d, Y" }}
+    {% endif %}
+</td>
                                
                             </tr>
                             {% empty %}
@@ -664,6 +664,11 @@
 
         </div>
     </div>
+
+    <script>
+    currentMembers = JSON.parse('{{ members_json|safe }}');
+</script>
+
 
 
     <script>
